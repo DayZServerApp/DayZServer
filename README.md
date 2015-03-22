@@ -24,7 +24,8 @@ Release 1.0
 
 ## Credits
 
-VG7 http://steamcommunity.com/id/VG7/
+VG7 <a href="http://steamcommunity.com/id/VG7/" target="_blank">Join me on Steam</a>
+<a href="http://steamcommunity.com/id/VG7/">Join me on Steam</a>
 
 ## License
 
