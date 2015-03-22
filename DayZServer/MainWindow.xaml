@@ -15,10 +15,11 @@
             <BeginStoryboard Storyboard="{StaticResource Storyboard1}"/>
         </EventTrigger>
     </Window.Triggers>
+
     <Grid>
+
         <Image HorizontalAlignment="Left" Height="350" VerticalAlignment="Top" Width="580" Source="images/1.png"/>
         <TextBox x:Name="serverTextBox" HorizontalAlignment="Left" Height="48" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="557" Background="{x:Null}" FontSize="18" Foreground="White" BorderBrush="{x:Null}"/>
-        <TextBox x:Name="serverList" HorizontalAlignment="Left" Height="137" Margin="33,83,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="504" Foreground="White" Background="{x:Null}" FontSize="14" BorderBrush="{x:Null}"/>
         <Label Content="Standalone Version" HorizontalAlignment="Left" Margin="324,322,0,0" VerticalAlignment="Top" Background="{x:Null}" Foreground="White" FontSize="14" Width="129" HorizontalContentAlignment="Right"/>
         <Label x:Name="versionlabel" Content="" HorizontalAlignment="Left" Margin="453,322,0,0" VerticalAlignment="Top" Foreground="White" Background="{x:Null}" FontSize="14" Width="114"/>
 
@@ -39,14 +40,12 @@
                     </LinearGradientBrush>
                 </Ellipse.Stroke>
             </Ellipse>
-
         </Canvas>
 
-
-
-
-
-
-
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="23,74,24,145">
+            <TextBlock x:Name="serverList" TextWrapping="Wrap" VerticalAlignment="Top" Width="535" Foreground="White" Background="{x:Null}" FontSize="14"  AllowDrop="False" HorizontalAlignment="Left" TextAlignment="Justify"/>
+        </ScrollViewer>
+        <Button x:Name="clear_button" Content="Clear History" Canvas.Left="77" Canvas.Top="286" Width="182" Background="#FF6F0000" Foreground="White" Click="ClearHistory" FontSize="18" BorderBrush="{x:Null}" Margin="70,253,330,70"/>
     </Grid>
+
 </Window>
