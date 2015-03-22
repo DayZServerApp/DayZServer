@@ -24,7 +24,7 @@ Release 1.0
 
 ## Credits
 
-VG7
+VG7 http://steamcommunity.com/id/VG7/
 
 ## License
 
