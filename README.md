@@ -1,11 +1,10 @@
-# DayZServer
+<snippet>
+  <content><![CDATA[
+# ${1:Project Name}
 
 
 ![alt tag](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot.png)
 
-<snippet>
-  <content><![CDATA[
-# ${1:Project Name}
 
 TODO: Write a project description
 
