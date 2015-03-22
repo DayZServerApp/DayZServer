@@ -9,7 +9,7 @@ Run the DayZServer.exe
 
 ## Usage
 
-Source code is C# .Net
+Source code is C# .Net developed using Visual Studio 2013
 
 ## Contributing
 
