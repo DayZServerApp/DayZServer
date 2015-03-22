@@ -3,7 +3,7 @@
 ![alt tag](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot.png)
 
 ## Installation
-Download the release from Github https://github.com/DayZServerApp/DayZServer/releases/tag/1.0
+Download the release from Github https://github.com/DayZServerApp/DayZServer/releases
 
 Run the DayZServer.exe
 
