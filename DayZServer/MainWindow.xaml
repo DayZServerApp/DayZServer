@@ -1,0 +1,52 @@
+﻿<Window x:Class="DayZServer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DayZ Server" Height="392" Width="588" Background="Black" ResizeMode="NoResize" Icon="images/icon.png">
+
+    <Window.Resources>
+        <Storyboard x:Key="Storyboard1" RepeatBehavior="Forever">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ellipse" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)">
+                <SplineDoubleKeyFrame KeyTime="00:00:02" Value="360"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Window.Resources>
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource Storyboard1}"/>
+        </EventTrigger>
+    </Window.Triggers>
+    <Grid>
+        <Image HorizontalAlignment="Left" Height="350" VerticalAlignment="Top" Width="580" Source="images/1.png"/>
+        <TextBox x:Name="serverTextBox" HorizontalAlignment="Left" Height="48" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="557" Background="{x:Null}" FontSize="18" Foreground="White" BorderBrush="{x:Null}"/>
+        <TextBox x:Name="serverList" HorizontalAlignment="Left" Height="137" Margin="33,83,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="504" Foreground="White" Background="{x:Null}" FontSize="14" BorderBrush="{x:Null}"/>
+        <Label Content="Standalone Version" HorizontalAlignment="Left" Margin="324,322,0,0" VerticalAlignment="Top" Background="{x:Null}" Foreground="White" FontSize="14" Width="129" HorizontalContentAlignment="Right"/>
+        <Label x:Name="versionlabel" Content="" HorizontalAlignment="Left" Margin="453,322,0,0" VerticalAlignment="Top" Foreground="White" Background="{x:Null}" FontSize="14" Width="114"/>
+
+        <Canvas x:Name="c" HorizontalAlignment="Left" Height="361" VerticalAlignment="Top" Width="580" Background="Black">
+            <Image HorizontalAlignment="Left" Height="350" VerticalAlignment="Top" Width="580" Source="images/1.png"/>
+            <Ellipse x:Name="ellipse" StrokeThickness="5" RenderTransformOrigin="0.5,0.5" Height="55" Canvas.Left="257" Canvas.Top="148" Width="55">
+                <Ellipse.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                    </TransformGroup>
+                </Ellipse.RenderTransform>
+                <Ellipse.Stroke>
+                    <LinearGradientBrush EndPoint="0.445,0.997" StartPoint="0.555,0.003">
+                        <GradientStop Color="#FF270000" Offset="0"/>
+                        <GradientStop Color="#FF890000" Offset="1"/>
+                    </LinearGradientBrush>
+                </Ellipse.Stroke>
+            </Ellipse>
+
+        </Canvas>
+
+
+
+
+
+
+
+    </Grid>
+</Window>
