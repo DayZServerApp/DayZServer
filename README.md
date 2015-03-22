@@ -24,7 +24,7 @@ Release 1.0
 
 ## Credits
 
-VG7 <a href="http://steamcommunity.com/id/VG7/" target="_blank">Join me on Steam</a>
+VectorG7 <a href="http://steamcommunity.com/id/VG7/" target="_blank">Join me on Steam</a>
 
 
 ## License
