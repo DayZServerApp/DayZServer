@@ -4,6 +4,7 @@
 
 ## Installation
 Download the release from Github https://github.com/DayZServerApp/DayZServer/releases/tag/1.0
+
 Run the DayZServer.exe
 
 ## Usage
