@@ -16,6 +16,8 @@ using System.IO;
 using System.Timers;
 using System.Windows.Media.Animation;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace DayZServer
 {
@@ -26,6 +28,11 @@ namespace DayZServer
     {
 
         private static Timer aTimer;
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindowAsync(HandleRef hWnd, int nCmdShow);
+        [DllImport("user32.dll")]
+        public static extern bool SetForegroundWindow(IntPtr WindowHandle);
+        public const int SW_RESTORE = 9;
 
         public MainWindow()
         {
@@ -35,8 +42,10 @@ namespace DayZServer
             // Hook up the Elapsed event for the timer. 
             aTimer.Elapsed += OnTimedEvent;
             aTimer.Enabled = true;
-            clear_button.Visibility = Visibility.Hidden;
-   
+            remove_button.Visibility = Visibility.Hidden;
+            join_button.Visibility = Visibility.Hidden;
+            browse_dialog.Visibility = Visibility.Hidden;
+
         }
 
         void OnTimedEvent(Object source, ElapsedEventArgs e)
@@ -52,16 +61,25 @@ namespace DayZServer
                 string json = System.IO.File.ReadAllText(configpath);
                 string servername = json.Split(new string[] { "lastMPServerName=\"" }, StringSplitOptions.None)[1].Split(new string[] { "\";" }, StringSplitOptions.None)[0].Trim();
                 Console.WriteLine("Server Name" + servername);
-                string IPAddress = json.Split(new string[] { "lastMPServer=\""}, StringSplitOptions.None)[1].Split(new string[] { "\";" }, StringSplitOptions.None)[0].Trim();
+                string IPAddress = json.Split(new string[] { "lastMPServer=\"" }, StringSplitOptions.None)[1].Split(new string[] { "\";" }, StringSplitOptions.None)[0].Trim();
                 Console.WriteLine("IP Address" + IPAddress);
                 string version = json.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
                 Console.WriteLine("Version" + version);
                 string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
                 string path = System.IO.Path.Combine(appDataPath, "DayZServer");
-                
+                //string steam = "\\Steam\\SteamApps\\common\\DayZ\\";
+                string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
+
+                if (!File.Exists(dayzapppath))
+                {
+                    string dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
+                    writeAppPath(dayzpath);
+                }
+
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
+
                 }
 
 
@@ -83,11 +101,11 @@ namespace DayZServer
                         else
                         {
                             serverList.Text = "No Server History Available";
-                            clear_button.Visibility = Visibility.Hidden;
+                            remove_button.Visibility = Visibility.Hidden;
                         }
 
                         writeCurrentServer(currentserverpath, servername + "\r\nIP Address: " + IPAddress);
-                        
+
                     }
                     else
                     {
@@ -118,7 +136,7 @@ namespace DayZServer
 
             if (File.Exists(serverhistorypath))
             {
-                clear_button.Visibility = Visibility.Visible;
+                remove_button.Visibility = Visibility.Visible;
                 string temphistory;
 
                 try
@@ -137,8 +155,8 @@ namespace DayZServer
                         sw.Write(temphistory);
                         sw.Close();
                         readServerHistoryList(serverhistorypath);
-                        
-                        
+
+
                     }
 
 
@@ -150,7 +168,7 @@ namespace DayZServer
             }
             else
             {
-                clear_button.Visibility = Visibility.Visible;
+                remove_button.Visibility = Visibility.Visible;
                 try
                 {
 
@@ -164,7 +182,7 @@ namespace DayZServer
                             sw.WriteLine(server);
                             sw.Close();
                             readServerHistoryList(serverhistorypath);
-                            
+
                         }
 
                     }
@@ -192,6 +210,8 @@ namespace DayZServer
                         String line = sw.ReadToEnd();
                         serverList.Text = line;
                     }
+
+                    remove_button.Visibility = Visibility.Visible;
                 }
                 catch (Exception e)
                 {
@@ -213,6 +233,7 @@ namespace DayZServer
 
             if (File.Exists(currentserverpath))
             {
+                join_button.Visibility = Visibility.Visible;
                 try
                 {
                     // Create an instance of StreamReader to read from a file. 
@@ -238,6 +259,8 @@ namespace DayZServer
 
         }
 
+
+
         public void writeCurrentServer(string currentserverpath, string server)
         {
             try
@@ -262,6 +285,67 @@ namespace DayZServer
             }
         }
 
+        public void writeAppPath(string dayzpath)
+        {
+            try
+            {
+                string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+                string path = System.IO.Path.Combine(appDataPath, "DayZServer");
+                string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
+
+                using (StreamWriter sw = File.CreateText(dayzapppath))
+                {
+
+                    if (sw.BaseStream != null)
+                    {
+                        sw.WriteLine(dayzpath);
+                        sw.Close();
+                    }
+
+                }
+
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        String readAppPath(string dayzapppath)
+        {
+
+            if (File.Exists(dayzapppath))
+            {
+
+                try
+                {
+                    // Create an instance of StreamReader to read from a file. 
+                    // The using statement also closes the StreamReader. 
+                    using (StreamReader sw = new StreamReader(dayzapppath))
+                    {
+                        String line = sw.ReadToEnd();
+                        return line;
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Let the user know what went wrong.
+                    string dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
+                    return dayzpath;
+                }
+            }
+            else
+            {
+                string dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
+                writeAppPath(dayzpath);
+                return dayzpath;
+            }
+
+        }
+
+
+
+
         private void ClearHistory(object sender, RoutedEventArgs e)
         {
             string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
@@ -270,19 +354,132 @@ namespace DayZServer
             if (File.Exists(serverhistorypath))
             {
                 File.Delete(serverhistorypath);
-               
+
             }
 
             serverList.Text = "No Server History Available";
-            clear_button.Visibility = Visibility.Hidden;
-            
+            remove_button.Visibility = Visibility.Hidden;
+
+        }
+
+        public bool IsProcessOpen(string name)
+        {
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.ProcessName.Equals(name))
+                {
+                    //clsProcess.Kill();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        private void JoinServer(object sender, RoutedEventArgs e)
+        {
+            string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+            string path = System.IO.Path.Combine(appDataPath, "DayZServer");
+            string latestserverpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzserver.txt");
+
+            if (File.Exists(latestserverpath))
+            {
+                var lines = File.ReadAllLines(latestserverpath);
+                string server = lines[1].ToString();
+                server = server.Remove(0, 12);
+
+                // start the game seperated from this process.
+                using (Process game = new Process())
+                {
+                    string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
+                    string dayzpath = readAppPath(dayzapppath);
+                    dayzpath = dayzpath.TrimEnd('\r', '\n');
+                    if (File.Exists(dayzpath))
+                    {
+                        try
+                        {
+                            Process thisProc = Process.GetCurrentProcess();
+                            if (IsProcessOpen("DayZ") == false)
+                            {
+                                ProcessStartInfo startInf = new ProcessStartInfo(dayzpath);
+                                startInf.Arguments = "-connect=" + server;
+                                game.StartInfo = startInf;
+                                game.Start();
+                            }
+                            else
+                            {
+
+                                Process[] objProcesses = System.Diagnostics.Process.GetProcessesByName("DayZ");
+                                if (objProcesses.Length > 0)
+                                {
+
+                                    //******Works to bring the app to the foreground but cant pass the server Argument so just commented this. 
+                                    //IntPtr hWnd = IntPtr.Zero;
+                                    //hWnd = objProcesses[0].MainWindowHandle;
+                                    //ShowWindowAsync(new HandleRef(null,hWnd), SW_RESTORE);
+                                    //SetForegroundWindow(objProcesses[0].MainWindowHandle);
+
+                                    //******could not get Steam to pass the server Argument so just killed the app and start it up. 
+
+                                    objProcesses[0].Kill();
+                                    ProcessStartInfo startInf = new ProcessStartInfo(dayzpath);
+                                    startInf.Arguments = "-connect=" + server;
+                                    game.StartInfo = startInf;
+                                    game.Start();
+
+                                }
+
+                            }
+
+
+                        }
+                        catch (Exception err)
+                        {
+                            Console.WriteLine(err.Message);
+                        }
+                    }
+                    else
+                    {
+                        browse_dialog.Visibility = Visibility.Visible;
+                    }
+
+
+
+
+                }
+            }
+        }
+
+
+
+
+        private void cancel_click(object sender, RoutedEventArgs e)
+        {
+            browse_dialog.Visibility = Visibility.Hidden;
+        }
+
+        private void browse_click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+            // Set filter for file extension and default file extension 
+            dlg.DefaultExt = ".exe";
+
+            // Display OpenFileDialog by calling ShowDialog method 
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                // Open document 
+                string filename = dlg.FileName;
+                browse_dialog.Visibility = Visibility.Hidden;
+                writeAppPath(filename);
+
+            }
         }
 
 
     }
-
-
-
 }
 
 
