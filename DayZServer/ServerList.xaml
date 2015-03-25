@@ -1,0 +1,178 @@
+﻿<Window x:Class="DayZServer.Window1"
+
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+
+        Title="Window1" Width="1024" Height="768" WindowStartupLocation="Manual" WindowState="Maximized">
+
+
+
+    <DockPanel Margin="0,0,2,0">
+        <ToolBarTray Height="70" DockPanel.Dock="Top" Background="White" HorizontalAlignment="Right" Width="1016">
+            <ToolBar Height="70" Width="384" Margin="632,0,-992,-57" Background="White">
+                <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map" Width="135">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="images/appicon.png" />
+                        <TextBlock Margin="3,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">Map</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button  ToolTip="Steam Login" Width="133" Margin="0,10" Click="steam_click">
+                    <Image Source="images/sits_large_noborder.png"/>
+                </Button>
+                <Button  ToolTip="Steam Login" Width="91" Click="steam_click">
+                    <Image Source="images/button.png"/>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+
+
+
+        <DataGrid  Name="severList" AutoGenerateColumns="False" GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top">
+
+            <DataGrid.Columns>
+
+                <DataGridTemplateColumn Header="Server Name" Width="auto" MaxWidth="500" SortMemberPath="ServerName" IsReadOnly="True">
+
+                    <DataGridTemplateColumn.CellTemplate>
+
+                        <DataTemplate>
+
+                            <TextBlock Text="{Binding ServerName}" Foreground="#FF5B5B5B" Cursor="Hand" FontSize="18" Margin="10,10,0,10" />
+
+                        </DataTemplate>
+
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="IP Address" Width="150" SortMemberPath="IPAddress">
+
+                    <DataGridTemplateColumn.CellTemplate>
+
+                        <DataTemplate>
+
+                            <TextBlock Text="{Binding IPAddress}" Foreground="#FF5B5B5B" Cursor="Hand" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                        </DataTemplate>
+
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date">
+
+                    <DataGridTemplateColumn.CellTemplate>
+
+                        <DataTemplate>
+
+                            <TextBlock Text="{Binding Date}" Foreground="#FF9B9B9C" Cursor="Hand" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                        </DataTemplate>
+
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="100">
+
+                    <DataGridTemplateColumn.CellTemplate>
+
+                        <DataTemplate>
+
+                            <Button Click="Join_Click" Content="Join" Height="25" VerticalAlignment="Center" Width="75" BorderBrush="{x:Null}" Tag="{Binding IPAddress}" Foreground="#FF919191"/>
+
+                        </DataTemplate>
+
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="100">
+
+                    <DataGridTemplateColumn.CellTemplate>
+
+                        <DataTemplate>
+
+                            <!--<ToggleButton x:Name="pbStations" Template="{StaticResource ContentOnlyTemplateToggleButton}">
+
+                                    <Image Margin="2" Stretch="Uniform" x:Name="img">
+
+                                        <Image.Style>
+
+                                            <Style TargetType="Image">
+
+                                                <Style.Triggers>
+
+                                                    <DataTrigger Binding="{Binding ElementName=pbStations,Path=IsChecked}" Value="True">
+
+                                                    <Setter Property="Source" Value="images/checkmarkon.png" />
+
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding ElementName=pbStations,Path=IsChecked}" Value="False">
+
+                                                    <Setter Property="Source" Value="images/checkmarkoff.png" />
+
+                                                    </DataTrigger>
+
+                                                </Style.Triggers>
+
+                                            </Style>
+
+                                        </Image.Style>
+
+                                    </Image>
+
+                            </ToggleButton>-->
+
+                        </DataTemplate>
+
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+
+        </DataGrid>
+        <Canvas x:Name="steamLogin" Height="212" VerticalAlignment="Top" Width="440" Margin="0,188,0,0" Background="#FFF3F4F6">
+            <StackPanel Height="46" Canvas.Left="30" Canvas.Top="62">
+                <TextBox x:Name="userId" Height="35" TextWrapping="Wrap" Text="UserID" Width="200" Padding="5,4,5,5" FontSize="18" BorderBrush="#FFDADADA" Foreground="#FF747474" GotKeyboardFocus="userIdGotKeyboardFocus" LostKeyboardFocus="userIdLostKeyboardFocus"/>
+            </StackPanel>
+            <StackPanel Height="58" Canvas.Left="30" Canvas.Top="108" Width="200">
+                <PasswordBox x:Name="password"  Padding="5,10,5,5" PasswordChar="*" Height="35" BorderBrush="#FFDADADA" Password="asdfadsfasdf"/>
+            </StackPanel>
+            <StackPanel Height="58" Canvas.Left="255" Canvas.Top="84" Width="152">
+                <TextBox x:Name="authCodeBox" Height="35" TextWrapping="Wrap" Text="Auth Code" Padding="5,4,5,5" FontSize="18" BorderBrush="#FFDADADA" Foreground="#FF747474"/>
+            </StackPanel>
+            <StackPanel Height="40" Canvas.Left="197" Canvas.Top="158" Width="220" Orientation="Horizontal">
+                <Button Content="Login"  Height="35" BorderBrush="{x:Null}" Width="100" Margin="0,2,15,2" FontSize="18" Foreground="#FF636363" Click="login_click"/>
+                <Button Content="Cancel" Height="35" BorderBrush="{x:Null}" Width="100" Margin="0,2" FontSize="18" Foreground="#FF636363" Click="cancelLogin_Click"/>
+
+            </StackPanel>
+            <Canvas Height="47" Width="440">
+                <Image Source="images/globalheader_logo.png" HorizontalAlignment="Right" Height="47" Width="111" Canvas.Left="319" />
+                <Label Content="Login" Canvas.Left="10" Canvas.Top="6" Foreground="White" Width="134" FontSize="18"/>
+                <Canvas.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF7AAE35" Offset="0"/>
+                        <GradientStop Color="#FF47661F" Offset="1"/>
+                    </LinearGradientBrush>
+                </Canvas.Background>
+
+            </Canvas>
+
+
+        </Canvas>
+
+
+
+
+
+
+
+
+
+    </DockPanel>
+
+</Window>
