@@ -1,4 +1,4 @@
-﻿<Window x:Class="DayZServer.Window1"
+﻿<Window x:Class="Steam.Window1"
 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 
