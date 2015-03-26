@@ -19,7 +19,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Steam
+namespace DayZServer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
