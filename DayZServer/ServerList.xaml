@@ -4,7 +4,7 @@
 
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 
-        Title="Window1" Width="1024" Height="768" WindowStartupLocation="Manual" WindowState="Maximized">
+        Title="DayZServer" Width="1024" Height="768" WindowStartupLocation="Manual" WindowState="Maximized" Icon="images/icon.png">
 
 
 
@@ -153,6 +153,7 @@
             <Canvas Height="47" Width="440">
                 <Image Source="images/globalheader_logo.png" HorizontalAlignment="Right" Height="47" Width="111" Canvas.Left="319" />
                 <Label Content="Login" Canvas.Left="10" Canvas.Top="6" Foreground="White" Width="134" FontSize="18"/>
+                <Label x:Name="statusMessage" Content="" Canvas.Left="72" Canvas.Top="12" Width="242" Foreground="White"/>
                 <Canvas.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                         <GradientStop Color="#FF7AAE35" Offset="0"/>
