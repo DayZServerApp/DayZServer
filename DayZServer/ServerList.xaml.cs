@@ -16,6 +16,7 @@ using DayZServer;
 using System.IO;
 using System.Threading;
 using System.Timers;
+using Steam;
 
 
 
@@ -32,7 +33,7 @@ namespace DayZServer
     public partial class Window1 : Window
     {
         private static System.Timers.Timer aTimer;
-        
+
         public Window1()
         {
 
@@ -46,17 +47,17 @@ namespace DayZServer
             aTimer = new System.Timers.Timer(4000);
             aTimer.Elapsed += OnTimedEvent;
             aTimer.Enabled = true;
-            
 
-           
-            
+
+
+
 
             steamLogin.Visibility = Visibility.Hidden;
             //authCodeBox.Visibility = Visibility.Hidden;
 
         }
 
-       
+
 
         public class Server
         {
@@ -75,8 +76,8 @@ namespace DayZServer
 
             public string Favorite { get; set; }
 
-            
-            
+
+
 
         }
 
@@ -93,9 +94,9 @@ namespace DayZServer
                     {
                         severList.ItemsSource = dm.getServerList(dm.serverhistorypath);
                     }
-                    
-                   
-                   
+
+
+
                 }));
             }
             catch (Exception err)
@@ -117,7 +118,7 @@ namespace DayZServer
             string IPAddress = ((Button)sender).Tag.ToString();
         }
 
-       
+
 
         private void steam_click(object sender, RoutedEventArgs e)
         {
@@ -150,7 +151,7 @@ namespace DayZServer
                 source.Text = "UserID";
             }
         }
-        
+
 
         private void login_click(object sender, RoutedEventArgs e)
         {
@@ -158,12 +159,12 @@ namespace DayZServer
             string steampassword = password.Password;
             string steamAuthCode = authCodeBox.Text;
 
-            string[] arr1 = new string[] { steamid, steampassword, steamAuthCode, steamAuthCode};
+            string[] arr1 = new string[] { steamid, steampassword, steamAuthCode, steamAuthCode };
 
-             SteamAccess v1 = new SteamAccess();
-             SteamAccess.Login(arr1);
+            SteamAccess v1 = new SteamAccess();
+            SteamAccess.Login(arr1);
 
-           
+
         }
 
         private void cancelLogin_Click(object sender, RoutedEventArgs e)
