@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Threading;
-using Steam;
+using DayZServer;
 using SteamKit2;
 
 //
@@ -37,7 +37,7 @@ using SteamKit2;
 // 2. logon to account using username, password, and sha-1 hash of the sentry file
 
 
-namespace Steam
+namespace DayZServer
 {
     public class SteamAccess
     {
@@ -45,12 +45,9 @@ namespace Steam
         static CallbackManager manager;
         static SteamFriends steamFriends;
         static SteamUser steamUser;
-        
         static bool isRunning;
-
         static string user, pass;
         static string authCode, twoFactorAuth;
-
 
        public static void Login( string[] args )
         {
@@ -65,8 +62,6 @@ namespace Steam
             pass = args[1];
             authCode = args[2];
             twoFactorAuth = args[3];
-
-
             // create our steamclient instance
             steamClient = new SteamClient(System.Net.Sockets.ProtocolType.Tcp);
             // create the callback manager which will route callbacks to function calls
@@ -148,16 +143,11 @@ namespace Steam
             } );
         }
 
-        static void OnDisconnected( SteamClient.DisconnectedCallback callback )
+        static void OnDisconnected(SteamClient.DisconnectedCallback callback)
         {
-            // after recieving an AccountLogonDenied, we'll be disconnected from steam
-            // so after we read an authcode from the user, we need to reconnect to begin the logon flow again
+            Console.WriteLine("Disconnected from Steam");
 
-            Console.WriteLine( "Disconnected from Steam, reconnecting in 5..." );
-
-            Thread.Sleep( TimeSpan.FromSeconds( 5 ) );
-
-            steamClient.Connect();
+            isRunning = false;
         }
 
         static void OnLoggedOn( SteamUser.LoggedOnCallback callback )
