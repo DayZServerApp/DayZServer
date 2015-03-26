@@ -190,7 +190,7 @@ namespace Steam
             }
 
             Console.WriteLine("Successfully logged on!");
-            Window1 mainwindow2 = new Window1();
+            
 
 
             // at this point, we'd be able to perform actions on Steam

@@ -17,8 +17,8 @@ using System.IO;
 using System.Threading;
 using System.Timers;
 using Steam;
-
-
+using System.Data;
+using System.ComponentModel;
 
 
 namespace DayZServer
@@ -36,49 +36,24 @@ namespace DayZServer
 
         public Window1()
         {
-
             InitializeComponent();
-            //List<Server> items = new List<Server>();
-            //items.Add(new Server() { ServerName = "Server 1 test dont go there because its ...", IPAddress = "192.168.0.456", Date = "01-22-2015 : 10:30 AM", Favorite = "1" });
-            //items.Add(new Server() { ServerName = "Off the Cloud Server Death Zone 5", IPAddress = "192.168.0.275", Date = "01-22-2015 : 10:30 AM", Favorite = "4" });
-            //items.Add(new Server() { ServerName = "Joe's Jimmy Joe SAW Only Bambies Welcome Joe's Jimmy Joe SAW Only Bambies Welcome Joe's Jimmy Joe SAW Only Bambies Welcome", IPAddress = "192.168.0.756", Date = "01-22-2015 : 10:30 AM", Favorite = "5" });
-            //severList.ItemsSource = items;
-
             aTimer = new System.Timers.Timer(4000);
             aTimer.Elapsed += OnTimedEvent;
             aTimer.Enabled = true;
-
-
-
-
-
             steamLogin.Visibility = Visibility.Hidden;
-            //authCodeBox.Visibility = Visibility.Hidden;
-
         }
 
-
+        public class RootObject
+        {
+            public List<Server> Server { get; set; }
+        }
 
         public class Server
         {
-
             public string ServerName { get; set; }
-
-
-
-            public string IPAddress { get; set; }
-
-
-
-            public string Date { get; set; }
-
-
-
+            public string IP_Address { get; set; }
+            public DateTime Date { get; set; }
             public string Favorite { get; set; }
-
-
-
-
         }
 
         void OnTimedEvent(Object source, ElapsedEventArgs e)
@@ -88,14 +63,37 @@ namespace DayZServer
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     DataManager dm = new DataManager();
-
                     dm.writeServerHistoryList();
                     if (dm.getServerList(dm.serverhistorypath) != null)
                     {
+                        string dgSortDescription = null;
+                        ListSortDirection? dgSortDirection = null;
+                        int columnIndex = 0;
+                        System.Collections.ObjectModel.ObservableCollection<DataGrid> itemsColl = null;
+
+                        foreach (DataGridColumn column in severList.Columns)
+                        {
+                            columnIndex++;
+
+                            if (column.SortDirection != null)
+                            {
+                                dgSortDirection = column.SortDirection;
+                                dgSortDescription = column.SortMemberPath;
+
+                                break;
+                            }
+                        }
+
                         severList.ItemsSource = dm.getServerList(dm.serverhistorypath);
+
+                        if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
+                        {
+                            SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
+                            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(severList.ItemsSource);
+                            view.SortDescriptions.Add(s);
+                            severList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
+                        }
                     }
-
-
 
                 }));
             }
@@ -103,9 +101,9 @@ namespace DayZServer
             {
                 Console.WriteLine("The process failed: {0}", err.ToString());
             }
-            Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+            
+            //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
         }
-
 
         private void Link_Click(object sender, RoutedEventArgs e)
         {
@@ -118,17 +116,9 @@ namespace DayZServer
             string IPAddress = ((Button)sender).Tag.ToString();
         }
 
-
-
         private void steam_click(object sender, RoutedEventArgs e)
         {
             steamLogin.Visibility = Visibility.Visible;
-        }
-
-        private void login_close()
-        {
-
-
         }
 
 
@@ -152,7 +142,6 @@ namespace DayZServer
             }
         }
 
-
         private void login_click(object sender, RoutedEventArgs e)
         {
             string steamid = userId.Text;
@@ -163,8 +152,6 @@ namespace DayZServer
 
             SteamAccess v1 = new SteamAccess();
             SteamAccess.Login(arr1);
-
-
         }
 
         private void cancelLogin_Click(object sender, RoutedEventArgs e)
@@ -173,9 +160,5 @@ namespace DayZServer
             userId.Foreground = Brushes.LightGray;
             userId.Text = "UserID";
         }
-
-
-
     }
-
 }

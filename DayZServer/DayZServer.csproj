@@ -138,6 +138,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="VG7.DayZProfile" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

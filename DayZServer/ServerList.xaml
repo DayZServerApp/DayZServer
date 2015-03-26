@@ -28,11 +28,11 @@
 
 
 
-        <DataGrid  Name="severList" AutoGenerateColumns="False" GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top">
+        <DataGrid  Name="severList" CanUserAddRows="False" AutoGenerateColumns="False" GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top">
 
             <DataGrid.Columns>
 
-                <DataGridTemplateColumn Header="Server Name" Width="auto" MaxWidth="500" SortMemberPath="ServerName" IsReadOnly="True">
+                <DataGridTemplateColumn Header="Server Name" Width="auto" SortMemberPath="ServerName" IsReadOnly="True" MinWidth="500">
 
                     <DataGridTemplateColumn.CellTemplate>
 
@@ -46,13 +46,13 @@
 
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="IP Address" Width="150" SortMemberPath="IPAddress">
+                <DataGridTemplateColumn Header="IP Address" Width="150" SortMemberPath="IP_Address">
 
                     <DataGridTemplateColumn.CellTemplate>
 
                         <DataTemplate>
 
-                            <TextBlock Text="{Binding IPAddress}" Foreground="#FF5B5B5B" Cursor="Hand" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding IP_Address}" Foreground="#FF5B5B5B" Cursor="Hand" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                         </DataTemplate>
 
@@ -60,7 +60,7 @@
 
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date">
+                <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date" SortDirection="Descending">
 
                     <DataGridTemplateColumn.CellTemplate>
 
@@ -80,7 +80,7 @@
 
                         <DataTemplate>
 
-                            <Button Click="Join_Click" Content="Join" Height="25" VerticalAlignment="Center" Width="75" BorderBrush="{x:Null}" Tag="{Binding IPAddress}" Foreground="#FF919191"/>
+                            <Button Click="Join_Click" Content="Join" Height="25" VerticalAlignment="Center" Width="75" BorderBrush="{x:Null}" Tag="{Binding IP_Address}" Foreground="#FF919191"/>
 
                         </DataTemplate>
 

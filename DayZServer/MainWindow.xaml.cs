@@ -230,7 +230,6 @@ namespace DayZServer
 
         String readCurrentServer(string currentserverpath)
         {
-
             if (File.Exists(currentserverpath))
             {
                 join_button.Visibility = Visibility.Visible;
@@ -247,13 +246,12 @@ namespace DayZServer
                 }
                 catch (Exception e)
                 {
-                    // Let the user know what went wrong.
+                    Console.WriteLine(e.Message);
                     return "Saving history requires Windows Administrator Privilages";
                 }
             }
             else
             {
-                //writeServerHistoryList(currentserverpath, "No Server History Available");
                 return "No Server History Available";
             }
 
