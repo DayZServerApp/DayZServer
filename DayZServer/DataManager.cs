@@ -9,10 +9,13 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net.NetworkInformation;
 
 
 namespace DayZServer
 {
+
+
     class DataManager
     {
         public string defaultPath;
@@ -58,10 +61,6 @@ namespace DayZServer
             }
         }
 
-         public class RootObject
-         {
-             public List<Server> Server { get; set; }
-         }
 
         public class Server
         {
@@ -70,8 +69,18 @@ namespace DayZServer
             public DateTime Date { get; set; }
             public string Favorite { get; set; }
             public string Current { get; set; }
+            public string PingSpeed { get; set; }
         }
 
+         public class PingSpeed
+        {
+
+             public string Speed { get; set; } 
+        }
+
+        
+
+   
         public void writeServerHistoryList()
         {
             if (File.Exists(serverhistorypath))
@@ -95,6 +104,7 @@ namespace DayZServer
                             match.Date = DateTime.Now;
                             match.IP_Address = IPAddress;
                             match.Current = "1";
+                            match.PingSpeed = getPing(IPAddress);
                             Server replacement = match;
                             customData[index] = replacement;
                             File.Delete(serverhistorypath);
@@ -123,6 +133,7 @@ namespace DayZServer
                                 Date = DateTime.Now,
                                 Favorite = "0",
                                 Current = "1",
+                                PingSpeed = getPing(IPAddress),
                              });
                             File.Delete(serverhistorypath);
                             string listjson = JsonConvert.SerializeObject(customData.ToArray());
@@ -152,16 +163,17 @@ namespace DayZServer
                             IP_Address = IPAddress,
                             Date = DateTime.Now,
                             Favorite = "0",
-                            Current = "1"
+                            Current = "1",
+                            PingSpeed = getPing(IPAddress),
                         });
 
                         JsonSerializer serializer = new JsonSerializer();
                         serializer.Serialize(sw, server_items);
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-
+                    Console.WriteLine("Exception" + e);
                 }
             }
         }
@@ -352,6 +364,33 @@ namespace DayZServer
                 }
             }
             
+        }
+
+        public static String getPing(string ip)
+        {
+
+            try
+            {
+
+                Ping ping = new Ping();
+                PingReply pingresult = ping.Send(ip);
+                string pingSpeed1;
+                if (pingresult.Status.ToString() == "Success")
+                {
+                    pingSpeed1 = pingresult.RoundtripTime.ToString();
+                    return pingSpeed1;
+                }
+                else
+                {
+                    pingSpeed1 = pingresult.Status.ToString();
+                    return pingSpeed1;
+                }
+                
+            }
+            catch (Exception e)
+            {
+                return "Unavailable";
+            }
         }
     }
 }

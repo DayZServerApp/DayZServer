@@ -19,6 +19,8 @@ using System.Timers;
 using Steam;
 using System.Data;
 using System.ComponentModel;
+using System.Net.NetworkInformation;
+ 
 
 
 namespace DayZServer
@@ -44,13 +46,6 @@ namespace DayZServer
 
         }
 
-        public class Server
-        {
-            public string ServerName { get; set; }
-            public string IP_Address { get; set; }
-            public DateTime Date { get; set; }
-            public string Favorite { get; set; }
-        }
 
         private void updateList()
         {

@@ -160,17 +160,17 @@
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource deleteStyle}">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Current}" Value="1">
+                                            <DataTrigger Binding="{Binding Current}" Value="0">
                                                 <Setter Property="Background">
                                                     <Setter.Value>
                                                         <ImageBrush ImageSource="images/deleteoff.png" Stretch="Uniform"/>
                                                     </Setter.Value>
                                                 </Setter>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Current}" Value="0">
+                                            <DataTrigger Binding="{Binding Current}" Value="1">
                                                 <Setter Property="Background">
                                                     <Setter.Value>
-                                                        <ImageBrush ImageSource="images/deleteon.png" Stretch="Uniform"/>
+                                                        <ImageBrush ImageSource="images/deletedisabled.png" Stretch="Uniform"/>
                                                     </Setter.Value>
                                                 </Setter>
                                             </DataTrigger>
@@ -178,6 +178,13 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Ping" Width="150"  SortMemberPath="PingSpeed" SortDirection="Descending">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding PingSpeed}" Foreground="#FF9B9B9C" Cursor="Hand" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
