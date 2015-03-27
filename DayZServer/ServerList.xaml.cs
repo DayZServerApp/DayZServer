@@ -41,11 +41,7 @@ namespace DayZServer
             aTimer.Elapsed += OnTimedEvent;
             aTimer.Enabled = true;
             steamLogin.Visibility = Visibility.Hidden;
-        }
 
-        public class RootObject
-        {
-            public List<Server> Server { get; set; }
         }
 
         public class Server
@@ -56,7 +52,7 @@ namespace DayZServer
             public string Favorite { get; set; }
         }
 
-        void OnTimedEvent(Object source, ElapsedEventArgs e)
+        private void updateList()
         {
             try
             {
@@ -69,7 +65,7 @@ namespace DayZServer
                         string dgSortDescription = null;
                         ListSortDirection? dgSortDirection = null;
                         int columnIndex = 0;
-                        System.Collections.ObjectModel.ObservableCollection<DataGrid> itemsColl = null;
+                        //System.Collections.ObjectModel.ObservableCollection<DataGrid> itemsColl = null;
 
                         foreach (DataGridColumn column in severList.Columns)
                         {
@@ -101,7 +97,23 @@ namespace DayZServer
             {
                 Console.WriteLine("The process failed: {0}", err.ToString());
             }
-            
+        }
+
+        void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+
+            try
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    updateList();
+
+                }));
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine("The process failed: {0}", err.ToString());
+            }
             //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
         }
 
@@ -160,5 +172,26 @@ namespace DayZServer
             userId.Foreground = Brushes.LightGray;
             userId.Text = "UserID";
         }
+
+        private void favorite_Click(object sender, RoutedEventArgs e)
+        {
+            DayZServer.DataManager.Server obj = ((Button)sender).Tag as DayZServer.DataManager.Server;
+            string favoriteServer = obj.ServerName;
+            DataManager dm = new DataManager();
+            dm.updateFavorite(favoriteServer);
+            updateList();
+        }
+
+        private void delete_Click(object sender, RoutedEventArgs e)
+        {
+            DayZServer.DataManager.Server obj = ((Button)sender).Tag as DayZServer.DataManager.Server;
+            string favoriteServer = obj.ServerName;
+            DataManager dm = new DataManager();
+            dm.deleteServer(favoriteServer);
+            updateList();
+        }
+
+
     }
 }
+

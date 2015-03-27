@@ -46,7 +46,7 @@ namespace DayZServer
             dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
             serverhistorypath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzhistory.txt");
             currentserverpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzserver.txt");
-            //Console.WriteLine("Server History Path: " + serverhistorypath);
+            Console.WriteLine("Server History Path: " + serverhistorypath);
 
             if (!Directory.Exists(path))
             {
@@ -88,6 +88,7 @@ namespace DayZServer
                         List<Server> customData = JsonConvert.DeserializeObject<List<Server>>(temphistory);
                         Server match = customData.FirstOrDefault(x => x.ServerName == servername);
                         int index = customData.FindIndex(x => x.ServerName == servername);
+                       
 
                         if (match != null)
                         {
@@ -106,14 +107,24 @@ namespace DayZServer
                         }
                         else
                         {
+                            Server matchCurrent = customData.FirstOrDefault(x => x.Current == "1");
+                            int indexCurrent = customData.FindIndex(x => x.Current == "1");
+                            if (matchCurrent != null)
+                            {
+                                matchCurrent.Current = "0";
+                                Server replacementCurrent = matchCurrent;
+                                customData[indexCurrent] = replacementCurrent;
+                            }
+                            
                             customData.Add(new Server()
                             {
                                 ServerName = servername,
                                 IP_Address = IPAddress,
                                 Date = DateTime.Now,
-                                Favorite = "1",
+                                Favorite = "0",
+                                Current = "1",
                              });
-
+                            File.Delete(serverhistorypath);
                             string listjson = JsonConvert.SerializeObject(customData.ToArray());
                             using (StreamWriter sw = File.CreateText(serverhistorypath))
                             {
@@ -226,6 +237,121 @@ namespace DayZServer
                 writeAppPath(dayzpath);
                 return dayzpath;
             }
+        }
+
+        public void updateFavorite(string favoriteServer)
+        {
+            if (File.Exists(serverhistorypath))
+            {
+                string temphistory;
+                try
+                {
+                    using (StreamReader sreader = new StreamReader(serverhistorypath))
+                    {
+                        temphistory = sreader.ReadToEnd();
+                        sreader.Close();
+                        string matchIdToFindServer = favoriteServer;
+                        string matchIdToFindIPAddress = IPAddress;
+                        List<Server> customData = JsonConvert.DeserializeObject<List<Server>>(temphistory);
+                        Server match = customData.FirstOrDefault(x => x.ServerName == favoriteServer);
+                        int index = customData.FindIndex(x => x.ServerName == favoriteServer);
+
+
+                        if (match != null)
+                        {
+                            if (match.Favorite == "1")
+                            {
+                                match.Favorite = "0";
+                            }
+                            else if (match.Favorite == "0")
+                            {
+                                match.Favorite = "1";
+                            }
+                          
+                            Server replacement = match;
+                            customData[index] = replacement;
+                            File.Delete(serverhistorypath);
+                            string listjson = JsonConvert.SerializeObject(customData.ToArray());
+                            using (StreamWriter sw = File.CreateText(serverhistorypath))
+                            {
+                                sw.Write(listjson);
+                                sw.Close();
+                            }
+                        }
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+            else
+            {
+                try
+                {
+                    using (StreamWriter sw = File.CreateText(serverhistorypath))
+                    {
+                        var server_items = new List<Server>();
+                        server_items.Add(new Server()
+                        {
+                            ServerName = servername,
+                            IP_Address = IPAddress,
+                            Date = DateTime.Now,
+                            Favorite = "0",
+                            Current = "1"
+                        });
+
+                        JsonSerializer serializer = new JsonSerializer();
+                        serializer.Serialize(sw, server_items);
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+        }
+
+        public void deleteServer(string deleteServer)
+        {
+            if (File.Exists(serverhistorypath))
+            {
+                string temphistory;
+                try
+                {
+                    using (StreamReader sreader = new StreamReader(serverhistorypath))
+                    {
+                        temphistory = sreader.ReadToEnd();
+                        sreader.Close();
+                        string matchIdToFindServer = deleteServer;
+                        string matchIdToFindIPAddress = IPAddress;
+                        List<Server> customData = JsonConvert.DeserializeObject<List<Server>>(temphistory);
+                        Server match = customData.FirstOrDefault(x => x.ServerName == deleteServer);
+                        int index = customData.FindIndex(x => x.ServerName == deleteServer);
+
+
+                        if (match != null)
+                        {
+
+                            customData.RemoveAt(index);
+                            File.Delete(serverhistorypath);
+                            string listjson = JsonConvert.SerializeObject(customData.ToArray());
+                            using (StreamWriter sw = File.CreateText(serverhistorypath))
+                            {
+                                sw.Write(listjson);
+                                sw.Close();
+                            }
+                        }
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+            
         }
     }
 }
