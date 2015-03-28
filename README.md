@@ -4,17 +4,17 @@
 The application will show you a history of servers you have played on while also updating your current server in real-time.
 
 **This version is packed full of features including:**
-*Full server list
-*Highlight current server
-*IP addresses
-*Dates
-*Real-time ping rates
-*Sorting
-*Favorites
-*Join servers
-*Link to map
-*Delete one server at a time
-*Clear entire server history
+* Full server list
+* Highlight current server
+* IP addresses
+* Dates
+* Real-time ping rates
+* Sorting
+* Favorites
+* Join servers
+* Link to map
+* Delete one server at a time
+* Clear entire server history
 
 ![alt tag](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot1_1.png)
 
