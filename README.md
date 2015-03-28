@@ -1,6 +1,6 @@
 # DayZServer
 
-![alt tag](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot.png)
+![alt tag](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot1_1.png)
 
 ## Installation
 Download the release from Github https://github.com/DayZServerApp/DayZServer/releases
@@ -20,7 +20,7 @@ Source code is C# .Net developed using Visual Studio 2013
 
 ## History
 
-Release 1.0 
+Release 1.1 
 
 ## Credits
 
