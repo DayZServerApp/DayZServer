@@ -12,6 +12,25 @@
             </Setter>
             <Setter Property="BorderBrush" Value="{x:Null}"/>
         </Style>-->
+        <Style TargetType="{x:Type DataGridRow}">
+
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveBorderBrushKey}" Color="Transparent" />
+            </Style.Resources>
+        </Style>
+        <Style TargetType="{x:Type DataGridCell}">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{x:Null}" />
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="firstStyle" TargetType="Button">
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="Margin" Value="5"/>
@@ -78,57 +97,41 @@
 
 
     <DockPanel Margin="0,0,2,0">
-        <ToolBarTray Height="70" DockPanel.Dock="Top" Background="White" HorizontalAlignment="Right" Width="1016">
-            <ToolBar Height="70" Width="384" Margin="632,0,-992,-57" Background="White">
-                <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map" Width="135">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="images/appicon.png" />
-                        <TextBlock Margin="3,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18">Map</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Button  ToolTip="Steam Login" Width="133" Margin="0,10" Click="steam_click">
-                    <Image Source="images/sits_large_noborder.png"/>
-                </Button>
-                <Button  ToolTip="Steam Login" Width="91" Click="steam_click">
+        <ToolBarTray Height="711" VerticalAlignment="Top" Width="100" HorizontalAlignment="Right" Orientation="Vertical" DockPanel.Dock="Right" Background="{x:Null}">
+            <ToolBar HorizontalAlignment="Right" Height="345" VerticalAlignment="Top" Width="100" Margin="0,0,-87,-321" Background="{x:Null}">
+                <Button  ToolTip="DayZServer" Width="91" Click="Link_Click" Tag="https://github.com/DayZServerApp/DayZServer/releases" Cursor="Hand" >
                     <Image Source="images/button.png"/>
                 </Button>
+                <Button Click="ClearHistory" ToolTip="Clear All Servers" Width="94" Height="87" Cursor="Hand">
+                    <Image Source="images/All-Clear-Icon.png" Width="94" Height="77" />
+                </Button>
+                <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map" Width="92" Height="87" Cursor="Hand">
+                        <Image Source="images/appicon.png" Width="75" />
+                </Button>
+                <Button  ToolTip="Steam Login Disabled" Width="104" Height="55" Cursor="No">
+                    <Image Source="images/sits_large_noborder.png" Width="93" Height="39" />
+                </Button>
+
             </ToolBar>
         </ToolBarTray>
 
+        <Canvas Height="58" VerticalAlignment="Top" DockPanel.Dock="Top" HorizontalAlignment="Left" Width="721" >
+            <Canvas.Background>
+                <ImageBrush ImageSource="images/header.png" Stretch="Uniform"/>
+            </Canvas.Background>
+            <Label Content="Standalone Version 2" Canvas.Left="148" Canvas.Top="33" Width="181" Foreground="White" Height="25" FontSize="14" Opacity="0.7"/>
+        </Canvas>
         <DataGrid  Name="severList" CanUserAddRows="False" AutoGenerateColumns="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFF3F3F3" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
+            </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Server Name" Width="auto" SortMemberPath="ServerName" IsReadOnly="True" MinWidth="500">
+                <DataGridTemplateColumn Width="55" SortMemberPath="Favorite" Header="Favorite">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding ServerName}" Foreground="#FF5B5B5B" Cursor="Hand" FontSize="18" Margin="10,10,0,10" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="IP Address" Width="150" SortMemberPath="IP_Address">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding IP_Address}" Foreground="#FF5B5B5B" Cursor="Hand" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date" SortDirection="Descending">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Date}" Foreground="#FF9B9B9C" Cursor="Hand" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Width="100">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Click="Join_Click" Content="Join" Height="25" VerticalAlignment="Center" Width="75" BorderBrush="{x:Null}" Tag="{Binding IP_Address}" Foreground="#FF919191"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Width="100" SortMemberPath="Favorite" Header="Favorite">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button x:Name="favoriteButton" Height="32" Click="favorite_Click" Tag="{Binding}" VerticalAlignment="Center" Width="32">
+                            <Button x:Name="favoriteButton" Height="32" Click="favorite_Click" Tag="{Binding}" VerticalAlignment="Center" Width="32" Cursor="Hand">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource firstStyle}">
                                         <Style.Triggers>
@@ -153,10 +156,45 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Width="100" Header="Delete">
+                <DataGridTemplateColumn Header="Server Name" Width="auto" SortMemberPath="ServerName" IsReadOnly="True" MinWidth="400">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button x:Name="deleteButton" Height="32" Click="delete_Click" Tag="{Binding}" VerticalAlignment="Center" Width="32">
+                            <TextBlock Text="{Binding ServerName}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="18" Margin="10" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="IP Address" Width="150" SortMemberPath="IP_Address">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding IP_Address}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date" SortDirection="Descending">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Date}" Foreground="#FF9B9B9C" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="JoinServer" Content="Join" Height="25" VerticalAlignment="Center" Width="75" BorderBrush="{x:Null}" Tag="{Binding}" Foreground="#FF919191" Cursor="Hand"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed" SortDirection="Descending">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding PingSpeed}" Foreground="#FF9B9B9C" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="55">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button x:Name="deleteButton" Height="32" Click="delete_Click" Tag="{Binding}" VerticalAlignment="Center" Width="32" Cursor="Hand">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource deleteStyle}">
                                         <Style.Triggers>
@@ -178,13 +216,6 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Ping" Width="150"  SortMemberPath="PingSpeed" SortDirection="Descending">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding PingSpeed}" Foreground="#FF9B9B9C" Cursor="Hand" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -217,6 +248,13 @@
                 </Canvas.Background>
             </Canvas>
         </Canvas>
+        <Canvas x:Name="browse_dialog" Height="207" Canvas.Left="28" Canvas.Top="58" Width="516" Background="#FFF0F0F0" Margin="42,191,24,255" >
+            <Button x:Name="cancel_button" Content="Cancel" Canvas.Left="364" Canvas.Top="160" Width="142" Height="37" Click="cancel_click" FontSize="18" BorderBrush="{x:Null}"/>
+            <TextBox Height="66" Canvas.Left="10" TextWrapping="Wrap" Text="Browse and find the location of DayZ.exe and try again. &#xA;The game should be in the steam folder &#xA;\Steam\SteamApps\common\DayZ\DayZ.exe" Canvas.Top="50" Width="496" Background="{x:Null}" Foreground="#FF6A6A6A" FontSize="16" BorderBrush="{x:Null}"/>
+            <TextBox Height="33" Canvas.Left="10" TextWrapping="Wrap" Text="Unable to locate where you installed DayZ" Canvas.Top="12" Width="496"  Background="{x:Null}" Foreground="#FF3E3E3E" FontSize="18" BorderBrush="{x:Null}"/>
+            <Button x:Name="browse" Content="Browse" Canvas.Left="364" Canvas.Top="118" Width="142" Height="37" Click="browse_click" FontSize="18" BorderBrush="{x:Null}"/>
+        </Canvas>
+
     </DockPanel>
 
 </Window>

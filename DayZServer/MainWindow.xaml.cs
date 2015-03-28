@@ -70,17 +70,19 @@ namespace DayZServer
                 //string steam = "\\Steam\\SteamApps\\common\\DayZ\\";
                 string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
 
-                if (!File.Exists(dayzapppath))
-                {
-                    string dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
-                    writeAppPath(dayzpath);
-                }
 
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
 
                 }
+                if (!File.Exists(dayzapppath))
+                {
+                    string dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
+                    writeAppPath(dayzpath);
+                }
+
+
 
 
                 this.Dispatcher.Invoke((Action)(() =>
