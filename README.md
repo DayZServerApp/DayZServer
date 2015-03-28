@@ -3,6 +3,8 @@
 
 The application will show you a history of servers you have played on while also updating your current server in real-time.
 
+![alt tag](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot1_1.png)
+
 **This version is packed full of features including:**
 * Full server list
 * Highlight current server
@@ -16,7 +18,6 @@ The application will show you a history of servers you have played on while also
 * Delete one server at a time
 * Clear entire server history
 
-![alt tag](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot1_1.png)
 
 ## Installation
 **Download the release from Github https://github.com/DayZServerApp/DayZServer/releases**
