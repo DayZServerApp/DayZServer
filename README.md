@@ -21,9 +21,9 @@ The application will show you a history of servers you have played on while also
 
 ## Installation
 **Download the release from Github https://github.com/DayZServerApp/DayZServer/releases**
-*Unzip all the files into a folder. 
-*Run DayZServer.exe. 
-*Then play DayZ. 
+* Unzip all the files into a folder. 
+* Run DayZServer.exe. 
+* Then play DayZ. 
 
 ## Usage
 
