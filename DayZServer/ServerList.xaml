@@ -4,16 +4,16 @@
         Title="DayZServer" Width="1024" Height="768" WindowStartupLocation="Manual" WindowState="Maximized" Icon="images/icon.png" xmlns:local="DayZServer">
 
     <Window.Resources>
-        <!--<Style TargetType="Button" x:Key="firstStyle">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <ImageBrush ImageSource="images/checkon.png" Stretch="Uniform"/>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="BorderBrush" Value="{x:Null}"/>
-        </Style>-->
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="AlternatingRowBackground" Value="#FFF3F3F3"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+        </Style>
         <Style TargetType="{x:Type DataGridRow}">
-
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Current}" Value="1">
+                    <Setter Property="Background" Value="#f2f9fc" />
+                </DataTrigger>
+            </Style.Triggers>
             <Style.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
                 <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
@@ -106,7 +106,7 @@
                     <Image Source="images/All-Clear-Icon.png" Width="94" Height="77" />
                 </Button>
                 <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map" Width="92" Height="87" Cursor="Hand">
-                        <Image Source="images/appicon.png" Width="75" />
+                    <Image Source="images/appicon.png" Width="75" />
                 </Button>
                 <Button  ToolTip="Steam Login Disabled" Width="104" Height="55" Cursor="No">
                     <Image Source="images/sits_large_noborder.png" Width="93" Height="39" />
@@ -121,7 +121,9 @@
             </Canvas.Background>
             <Label Content="Standalone Version 2" Canvas.Left="148" Canvas.Top="33" Width="181" Foreground="White" Height="25" FontSize="14" Opacity="0.7"/>
         </Canvas>
-        <DataGrid  Name="severList" CanUserAddRows="False" AutoGenerateColumns="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" AlternatingRowBackground="#FFF3F3F3" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
+
+
+        <DataGrid  Name="severList" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="BorderThickness" Value="0"/>

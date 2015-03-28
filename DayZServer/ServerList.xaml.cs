@@ -56,6 +56,7 @@ namespace DayZServer
                 {
                     DataManager dm = new DataManager();
                     dm.writeServerHistoryList();
+
                     if (dm.getServerList(dm.serverhistorypath) != null)
                     {
                         string dgSortDescription = null;
