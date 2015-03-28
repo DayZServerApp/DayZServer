@@ -43,6 +43,7 @@ Release 1.1
 ## Credits
 
 VectorG7 <a href="http://steamcommunity.com/id/VG7/" target="_blank">Join me on Steam</a>
+
 AeroXbird - Kick started the Join server functionality
 
 
