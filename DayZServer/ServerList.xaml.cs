@@ -21,7 +21,8 @@ using System.Data;
 using System.ComponentModel;
 using System.Net.NetworkInformation;
 using System.Diagnostics;
- 
+using System.Net;
+
 
 namespace DayZServer
 {
@@ -35,18 +36,20 @@ namespace DayZServer
     public partial class Window1 : Window
     {
         private static System.Timers.Timer aTimer;
+        public string selectedIP;
+
 
         public Window1()
         {
             InitializeComponent();
-            aTimer = new System.Timers.Timer(4000);
+            aTimer = new System.Timers.Timer(7000);
             aTimer.Elapsed += OnTimedEvent;
             aTimer.Enabled = true;
             steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
 
-        }
 
+        }
 
         private void updateList()
         {
@@ -78,6 +81,20 @@ namespace DayZServer
                         }
 
                         severList.ItemsSource = dm.getServerList(dm.serverhistorypath);
+
+                        if (userList.Items.Count == 0)
+                        {
+                            DataManager.Server serverobj = dm.getCurrentServerList();
+                            updateUserList(serverobj);
+                            selectedIP = serverobj.IP_Address;
+
+                        }
+                        else
+                        {
+
+                            DataManager.Server serverobj = dm.getServerByIP(selectedIP);
+                            updateUserList(serverobj);
+                        }
 
                         if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
                         {
@@ -151,6 +168,8 @@ namespace DayZServer
             }
         }
 
+
+
         private void login_click(object sender, RoutedEventArgs e)
         {
             string steamid = userId.Text;
@@ -159,9 +178,10 @@ namespace DayZServer
 
             string[] arr1 = new string[] { steamid, steampassword, steamAuthCode, steamAuthCode };
 
-            SteamAccess v1 = new SteamAccess();
             SteamAccess.Login(arr1);
         }
+
+
 
         private void cancelLogin_Click(object sender, RoutedEventArgs e)
         {
@@ -172,7 +192,7 @@ namespace DayZServer
 
         private void favorite_Click(object sender, RoutedEventArgs e)
         {
-            DayZServer.DataManager.Server obj = ((Button)sender).Tag as DayZServer.DataManager.Server;
+            DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
             string favoriteServer = obj.ServerName;
             DataManager dm = new DataManager();
             dm.updateFavorite(favoriteServer);
@@ -181,11 +201,18 @@ namespace DayZServer
 
         private void delete_Click(object sender, RoutedEventArgs e)
         {
-            DayZServer.DataManager.Server obj = ((Button)sender).Tag as DayZServer.DataManager.Server;
+            DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
             string favoriteServer = obj.ServerName;
             DataManager dm = new DataManager();
             dm.deleteServer(favoriteServer);
             updateList();
+            if (obj.IP_Address == selectedIP)
+            {
+                DataManager.Server serverobj = dm.getCurrentServerList();
+                updateUserList(serverobj);
+                selectedIP = serverobj.IP_Address;
+            }
+
         }
 
         private void ClearHistory(object sender, RoutedEventArgs e)
@@ -276,71 +303,71 @@ namespace DayZServer
         {
             string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
             string path = System.IO.Path.Combine(appDataPath, "DayZServer");
-            DayZServer.DataManager.Server obj = ((Button)sender).Tag as DayZServer.DataManager.Server;
+            DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
             string serverIP = obj.IP_Address;
 
-                
 
-                // start the game seperated from this process.
-                using (Process game = new Process())
+
+            // start the game seperated from this process.
+            using (Process game = new Process())
+            {
+                string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
+                string dayzpath = readAppPath(dayzapppath);
+                dayzpath = dayzpath.TrimEnd('\r', '\n');
+                if (File.Exists(dayzpath))
                 {
-                    string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
-                    string dayzpath = readAppPath(dayzapppath);
-                    dayzpath = dayzpath.TrimEnd('\r', '\n');
-                    if (File.Exists(dayzpath))
+                    try
                     {
-                        try
+                        Process thisProc = Process.GetCurrentProcess();
+                        if (IsProcessOpen("DayZ") == false)
                         {
-                            Process thisProc = Process.GetCurrentProcess();
-                            if (IsProcessOpen("DayZ") == false)
+                            ProcessStartInfo startInf = new ProcessStartInfo(dayzpath);
+                            startInf.Arguments = "-connect=" + serverIP;
+                            game.StartInfo = startInf;
+                            game.Start();
+                        }
+                        else
+                        {
+
+                            Process[] objProcesses = System.Diagnostics.Process.GetProcessesByName("DayZ");
+                            if (objProcesses.Length > 0)
                             {
+
+                                //******Works to bring the app to the foreground but cant pass the server Argument so just commented this. 
+                                //IntPtr hWnd = IntPtr.Zero;
+                                //hWnd = objProcesses[0].MainWindowHandle;
+                                //ShowWindowAsync(new HandleRef(null,hWnd), SW_RESTORE);
+                                //SetForegroundWindow(objProcesses[0].MainWindowHandle);
+
+                                //******could not get Steam to pass the server Argument so just killed the app and start it up. 
+
+                                objProcesses[0].Kill();
                                 ProcessStartInfo startInf = new ProcessStartInfo(dayzpath);
                                 startInf.Arguments = "-connect=" + serverIP;
                                 game.StartInfo = startInf;
                                 game.Start();
-                            }
-                            else
-                            {
-
-                                Process[] objProcesses = System.Diagnostics.Process.GetProcessesByName("DayZ");
-                                if (objProcesses.Length > 0)
-                                {
-
-                                    //******Works to bring the app to the foreground but cant pass the server Argument so just commented this. 
-                                    //IntPtr hWnd = IntPtr.Zero;
-                                    //hWnd = objProcesses[0].MainWindowHandle;
-                                    //ShowWindowAsync(new HandleRef(null,hWnd), SW_RESTORE);
-                                    //SetForegroundWindow(objProcesses[0].MainWindowHandle);
-
-                                    //******could not get Steam to pass the server Argument so just killed the app and start it up. 
-
-                                    objProcesses[0].Kill();
-                                    ProcessStartInfo startInf = new ProcessStartInfo(dayzpath);
-                                    startInf.Arguments = "-connect=" + serverIP;
-                                    game.StartInfo = startInf;
-                                    game.Start();
-
-                                }
 
                             }
 
+                        }
 
-                        }
-                        catch (Exception err)
-                        {
-                            Console.WriteLine(err.Message);
-                        }
+
                     }
-                    else
+                    catch (Exception err)
                     {
-                        browse_dialog.Visibility = Visibility.Visible;
+                        Console.WriteLine(err.Message);
                     }
-
-
-
-
                 }
-            
+                else
+                {
+                    browse_dialog.Visibility = Visibility.Visible;
+                }
+
+
+
+
+            }
+
         }
 
         private void cancel_click(object sender, RoutedEventArgs e)
@@ -364,10 +391,53 @@ namespace DayZServer
                 string filename = dlg.FileName;
                 browse_dialog.Visibility = Visibility.Hidden;
                 writeAppPath(filename);
-
             }
         }
 
+        private void server_Details(object sender, RoutedEventArgs e)
+        {
+            string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+            string path = System.IO.Path.Combine(appDataPath, "DayZServer");
+            DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
+
+            selectedIP = obj.IP_Address;
+            updateUserList(obj);
+
+        }
+
+
+
+        public void updateUserList(DataManager.Server obj)
+        {
+
+            string dgSortDescription = null;
+            ListSortDirection? dgSortDirection = null;
+            int columnIndex = 0;
+
+            foreach (DataGridColumn column in userList.Columns)
+            {
+                columnIndex++;
+
+                if (column.SortDirection != null)
+                {
+                    dgSortDirection = column.SortDirection;
+                    dgSortDescription = column.SortMemberPath;
+
+                    break;
+                }
+            }
+
+            userList.ItemsSource = obj.linkItem;
+
+            if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
+            {
+                SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
+                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(userList.ItemsSource);
+                view.SortDescriptions.Add(s);
+                userList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
+            }
+
+        }
 
     }
 }
