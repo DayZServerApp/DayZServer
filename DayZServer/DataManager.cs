@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Threading;
 using System.Net;
 using Microsoft;
+using System.Collections.Concurrent;
 
 
 
@@ -41,9 +42,14 @@ namespace DayZServer
         public List<Server> server_list;
         public static string tester;
         public static string currentIP;
+        static ConcurrentDictionary<string, Server> Servers = new ConcurrentDictionary<string, Server>();
+        
 
         public DataManager()
         {
+            
+            
+            
             defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString();
             dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile");
             dirs = dirs.Where(w => w != dirs[1]).ToArray();
@@ -75,6 +81,8 @@ namespace DayZServer
                     writeAppPath(dayzpath);
                 }
             }
+
+            
         }
 
         public class Server
@@ -88,6 +96,7 @@ namespace DayZServer
             public string PingSpeed { get; set; }
             public string UserCount { get; set; }
             public List<LinkItem> linkItem { get; set; }
+            static ConcurrentDictionary<string, LinkItem> ConcurrentDictionary { get; set; }
         }
 
         public class LinkItem
@@ -99,118 +108,53 @@ namespace DayZServer
 
         public void writeServerHistoryList()
         {
-            if (File.Exists(serverhistorypath))
-            {
-                
-                try
-                {
-                    if (server_list == null)
-                {
-                    server_list = new List<Server>();
-                }
-                    if (server_list.Count == 0) 
-                    {
-                        server_list = getServerList();
+            
+                        Server dzServer = new Server();
+                        dzServer.Date = DateTime.Now;
+                        dzServer.ServerName = servername;
+                        dzServer.IP_Address = IPAddress;
+                        dzServer.FullIP_Address = FullIPAddress;
+                        dzServer.Current = "1";
 
-                    
-                    }
-                       
-                        Server match = server_list.FirstOrDefault(x => x.ServerName == servername);
-                        int index = server_list.FindIndex(x => x.ServerName == servername);
-
-                        foreach (Server element in server_list)
+                        Servers.AddOrUpdate(dzServer.FullIP_Address, dzServer, (key, existingVal) =>
                         {
-                            Console.WriteLine(element);
-                            string[] arr1 = new string[] { element.IP_Address };
-                            int currentItem = server_list.IndexOf(element);
-                            Pinger(arr1, currentItem);
-                            pingIndex = server_list.IndexOf(element);
-                        }
-
-                        if (match != null)
-                        {
-                            match.Date = DateTime.Now;
-                            match.IP_Address = IPAddress;
-                            match.FullIP_Address = FullIPAddress;
-                            match.Current = "1";
-                            Server replacement = match;
-                            server_list[index] = replacement;
-                            //File.Delete(serverhistorypath);
-                            string listjson = JsonConvert.SerializeObject(server_list.ToArray());
-                            using (StreamWriter sw = File.CreateText(serverhistorypath))
+                            // If this delegate is invoked, then the key already exists. 
+                            // Here we make sure the city really is the same city we already have. 
+                            // (Support for multiple cities of the same name is left as an exercise for the reader.) 
+                            try
                             {
-                                sw.Write(listjson);
-                                sw.Close();
+                                if (dzServer != existingVal)
+                                    throw new ArgumentException("Duplicate IP Address are not allowed: {0}.", dzServer.FullIP_Address);
+
+                                // The only updatable fields are the temerature array and lastQueryDate.
+                                existingVal.Date = DateTime.Now;
+                                existingVal.Current = dzServer.Current;
+                                return existingVal;
                             }
-                        }
-                        else
-                        {
-                            Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
-                            int indexCurrent = server_list.FindIndex(x => x.Current == "1");
-                            if (matchCurrent != null)
+                            catch (ArgumentException e)
                             {
-                                matchCurrent.Current = "0";
-                                Server replacementCurrent = matchCurrent;
-                                server_list[indexCurrent] = replacementCurrent;
+                                Console.WriteLine(e.Message);
+                                return existingVal;
                             }
-
-                            server_list.Add(new Server()
-                            {
-                                ServerName = servername,
-                                IP_Address = IPAddress,
-                                FullIP_Address = FullIPAddress,
-                                Date = DateTime.Now,
-                                Favorite = "0",
-                                Current = "1",
-                                PingSpeed = "Accessing...",
-                            });
-                            File.Delete(serverhistorypath);
-                            string listjson = JsonConvert.SerializeObject(server_list.ToArray());
-                            using (StreamWriter sw = File.CreateText(serverhistorypath))
-                            {
-                                sw.Write(listjson);
-                                sw.Close();
-                            }
-                        }
-                    
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception" + e);
-                }
-            }
-            else
-            {
-                try
-                {
-                    if (server_list == null)
-                    {
-                        server_list = new List<Server>();
-                    }
-                    using (StreamWriter sw = File.CreateText(serverhistorypath))
-                    {
-                        
-                        server_list.Add(new Server()
-                        {
-                            ServerName = servername,
-                            IP_Address = IPAddress,
-                            FullIP_Address = FullIPAddress,
-                            Date = DateTime.Now,
-                            Favorite = "0",
-                            Current = "1",
-                            PingSpeed = "Accessing...",
                         });
 
-                        JsonSerializer serializer = new JsonSerializer();
-                        serializer.Serialize(sw, server_list);
-                        sw.Close();
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception" + e);
-                }
-            }
+                        Console.Write(Servers);
+
+
+                        System.Threading.Thread.Sleep(10000);
+                        
+                    
+
+                        //foreach (Server element in server_list)
+                        //{
+                        //    Console.WriteLine(element);
+                        //    string[] arr1 = new string[] { element.IP_Address };
+                        //    int currentItem = server_list.IndexOf(element);
+                        //    Pinger(arr1, currentItem);
+                        //    pingIndex = server_list.IndexOf(element);
+                        //}
+
+                        
         }
 
         public List<Server> getServerList()
