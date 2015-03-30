@@ -42,7 +42,7 @@ namespace DayZServer
         public Window1()
         {
             InitializeComponent();
-            aTimer = new System.Timers.Timer(7000);
+            aTimer = new System.Timers.Timer(4000);
             aTimer.Elapsed += OnTimedEvent;
             aTimer.Enabled = true;
             steamLogin.Visibility = Visibility.Hidden;
@@ -53,21 +53,20 @@ namespace DayZServer
 
         private void updateList()
         {
-            try
-            {
+
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     DataManager dm = new DataManager();
                     dm.writeServerHistoryList();
 
-                    if (dm.getServerList(dm.serverhistorypath) != null)
+                    if (dm.getServerList() != null)
                     {
                         string dgSortDescription = null;
                         ListSortDirection? dgSortDirection = null;
                         int columnIndex = 0;
                         //System.Collections.ObjectModel.ObservableCollection<DataGrid> itemsColl = null;
 
-                        foreach (DataGridColumn column in severList.Columns)
+                        foreach (DataGridColumn column in serverList.Columns)
                         {
                             columnIndex++;
 
@@ -80,7 +79,7 @@ namespace DayZServer
                             }
                         }
 
-                        severList.ItemsSource = dm.getServerList(dm.serverhistorypath);
+                        serverList.ItemsSource = dm.getServerList();
 
                         if (userList.Items.Count == 0)
                         {
@@ -99,18 +98,15 @@ namespace DayZServer
                         if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
                         {
                             SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
-                            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(severList.ItemsSource);
+                            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
                             view.SortDescriptions.Add(s);
-                            severList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
+                            serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
                         }
                     }
 
                 }));
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine("The process failed: {0}", err.ToString());
-            }
+            
+
         }
 
         void OnTimedEvent(Object source, ElapsedEventArgs e)
@@ -118,11 +114,11 @@ namespace DayZServer
 
             try
             {
-                this.Dispatcher.Invoke((Action)(() =>
-                {
+                //this.Dispatcher.Invoke((Action)(() =>
+                //{
                     updateList();
 
-                }));
+                //}));
             }
             catch (Exception err)
             {
@@ -410,33 +406,53 @@ namespace DayZServer
         public void updateUserList(DataManager.Server obj)
         {
 
-            string dgSortDescription = null;
-            ListSortDirection? dgSortDirection = null;
-            int columnIndex = 0;
 
-            foreach (DataGridColumn column in userList.Columns)
-            {
-                columnIndex++;
+            //if (userList.Items.Count != 0)
+            //{
+                string dgSortDescriptionUser = null;
+                ListSortDirection? dgSortDirectionUser = null;
+                int columnIndexUser = 0;
+                //System.Collections.ObjectModel.ObservableCollection<DataGrid> itemsColl = null;
 
-                if (column.SortDirection != null)
+                foreach (DataGridColumn column in userList.Columns)
                 {
-                    dgSortDirection = column.SortDirection;
-                    dgSortDescription = column.SortMemberPath;
+                    columnIndexUser++;
 
-                    break;
+                    if (column.SortDirection != null)
+                    {
+                        dgSortDirectionUser = column.SortDirection;
+                        dgSortDescriptionUser = column.SortMemberPath;
+
+                        break;
+                    }
                 }
-            }
 
-            userList.ItemsSource = obj.linkItem;
+                userList.ItemsSource = obj.linkItem;
 
-            if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
-            {
-                SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
-                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(userList.ItemsSource);
-                view.SortDescriptions.Add(s);
-                userList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
-            }
+                if (!string.IsNullOrEmpty(dgSortDescriptionUser) && dgSortDirectionUser != null)
+                {
+                    SortDescription sUser = new SortDescription(dgSortDescriptionUser, dgSortDirectionUser.Value);
+                    CollectionView viewUser = (CollectionView)CollectionViewSource.GetDefaultView(userList.ItemsSource);
+                    try
+                    {
+                        viewUser.SortDescriptions.Add(sUser);
+                        userList.Columns[columnIndexUser - 1].SortDirection = dgSortDirectionUser;
+                    }
+                    catch (Exception err)
+                    {
+                        Console.WriteLine(err.Message);
+                    }
+                    
+                    
+                }
 
+            //}
+            //else
+            //{
+            //    userList.ItemsSource = obj.linkItem;
+            //}
+
+            
         }
 
     }
