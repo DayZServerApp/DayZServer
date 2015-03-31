@@ -37,6 +37,9 @@ namespace DayZServer
     {
         private static System.Timers.Timer aTimer;
         public string selectedIP;
+        private static DataManager dm = new DataManager();
+        
+       
 
 
         public Window1()
@@ -47,6 +50,22 @@ namespace DayZServer
             aTimer.Enabled = true;
             steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
+            dm.startDataManager();
+            
+        }
+
+        public void updateServerList()
+        {
+
+            if (dm.serverList != null)
+            {
+                if (dm.serverList.Count != 0)
+                {
+                    DataGrid serverList = new DataGrid();
+                    serverList.ItemsSource = dm.getList();
+                }
+                
+            }
 
 
         }
@@ -117,6 +136,7 @@ namespace DayZServer
                 //this.Dispatcher.Invoke((Action)(() =>
                 //{
                     updateList();
+                updateServerList();
 
                 //}));
             }
