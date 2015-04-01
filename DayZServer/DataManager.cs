@@ -58,7 +58,7 @@ namespace DayZServer
         {
             defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString();
             dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile"); // TODO: crashes if DayZ is not loaded
-            dirs = dirs.Where(w => w != dirs[1]).ToArray(); // TODO: crashes if there is only 1 profile
+            dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
             configpath = dirs[0];
 
             if (!Directory.Exists(path))
@@ -69,7 +69,7 @@ namespace DayZServer
                     writeAppPath(dayzpath);
                 }
             }
-
+           
             writeServerHistoryList();
 
             PingTimer = new System.Timers.Timer(10000);
@@ -117,7 +117,7 @@ namespace DayZServer
             FullIPAddress = DayZProfile.Split(new string[] { "lastMPServer=\"" }, StringSplitOptions.None)[1].Split(new string[] { "\";" }, StringSplitOptions.None)[0].Trim();
             IPAddress = FullIPAddress.Substring(0, FullIPAddress.LastIndexOf(":"));
             version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
-
+            
             if (File.Exists(serverhistorypath))
             {
                 string temphistory;
@@ -129,65 +129,65 @@ namespace DayZServer
                     sr.Close();
                     fs.Close();
                     server_list = JsonConvert.DeserializeObject<List<Server>>(temphistory);
-                    Server match = server_list.FirstOrDefault(x => x.IP_Address == IPAddress);
-                    int index = server_list.FindIndex(x => x.IP_Address == IPAddress);
+                        Server match = server_list.FirstOrDefault(x => x.IP_Address == IPAddress);
+                        int index = server_list.FindIndex(x => x.IP_Address == IPAddress);
 
-                    if (match != null)
-                    {
-                        if (match.Current == "0")
+                        if (match != null)
                         {
-                            match.Date = DateTime.Now;
-                            match.IP_Address = IPAddress;
-                            match.FullIP_Address = FullIPAddress;
-                            match.Current = "1";
-                            match.PingSpeed = "Accessing...";
-                            match.Favorite = match.Favorite;
-                            server_list[index] = match;
-                            string listjson = JsonConvert.SerializeObject(server_list.ToArray());
-                            var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-                            var sw = new StreamWriter(fsw);
-                            sw.Write(listjson);
-                            sw.Close();
-                            fsw.Close();
-                            readHistoryfile();
+                            if (match.Current == "0")
+                            {
+                                match.Date = DateTime.Now;
+                                match.IP_Address = IPAddress;
+                                match.FullIP_Address = FullIPAddress;
+                                match.Current = "1";
+                                match.PingSpeed = "Accessing...";
+                                match.Favorite = match.Favorite;
+                                server_list[index] = match;
+                                string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                                var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                                var sw = new StreamWriter(fsw);
+                                sw.Write(listjson);
+                                sw.Close();
+                                fsw.Close();
+                                readHistoryfile();
+                            }
+                            else
+                            {
+                                readHistoryfile();
+                            }
+                            
                         }
                         else
-                        {
+                        {  //******Need to look at this due to saving already visited and current as current
+                            Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
+                            int indexCurrent = server_list.FindIndex(x => x.Current == "1");
+                            if (matchCurrent != null)
+                            {
+                                matchCurrent.Current = "0";
+
+                                server_list[indexCurrent] = matchCurrent;
+                            }
+
+                            server_list.Add(new Server()
+                            {
+                                ServerName = servername,
+                                IP_Address = IPAddress,
+                                FullIP_Address = FullIPAddress,
+                                Date = DateTime.Now,
+                                Favorite = "0",
+                                Current = "1",
+                                PingSpeed = "Accessing...",
+                            });
+                            
+                            string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                            var fswadd = new FileStream(serverhistorypath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+                            var swadd = new StreamWriter(fswadd);
+                            swadd.Write(listjson);
+                            swadd.Close();
+                            fswadd.Close();
                             readHistoryfile();
                         }
-
-                    }
-                    else
-                    {  //******Need to look at this due to saving already visited and current as current
-                        Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
-                        int indexCurrent = server_list.FindIndex(x => x.Current == "1");
-                        if (matchCurrent != null)
-                        {
-                            matchCurrent.Current = "0";
-
-                            server_list[indexCurrent] = matchCurrent;
-                        }
-
-                        server_list.Add(new Server()
-                        {
-                            ServerName = servername,
-                            IP_Address = IPAddress,
-                            FullIP_Address = FullIPAddress,
-                            Date = DateTime.Now,
-                            Favorite = "0",
-                            Current = "1",
-                            PingSpeed = "Accessing...",
-                        });
-
-                        string listjson = JsonConvert.SerializeObject(server_list.ToArray());
-                        var fswadd = new FileStream(serverhistorypath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-                        var swadd = new StreamWriter(fswadd);
-                        swadd.Write(listjson);
-                        swadd.Close();
-                        fswadd.Close();
-                        readHistoryfile();
-                    }
-
+                    
                 }
                 catch (Exception e)
                 {
@@ -200,30 +200,30 @@ namespace DayZServer
                 {
                     server_list = new List<Server>();
                 }
-                server_list.Add(new Server()
-                {
-                    ServerName = servername,
-                    IP_Address = IPAddress,
-                    FullIP_Address = FullIPAddress,
-                    Date = DateTime.Now,
-                    Favorite = "0",
-                    Current = "1",
-                    PingSpeed = "Accessing...",
-                });
-                string listjson = JsonConvert.SerializeObject(server_list.ToArray());
-                var fswnew = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-                var swnew = new StreamWriter(fswnew);
-                try
-                {
-                    swnew.Write(listjson);
-                    swnew.Close();
-                    fswnew.Close();
-                    readHistoryfile();
-                }
-                catch (ArgumentException e)
-                {
-                    Console.WriteLine("Exception" + e);
-                }
+                        server_list.Add(new Server()
+                        {
+                            ServerName = servername,
+                            IP_Address = IPAddress,
+                            FullIP_Address = FullIPAddress,
+                            Date = DateTime.Now,
+                            Favorite = "0",
+                            Current = "1",
+                            PingSpeed = "Accessing...",
+                        });
+                        string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                        var fswnew = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                        var swnew = new StreamWriter(fswnew);
+                        try
+                        {
+                            swnew.Write(listjson);
+                            swnew.Close();
+                            fswnew.Close();
+                            readHistoryfile();
+                        }
+                        catch (ArgumentException e)
+                        {
+                            Console.WriteLine("Exception" + e);
+                        }
             }
         }
 
@@ -240,7 +240,7 @@ namespace DayZServer
         {
             Servers.AddOrUpdate(DayZServer.IP_Address, DayZServer, (key, existingVal) =>
             {
-                //Console.WriteLine(" writeServerMemory:Servers1 " + Servers.Count);
+                Console.WriteLine(" writeServerHistoryList:Servers1 " + Servers);
                 // If this delegate is invoked, then the key already exists.
                 try
                 {
@@ -418,52 +418,52 @@ namespace DayZServer
 
         public void updateFavorite(string favoriteServer)
         {
-            if (server_list == null)
-            {
-                server_list = new List<Server>();
-            }
-            if (server_list.Count == 0)
-            {
-                try
+                if (server_list == null)
                 {
-                    server_list = getServerList();
+                    server_list = new List<Server>();
                 }
-                catch (Exception e)
+                if (server_list.Count == 0)
                 {
-                    Console.WriteLine("Exception" + e);
-                }
-            }
-
-            Server match = server_list.FirstOrDefault(x => x.FullIP_Address == favoriteServer);
-            int index = server_list.FindIndex(x => x.FullIP_Address == favoriteServer);
-
-            if (match != null)
-            {
-                if (match.Favorite == "1")
-                {
-                    match.Favorite = "0";
-                }
-                else if (match.Favorite == "0")
-                {
-                    match.Favorite = "1";
+                    try
+                    {
+                        server_list = getServerList();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception" + e);
+                    }
                 }
 
-                server_list[index] = match;
-                string listjson = JsonConvert.SerializeObject(server_list.ToArray());
-                var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-                var sw = new StreamWriter(fsw);
-                try
+                Server match = server_list.FirstOrDefault(x => x.FullIP_Address == favoriteServer);
+                int index = server_list.FindIndex(x => x.FullIP_Address == favoriteServer);
+
+                if (match != null)
                 {
-                    sw.Write(listjson);
-                    sw.Close();
-                    fsw.Close();
-                    writeServerMemory(match);
+                    if (match.Favorite == "1")
+                    {
+                        match.Favorite = "0";
+                    }
+                    else if (match.Favorite == "0")
+                    {
+                        match.Favorite = "1";
+                    }
+                   
+                    server_list[index] = match;
+                    string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                    var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                    var sw = new StreamWriter(fsw);
+                    try
+                    {
+                        sw.Write(listjson);
+                        sw.Close();
+                        fsw.Close();
+                        writeServerMemory(match);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        Console.WriteLine("Exception" + e);
+                    }
                 }
-                catch (ArgumentException e)
-                {
-                    Console.WriteLine("Exception" + e);
-                }
-            }
         }
 
         public void deleteServer(string deleteServer)
@@ -542,7 +542,7 @@ namespace DayZServer
 
                 Pinger(DayZServer.IP_Address);
                 //Task.Factory.StartNew( () => DoWork(DayZServer), token, TaskContinuationOptions.None, scheduler);
-                // Task.Factory.StartNew(() => Pinger(DayZServer.FullIP_Address), token);
+               // Task.Factory.StartNew(() => Pinger(DayZServer.FullIP_Address), token);
             }
 
             //foreach (KeyValuePair<string, Server> pair in Servers)
