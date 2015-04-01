@@ -35,16 +35,20 @@ namespace DayZServer
 
     public partial class Window1 : Window
     {
-        private static System.Timers.Timer aTimer;
+        private static System.Timers.Timer updateServerListTimer;
+        private static System.Timers.Timer checkProfileForNewServerTimer;
         public string selectedIP;
-        private static DataManager dm = new DataManager();
+        public static DataManager dm = new DataManager();
 
         public Window1()
         {
             InitializeComponent();
-            aTimer = new System.Timers.Timer(4000);
-            aTimer.Elapsed += OnTimedEvent;
-            aTimer.Enabled = true;
+            updateServerListTimer = new System.Timers.Timer(1000);
+            updateServerListTimer.Elapsed += OnServerListTimedEvent;
+            updateServerListTimer.Enabled = true;
+            checkProfileForNewServerTimer = new System.Timers.Timer(4000);
+            checkProfileForNewServerTimer.Elapsed += OnNewServerTimedEvent;
+            checkProfileForNewServerTimer.Enabled = true;
             steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
             dm.startDataManager();
@@ -99,17 +103,32 @@ namespace DayZServer
                     }
 
                 }));
-
-
-
-
         }
 
-        void OnTimedEvent(Object source, ElapsedEventArgs e)
+
+        public void checkProfileForNewServer()
+        {
+            dm.writeServerHistoryList();
+        }
+
+        void OnServerListTimedEvent(Object source, ElapsedEventArgs e)
         {
             try
             {
                 updateServerList();
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine("The process failed: {0}", err.ToString());
+            }
+            //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+        }
+
+        void OnNewServerTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            try
+            {
+                checkProfileForNewServer();
             }
             catch (Exception err)
             {
@@ -134,7 +153,6 @@ namespace DayZServer
             steamLogin.Visibility = Visibility.Visible;
         }
 
-
         private void userIdGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             TextBox source = e.Source as TextBox;
@@ -144,6 +162,7 @@ namespace DayZServer
                 source.Clear();
             }
         }
+        
         private void userIdLostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
             TextBox source = e.Source as TextBox;
@@ -154,8 +173,6 @@ namespace DayZServer
                 source.Text = "UserID";
             }
         }
-
-
 
         private void login_click(object sender, RoutedEventArgs e)
         {
@@ -168,8 +185,6 @@ namespace DayZServer
             SteamAccess.Login(arr1);
         }
 
-
-
         private void cancelLogin_Click(object sender, RoutedEventArgs e)
         {
             steamLogin.Visibility = Visibility.Hidden;
@@ -179,24 +194,32 @@ namespace DayZServer
 
         private void favorite_Click(object sender, RoutedEventArgs e)
         {
-            DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
-            string favoriteServer = obj.FullIP_Address;
-            dm.updateFavorite(favoriteServer);
+
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
+                string favoriteServer = obj.FullIP_Address;
+                dm.updateFavorite(favoriteServer);
+                updateServerList();
+
+            }));
         }
 
         private void delete_Click(object sender, RoutedEventArgs e)
         {
-            DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
-            string favoriteServer = obj.ServerName;
-            DataManager dm = new DataManager();
-            dm.deleteServer(favoriteServer);
-            if (obj.IP_Address == selectedIP)
+            this.Dispatcher.Invoke((Action)(() =>
             {
-                DataManager.Server serverobj = dm.getCurrentServerList();
-                updateUserList(serverobj);
-                selectedIP = serverobj.IP_Address;
-            }
-
+            DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
+            string deleteServer = obj.ServerName;
+            dm.deleteServer(deleteServer);
+            updateServerList();
+            }));
+            //if (obj.IP_Address == selectedIP)
+            //{
+            //    DataManager.Server serverobj = dm.getCurrentServerList();
+            //    updateUserList(serverobj);
+            //    selectedIP = serverobj.IP_Address;
+            //}
         }
 
         private void ClearHistory(object sender, RoutedEventArgs e)
