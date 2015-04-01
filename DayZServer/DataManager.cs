@@ -136,6 +136,15 @@ namespace DayZServer
                         {
                             if (match.Current == "0")
                             {
+                                Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
+                                int indexCurrent = server_list.FindIndex(x => x.Current == "1");
+                                if (matchCurrent != null)
+                                {
+                                    matchCurrent.Current = "0";
+
+                                    server_list[indexCurrent] = matchCurrent;
+                                }
+                                
                                 match.Date = DateTime.Now;
                                 match.IP_Address = IPAddress;
                                 match.FullIP_Address = FullIPAddress;
@@ -158,7 +167,7 @@ namespace DayZServer
                             
                         }
                         else
-                        {  //******Need to look at this due to saving already visited and current as current
+                        { 
                             Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
                             int indexCurrent = server_list.FindIndex(x => x.Current == "1");
                             if (matchCurrent != null)
@@ -515,8 +524,6 @@ namespace DayZServer
             }
         }
 
-
-
         void PingTimedEvent(Object source, ElapsedEventArgs e)
         {
             try
@@ -533,9 +540,6 @@ namespace DayZServer
 
         public void getPing()
         {
-
-            //TaskScheduler scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-            //CancellationToken token = new CancellationToken();
             try
             {
                 server_list = getServerList();
@@ -546,39 +550,8 @@ namespace DayZServer
             }
             foreach (Server DayZServer in server_list)
             {
-
                 Pinger(DayZServer.IP_Address);
-                //Task.Factory.StartNew( () => DoWork(DayZServer), token, TaskContinuationOptions.None, scheduler);
-               // Task.Factory.StartNew(() => Pinger(DayZServer.FullIP_Address), token);
             }
-
-            //foreach (KeyValuePair<string, Server> pair in Servers)
-            //{
-            //    Console.WriteLine(Servers);
-
-
-            //   // Task.Factory.StartNew([DoWork(pair.Value.FullIP_Address])).ContinueWith(w => tester = "All done", token, TaskContinuationOptions.None, scheduler);
-
-            //}
-
-
-
-            //TaskScheduler scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-
-            ////We don't use the Cancel Token in this example but it's required
-            //CancellationToken token = new CancellationToken();
-
-            ////This starts the work on a new thread calling the DoWork method.
-            ////Once the work is done it sets txtResult.Text = "All done". Notice we need
-            ////to give the ContinueWith statement the scheduler. This is how it knows what
-            ////thread to marshal the ContinueWith block to. So it executes it on our UI thread.
-            ////If you remove that part it will try to call it from a different thread and
-            ////an exception will be thrown.
-
-            //DataManager dm = new DataManager();
-            //tester = "working...";
-            //currentIP = reply.Address.ToString();
-            //Task.Factory.StartNew(dm.DoWork).ContinueWith(w => tester = "All done", token, TaskContinuationOptions.None, scheduler);
         }
 
         public void Pinger(string fullIP)
