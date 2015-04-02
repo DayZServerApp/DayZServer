@@ -13,8 +13,11 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
+using System.Net;
+using Microsoft;
+using System.Collections.Concurrent;
+using SSQLib;
+using System.Collections;
 
 
 namespace DayZServer
@@ -83,6 +86,7 @@ namespace DayZServer
             PlayerTimer = new System.Timers.Timer(10000);
             PlayerTimer.Elapsed += PlayerTimedEvent;
             PlayerTimer.Enabled = true;
+            serverInfo();
         }
 
         public List<Server> getList()
@@ -251,6 +255,16 @@ namespace DayZServer
             }
         }
 
+        public void removeHistoryfile()
+        {
+            server_list = getServerList();
+            foreach (Server DayZServer in server_list)
+            {
+                removeServerMemory(DayZServer);
+            }
+            File.Delete(serverhistorypath);
+        }
+
         public void writeServerMemory(Server DayZServer)
         {
             Console.WriteLine(" writeServerHistoryList:Servers1 " + Servers.Count.ToString());
@@ -259,13 +273,9 @@ namespace DayZServer
                 // If this delegate is invoked, then the key already exists.
                 try
                 {
-                    if (DayZServer.IP_Address == existingVal.IP_Address)
-                    {
                     existingVal.Current = DayZServer.Current;
                     existingVal.Favorite = DayZServer.Favorite;
-                    }
-
-                        return existingVal;
+                    return existingVal;
                 }
                 catch (ArgumentException e)
                 {
@@ -350,6 +360,20 @@ namespace DayZServer
             if (matchCurrent != null)
             {
                 return matchCurrent;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Server userList(string ip)
+        {
+            Server matchPlayers = serversList.FirstOrDefault(x => x.IP_Address == ip);
+            int indexCurrent = server_list.FindIndex(x => x.IP_Address == ip);
+            if (matchPlayers != null)
+            {
+                return matchPlayers;
             }
             else
             {
@@ -524,6 +548,51 @@ namespace DayZServer
             }
         }
 
+        
+
+        public void serverInfo()
+        {
+
+              try
+                {
+                   
+
+//System.Net.IPAddress hostIPAddress1 = System.Net.IPAddress.Parse("62.210.177.22");
+//IPEndPoint endpoint = new IPEndPoint(hostIPAddress1, int.Parse("2602"));
+//SSQL ssql = new SSQL(endpoint);
+
+//string AppID = ssql.Server
+//                  ArrayList myAL = new ArrayList();
+//                  myAL = ssql.Players(endpoint);
+//Console.WriteLine("AppID: " + AppID);
+//Console.WriteLine("Players: " + myAL);
+
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            
+        }
+
+        public void deleteServerHistory()
+        {
+
+              try
+                {
+                    server_list.Clear();
+                    serversList.Clear();
+                    Servers.Clear();
+                    File.Delete(serverhistorypath);
+
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+            }
+            
+        }
+
         void PingTimedEvent(Object source, ElapsedEventArgs e)
         {
             Interlocked.Increment(ref pingLoopInProgress);
@@ -643,8 +712,8 @@ namespace DayZServer
             }
             else
             {
-                PingReply reply = e.Reply;
-                DisplayReply(reply);
+            PingReply reply = e.Reply;
+            DisplayReply(reply);
             }
 
             ((AutoResetEvent)e.UserState).Set();
@@ -670,17 +739,17 @@ namespace DayZServer
                 // is waiting for.
                 ((AutoResetEvent)e.UserState).Set();
 
-                byte[] data = (byte[])e.Result;
-                string result = System.Text.Encoding.UTF8.GetString(data);
-                string URL;
+            byte[] data = (byte[])e.Result;
+            string result = System.Text.Encoding.UTF8.GetString(data);
+            string URL;
 
-                // EXAMPLE     ip=216.244.78.242&
-                Match m2 = Regex.Match(result, "(?<=ip=).*?(?=&)", RegexOptions.Singleline);
-                if (m2.Success)
-                {
-                    URL = m2.ToString();
-                    DisplayResult(result, URL);
-                }
+            // EXAMPLE     ip=216.244.78.242&
+            Match m2 = Regex.Match(result, "(?<=ip=).*?(?=&)", RegexOptions.Singleline);
+            if (m2.Success)
+            {
+                URL = m2.ToString();
+                DisplayResult(result, URL);
+            }
             }
 
             // Let the main thread resume.
@@ -710,7 +779,6 @@ namespace DayZServer
                     // If this delegate is invoked, then the key already exists.
                     try
                     {
-                        if (dzServer.IP_Address == existingVal.IP_Address)
                         existingVal.PingSpeed = dzServer.PingSpeed;
 
                         return existingVal;
@@ -748,7 +816,7 @@ namespace DayZServer
             else
             {
                 playerhtml = "<a href=\"https://github.com/DayZServerApp/DayZServer/releases\" target=\"_blank\" > Unavailable </a>";
-        }
+            }
 
 
             List<DayZPlayer> list = new List<DayZPlayer>();
