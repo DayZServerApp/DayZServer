@@ -111,7 +111,7 @@
                     <Image Source="images/appicon.png" Width="75" />
                 </Button>
 
-                <Button  ToolTip="Steam Login Disabled" Width="104" Height="55" Cursor="No" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Hidden">
+                <Button  ToolTip="Steam Login Disabled" Click="steam_click" Width="104" Height="55" Cursor="No" Background="{x:Null}" BorderBrush="{x:Null}">
                     <Image Source="images/sits_large_noborder.png" Width="93" Height="39" />
                 </Button>
 
