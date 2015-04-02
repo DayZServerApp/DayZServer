@@ -39,9 +39,11 @@ namespace DayZServer
         public int pingIndex;
         public List<Server> server_list;
         public List<Server> serversList = new List<Server>();
+        public List<DayZPlayer> playersList = new List<DayZPlayer>();
         public static string tester;
         public static string currentIP;
         static ConcurrentDictionary<string, Server> Servers = new ConcurrentDictionary<string, Server>();
+        static ConcurrentDictionary<string, Server> Players = new ConcurrentDictionary<string, Server>();
         private static System.Timers.Timer PingTimer;
         private static System.Timers.Timer PlayerTimer;
 
@@ -97,19 +99,14 @@ namespace DayZServer
             public string Current { get; set; }
             public string PingSpeed { get; set; }
             public string UserCount { get; set; }
-            public List<LinkItem> linkItem { get; set; }
-            static ConcurrentDictionary<string, LinkItem> ConcurrentDictionary { get; set; }
+            public List<DayZPlayer> playersList { get; set; }
         }
 
-        public class LinkItem
+        public class DayZPlayer
         {
             public string Href { get; set; }
             public string UserName { get; set; }
         }
-
-
-
-
 
         public void writeServerHistoryList()
         {
@@ -270,11 +267,9 @@ namespace DayZServer
                 // If this delegate is invoked, then the key already exists.
                 try
                 {
-                    if (dzServer != existingVal)
-                        throw new ArgumentException("Duplicate IP Address are not allowed: {0}.", dzServer.IP_Address);
                     existingVal.Current = DayZServer.Current;
                     existingVal.Favorite = DayZServer.Favorite;
-                        return existingVal;
+                    return existingVal;
                 }
                 catch (ArgumentException e)
                 {
@@ -700,8 +695,6 @@ namespace DayZServer
                     // If this delegate is invoked, then the key already exists.
                     try
                     {
-                        if (dzServer != existingVal)
-                            throw new ArgumentException("Duplicate IP Address are not allowed: {0}.", reply.Address.ToString());
                         existingVal.PingSpeed = dzServer.PingSpeed;
                         return existingVal;
                     }
@@ -723,7 +716,57 @@ namespace DayZServer
             if (result == null)
                 return;
 
-            Console.WriteLine("html: {0}", result);
+           // Console.WriteLine("html: {0}", result);
+
+            string playerhtml = result;
+            if (playerhtml.Contains("Players:") && playerhtml.Contains("Rank:"))
+            {
+                Match m2 = Regex.Match(playerhtml, "(?<=Online Players).*?(?=JOIN THIS SERVER)", RegexOptions.Singleline);
+                if (m2.Success)
+                {
+                    playerhtml = m2.ToString();
+
+                }
+            }
+            else
+            {
+                playerhtml = "<a href=\"https://github.com/DayZServerApp/DayZServer/releases\" target=\"_blank\" > Unavailable </a>";
+            }
+
+
+            List<DayZPlayer> list = new List<DayZPlayer>();
+
+            // 1.
+            // Find all matches in file.
+            MatchCollection m1 = Regex.Matches(playerhtml, @"(<a.*?>.*?</a>)",
+                RegexOptions.Singleline);
+
+            // 2.
+            // Loop over each match.
+            foreach (Match m in m1)
+            {
+                string value = m.Groups[1].Value;
+                DayZPlayer i = new DayZPlayer();
+
+                // 3.
+                // Get href attribute.
+                Match m3 = Regex.Match(value, @"href=\""(.*?)\""",
+                RegexOptions.Singleline);
+
+                if (m3.Success)
+                {
+                    i.Href = m3.Groups[1].Value.ToString();
+                }
+
+                // 4.
+                // Remove inner tags from text.
+                string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
+                RegexOptions.Singleline);
+                i.UserName = t;
+
+                list.Add(i);
+
+            }
 
             int Start, End;
             string userCount;
@@ -744,30 +787,37 @@ namespace DayZServer
                 userCount = "Unavailable";
             }
 
-             Server dzServer = new Server();
-                dzServer.UserCount = userCount;
 
-                            Servers.AddOrUpdate(IP, dzServer, (key, existingVal) =>
+
+
+
+
+            Server dzServer = new Server();
+            dzServer.UserCount = userCount;
+            dzServer.playersList = list;
+
+            Servers.AddOrUpdate(IP, dzServer, (key, existingVal) =>
+            {
+                Console.WriteLine(" writeServerHistoryList:Servers1 " + Servers);
+                // If this delegate is invoked, then the key already exists.
+                try
                 {
-                    Console.WriteLine(" writeServerHistoryList:Servers1 " + Servers);
-                    // If this delegate is invoked, then the key already exists.
-                    try
-                    {
-                        if (dzServer != existingVal)
-                            throw new ArgumentException("Duplicate IP Address are not allowed: {0}.", IP);
-                        existingVal.UserCount = dzServer.UserCount;
-                        return existingVal;
-                    }
-                    catch (ArgumentException e)
-                    {
-                        Console.WriteLine("Exception" + e);
-                        existingVal.UserCount = dzServer.UserCount;
-                        return existingVal;
-                    }
-                });
-                List<Server> serversList = new List<Server>();
-                serversList = Servers.Values.ToList() as List<Server>;
-            }
+                    existingVal.UserCount = dzServer.UserCount;
+                    existingVal.playersList = dzServer.playersList;
+                    return existingVal;
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                    existingVal.UserCount = dzServer.UserCount;
+                    existingVal.playersList = dzServer.playersList;
+                    return existingVal;
+                }
+            });
+            List<Server> serversList = new List<Server>();
+            serversList = Servers.Values.ToList() as List<Server>;
+
+        }
 
       
 
@@ -903,106 +953,106 @@ namespace DayZServer
 
 
 
-        public static String[] serverInfo(string ip)
-        {
+        //public static String[] serverInfo(string ip)
+        //{
 
-            WebClient webClient = new WebClient();
+        //    WebClient webClient = new WebClient();
 
-            string strUrl = "http://cache.www.gametracker.com/components/html0/?host=" + ip + "&currentPlayersHeight=300&showCurrPlayers=1";
-            byte[] reqHTML;
+        //    string strUrl = "http://cache.www.gametracker.com/components/html0/?host=" + ip + "&currentPlayersHeight=300&showCurrPlayers=1";
+        //    byte[] reqHTML;
 
-            //check this
-            reqHTML = webClient.DownloadData(strUrl);
-            UTF8Encoding objUTF8 = new UTF8Encoding();
-            string html = objUTF8.GetString(reqHTML);
+        //    //check this
+        //    reqHTML = webClient.DownloadData(strUrl);
+        //    UTF8Encoding objUTF8 = new UTF8Encoding();
+        //    string html = objUTF8.GetString(reqHTML);
 
-            int Start, End;
-            string noHTML;
-            string strStart = "Players:";
-            string strEnd = "Rank";
-
-
-
-            if (html.Contains("Players:") && html.Contains("Rank:"))
-            {
-                Start = html.IndexOf(strStart, 0) + strStart.Length;
-                End = html.IndexOf(strEnd, Start);
-                html = html.Substring(Start, End - Start);
-                noHTML = Regex.Replace(html, @"<[^>]+>|&nbsp;", "").Trim();
-
-            }
-            else
-            {
-                noHTML = "Unavailable";
-            }
-
-
-            string[] arr1 = new string[] { noHTML };
-            return arr1;
-        }
-
-        public static List<LinkItem> userList(string ip)
-        {
-
-            WebClient webClient = new WebClient();
-
-            string strUrl = "http://cache.www.gametracker.com/components/html0/?host=" + ip + "&currentPlayersHeight=300&showCurrPlayers=1";
-            byte[] reqHTML;
-            reqHTML = webClient.DownloadData(strUrl);
-            UTF8Encoding objUTF8 = new UTF8Encoding();
-            string phtml = objUTF8.GetString(reqHTML);
-
-
-            if (phtml.Contains("Players:") && phtml.Contains("Rank:"))
-            {
-                Match m2 = Regex.Match(phtml, "(?<=Online Players).*?(?=JOIN THIS SERVER)", RegexOptions.Singleline);
-                if (m2.Success)
-                {
-                    phtml = m2.ToString();
-
-                }
-            }
-            else
-            {
-                phtml = "<a href=\"https://github.com/DayZServerApp/DayZServer/releases\" target=\"_blank\" > Unavailable </a>";
-            }
+        //    int Start, End;
+        //    string noHTML;
+        //    string strStart = "Players:";
+        //    string strEnd = "Rank";
 
 
 
-            List<LinkItem> list = new List<LinkItem>();
+        //    if (html.Contains("Players:") && html.Contains("Rank:"))
+        //    {
+        //        Start = html.IndexOf(strStart, 0) + strStart.Length;
+        //        End = html.IndexOf(strEnd, Start);
+        //        html = html.Substring(Start, End - Start);
+        //        noHTML = Regex.Replace(html, @"<[^>]+>|&nbsp;", "").Trim();
 
-            // 1.
-            // Find all matches in file.
-            MatchCollection m1 = Regex.Matches(phtml, @"(<a.*?>.*?</a>)",
-                RegexOptions.Singleline);
+        //    }
+        //    else
+        //    {
+        //        noHTML = "Unavailable";
+        //    }
 
-            // 2.
-            // Loop over each match.
-            foreach (Match m in m1)
-            {
-                string value = m.Groups[1].Value;
-                LinkItem i = new LinkItem();
 
-                // 3.
-                // Get href attribute.
-                Match m3 = Regex.Match(value, @"href=\""(.*?)\""",
-                RegexOptions.Singleline);
+        //    string[] arr1 = new string[] { noHTML };
+        //    return arr1;
+        //}
 
-                if (m3.Success)
-                {
-                    i.Href = m3.Groups[1].Value.ToString();
-                }
+        //public static List<LinkItem> userList(string ip)
+        //{
 
-                // 4.
-                // Remove inner tags from text.
-                string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
-                RegexOptions.Singleline);
-                i.UserName = t;
+        //    WebClient webClient = new WebClient();
 
-                list.Add(i);
-            }
-            return list;
-        }
+        //    string strUrl = "http://cache.www.gametracker.com/components/html0/?host=" + ip + "&currentPlayersHeight=300&showCurrPlayers=1";
+        //    byte[] reqHTML;
+        //    reqHTML = webClient.DownloadData(strUrl);
+        //    UTF8Encoding objUTF8 = new UTF8Encoding();
+        //    string phtml = objUTF8.GetString(reqHTML);
+
+
+        //    if (phtml.Contains("Players:") && phtml.Contains("Rank:"))
+        //    {
+        //        Match m2 = Regex.Match(phtml, "(?<=Online Players).*?(?=JOIN THIS SERVER)", RegexOptions.Singleline);
+        //        if (m2.Success)
+        //        {
+        //            phtml = m2.ToString();
+
+        //        }
+        //    }
+        //    else
+        //    {
+        //        phtml = "<a href=\"https://github.com/DayZServerApp/DayZServer/releases\" target=\"_blank\" > Unavailable </a>";
+        //    }
+
+
+
+        //    List<Player> list = new List<Player>();
+
+        //    // 1.
+        //    // Find all matches in file.
+        //    MatchCollection m1 = Regex.Matches(phtml, @"(<a.*?>.*?</a>)",
+        //        RegexOptions.Singleline);
+
+        //    // 2.
+        //    // Loop over each match.
+        //    foreach (Match m in m1)
+        //    {
+        //        string value = m.Groups[1].Value;
+        //        Player i = new Player();
+
+        //        // 3.
+        //        // Get href attribute.
+        //        Match m3 = Regex.Match(value, @"href=\""(.*?)\""",
+        //        RegexOptions.Singleline);
+
+        //        if (m3.Success)
+        //        {
+        //            i.Href = m3.Groups[1].Value.ToString();
+        //        }
+
+        //        // 4.
+        //        // Remove inner tags from text.
+        //        string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
+        //        RegexOptions.Singleline);
+        //        i.UserName = t;
+
+        //        list.Add(i);
+        //    }
+        //    return list;
+        //}
 
 
 
