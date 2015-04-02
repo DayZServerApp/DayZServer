@@ -84,7 +84,7 @@
     </Reference>
     <Reference Include="SSQLib, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\DayZeroLauncher\source\SSQLib\bin\Release\SSQLib.dll</HintPath>
+      <HintPath>bin\SSQLib.dll</HintPath>
     </Reference>
     <Reference Include="SteamKit2">
       <HintPath>..\packages\SteamKit2.1.6.2\lib\net40\SteamKit2.dll</HintPath>

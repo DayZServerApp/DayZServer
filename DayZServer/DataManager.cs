@@ -18,6 +18,7 @@ using Microsoft;
 using System.Collections.Concurrent;
 using SSQLib;
 using System.Collections;
+using System.Timers;
 
 
 namespace DayZServer
@@ -596,16 +597,16 @@ namespace DayZServer
             {
                 lock (server_list)
                 {
-            try
-            {
-                getPing();
-            }
-            catch (Exception err)
-            {
+                    try
+                    {
+                        getPing();
+                    }
+                    catch (Exception err)
+                    {
                         Debug.WriteLine("The process failed: {0}", err.ToString());
-            }
-            //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
-        }
+                    }
+                    //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+                }
             }
             else
             {
