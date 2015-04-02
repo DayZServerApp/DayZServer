@@ -438,7 +438,7 @@ namespace DayZServer
                 }
             }
 
-            userList.ItemsSource = obj.linkItem;
+            userList.ItemsSource = obj.playersList;
 
             if (!string.IsNullOrEmpty(dgSortDescriptionUser) && dgSortDirectionUser != null)
             {
