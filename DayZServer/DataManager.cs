@@ -15,6 +15,8 @@ using System.Threading;
 using System.Net;
 using Microsoft;
 using System.Collections.Concurrent;
+using SSQLib;
+using System.Collections;
 
 
 namespace DayZServer
@@ -82,6 +84,7 @@ namespace DayZServer
             PlayerTimer = new System.Timers.Timer(10000);
             PlayerTimer.Elapsed += PlayerTimedEvent;
             PlayerTimer.Enabled = true;
+            serverInfo();
         }
 
         public List<Server> getList()
@@ -552,6 +555,33 @@ namespace DayZServer
                     Console.WriteLine("Exception" + e);
                 }
             }
+        }
+
+        
+
+        public void serverInfo()
+        {
+
+              try
+                {
+                   
+
+//System.Net.IPAddress hostIPAddress1 = System.Net.IPAddress.Parse("62.210.177.22");
+//IPEndPoint endpoint = new IPEndPoint(hostIPAddress1, int.Parse("2602"));
+//SSQL ssql = new SSQL(endpoint);
+
+//string AppID = ssql.Server
+//                  ArrayList myAL = new ArrayList();
+//                  myAL = ssql.Players(endpoint);
+//Console.WriteLine("AppID: " + AppID);
+//Console.WriteLine("Players: " + myAL);
+
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            
         }
 
         public void deleteServerHistory()
