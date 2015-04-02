@@ -249,6 +249,16 @@ namespace DayZServer
             }
         }
 
+        public void removeHistoryfile()
+        {
+            server_list = getServerList();
+            foreach (Server DayZServer in server_list)
+            {
+                removeServerMemory(DayZServer);
+            }
+            File.Delete(serverhistorypath);
+        }
+
         public void writeServerMemory(Server DayZServer)
         {
             Server dzServer = new Server();
@@ -297,6 +307,8 @@ namespace DayZServer
             Servers.TryRemove(DayZServer.IP_Address, out DayZServer);
             serversList = Servers.Values.ToList() as List<Server>;
         }
+
+
 
         public List<Server> getServerList()
         {
@@ -354,6 +366,20 @@ namespace DayZServer
             if (matchCurrent != null)
             {
                 return matchCurrent;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Server userList(string ip)
+        {
+            Server matchPlayers = serversList.FirstOrDefault(x => x.IP_Address == ip);
+            int indexCurrent = server_list.FindIndex(x => x.IP_Address == ip);
+            if (matchPlayers != null)
+            {
+                return matchPlayers;
             }
             else
             {
@@ -526,6 +552,24 @@ namespace DayZServer
                     Console.WriteLine("Exception" + e);
                 }
             }
+        }
+
+        public void deleteServerHistory()
+        {
+
+              try
+                {
+                    server_list.Clear();
+                    serversList.Clear();
+                    Servers.Clear();
+                    File.Delete(serverhistorypath);
+
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            
         }
 
         void PingTimedEvent(Object source, ElapsedEventArgs e)
