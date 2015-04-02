@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Timers;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
+﻿using Microsoft;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Net.NetworkInformation;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Net;
 using Microsoft;
@@ -48,6 +49,7 @@ namespace DayZServer
         static ConcurrentDictionary<string, Server> Players = new ConcurrentDictionary<string, Server>();
         private static System.Timers.Timer PingTimer;
         private static System.Timers.Timer PlayerTimer;
+        static int pingLoopInProgress = 0;
 
         public DataManager()
         {
@@ -62,8 +64,8 @@ namespace DayZServer
         public void startDataManager()
         {
             defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString();
-            dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile");
-            dirs = dirs.Where(w => w != dirs[1]).ToArray();
+            dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile"); // TODO: crashes if DayZ is not loaded
+            dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
             configpath = dirs[0];
 
             if (!Directory.Exists(path))
@@ -113,6 +115,7 @@ namespace DayZServer
 
         public void writeServerHistoryList()
         {
+            Debug.WriteLine("writeServerHistoryList");
             var profileFileStream = new FileStream(configpath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var profileStremReader = new StreamReader(profileFileStream);
             DayZProfile = profileStremReader.ReadToEnd();
@@ -164,14 +167,8 @@ namespace DayZServer
                                 sw.Write(listjson);
                                 sw.Close();
                                 fsw.Close();
-                                readHistoryfile();
                             }
-                            else
-                            {
-                                readHistoryfile();
                             }
-                            
-                        }
                         else
                         { 
                             Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
@@ -200,10 +197,10 @@ namespace DayZServer
                             swadd.Write(listjson);
                             swadd.Close();
                             fswadd.Close();
+                    }
+
                             readHistoryfile();
                         }
-                    
-                }
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception" + e);
@@ -215,6 +212,7 @@ namespace DayZServer
                 {
                     server_list = new List<Server>();
                 }
+                
                         server_list.Add(new Server()
                         {
                             ServerName = servername,
@@ -226,6 +224,7 @@ namespace DayZServer
                             PingSpeed = "Accessing...",
                             UserCount = "Accessing...",
                         });
+                
                         string listjson = JsonConvert.SerializeObject(server_list.ToArray());
                         var fswnew = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
                         var swnew = new StreamWriter(fswnew);
@@ -264,25 +263,15 @@ namespace DayZServer
 
         public void writeServerMemory(Server DayZServer)
         {
-            Server dzServer = new Server();
-            dzServer.Date = DayZServer.Date;
-            dzServer.ServerName = DayZServer.ServerName;
-            dzServer.IP_Address = DayZServer.IP_Address;
-            dzServer.FullIP_Address = DayZServer.FullIP_Address;
-            dzServer.Current = DayZServer.Current;
-            dzServer.Favorite = DayZServer.Favorite;
-            dzServer.PingSpeed = DayZServer.PingSpeed;
-            dzServer.UserCount = DayZServer.UserCount;
-
-            Servers.AddOrUpdate(dzServer.IP_Address, dzServer, (key, existingVal) =>
+            Debug.WriteLine(" update Server: {0} current: {1}, favorite: {2}", DayZServer.IP_Address, DayZServer.Current, DayZServer.Favorite);
+            Servers.AddOrUpdate(DayZServer.IP_Address, DayZServer, (key, existingVal) =>
             {
-                Console.WriteLine(" writeServerHistoryList:Servers1 " + Servers);
                 // If this delegate is invoked, then the key already exists.
                 try
                 {
                     existingVal.Current = DayZServer.Current;
                     existingVal.Favorite = DayZServer.Favorite;
-                    return existingVal;
+                        return existingVal;
                 }
                 catch (ArgumentException e)
                 {
@@ -310,8 +299,6 @@ namespace DayZServer
             Servers.TryRemove(DayZServer.IP_Address, out DayZServer);
             serversList = Servers.Values.ToList() as List<Server>;
         }
-
-
 
         public List<Server> getServerList()
         {
@@ -598,21 +585,33 @@ namespace DayZServer
                 catch (ArgumentException e)
                 {
                     Console.WriteLine("Exception" + e);
-                }
+            }
             
         }
 
         void PingTimedEvent(Object source, ElapsedEventArgs e)
         {
+            Interlocked.Increment(ref pingLoopInProgress);
+            if (pingLoopInProgress == 1)
+            {
+                lock (server_list)
+                {
             try
             {
                 getPing();
             }
             catch (Exception err)
             {
-                Console.WriteLine("The process failed: {0}", err.ToString());
+                        Debug.WriteLine("The process failed: {0}", err.ToString());
             }
             //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+        }
+            }
+            else
+            {
+                Debug.WriteLine("!!!!!!!!!!!! PING PROCESS ALREADY RUNNING !!!!!!!!!!!!");
+            }
+            Interlocked.Decrement(ref pingLoopInProgress);
         }
 
         void PlayerTimedEvent(Object source, ElapsedEventArgs e)
@@ -639,6 +638,7 @@ namespace DayZServer
             {
                 Console.WriteLine("Exception" + e);
             }
+
             foreach (Server DayZServer in server_list)
             {
                 Pinger(DayZServer.IP_Address);
@@ -655,6 +655,7 @@ namespace DayZServer
             {
                 Console.WriteLine("Exception" + e);
             }
+
             foreach (Server DayZServer in server_list)
             {
                 Player(DayZServer.FullIP_Address);
@@ -667,19 +668,17 @@ namespace DayZServer
                 throw new ArgumentException("Ping needs a host or IP Address.");
 
             string who = IP;
-            AutoResetEvent waiter = new AutoResetEvent(false);
+            //AutoResetEvent waiter = new AutoResetEvent(false);
             Ping pingSender = new Ping();
             pingSender.PingCompleted += new PingCompletedEventHandler(PingCompletedCallback);
             string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
             byte[] buffer = Encoding.ASCII.GetBytes(data);
             int timeout = 12000;
             PingOptions options = new PingOptions(64, true);
-            Console.WriteLine("Time to live: {0}", options.Ttl);
-            Console.WriteLine("Don't fragment: {0}", options.DontFragment);
-            pingSender.SendAsync(who, timeout, buffer, options, waiter);
+            //Console.WriteLine("Time to live: {0}", options.Ttl);
+            //Console.WriteLine("Don't fragment: {0}", options.DontFragment);
+            pingSender.SendAsync(who, timeout, buffer, options); //, waiter);
         }
-
-
 
         public void Player(string FullIP)
         {
@@ -687,13 +686,13 @@ namespace DayZServer
                 throw new ArgumentException("Ping needs a host or IP Address.");
 
             string who = FullIP;
-            AutoResetEvent waiter = new AutoResetEvent(false);
+            //AutoResetEvent waiter = new AutoResetEvent(false);
             WebClient webClient = new WebClient();
             webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(PlayerCompletedCallback);
             string strUrl = "http://cache.www.gametracker.com/components/html0/?host=" + FullIP + "&currentPlayersHeight=300&showCurrPlayers=1";
             //byte[] reqHTML;
             Uri uri = new Uri(strUrl);
-            webClient.DownloadDataAsync(uri, waiter);
+            webClient.DownloadDataAsync(uri); //, waiter);
         }
 
         private static void PingCompletedCallback(object sender, PingCompletedEventArgs e)
@@ -701,75 +700,81 @@ namespace DayZServer
             if (e.Cancelled)
             {
                 Console.WriteLine("Ping canceled.");
-                ((AutoResetEvent)e.UserState).Set();
             }
 
             if (e.Error != null)
             {
                 Console.WriteLine("Ping failed:");
                 Console.WriteLine(e.Error.ToString());
-                ((AutoResetEvent)e.UserState).Set();
+            }
+            else
+            {
+                PingReply reply = e.Reply;
+                DisplayReply(reply);
             }
 
-            PingReply reply = e.Reply;
-            DisplayReply(reply);
-            ((AutoResetEvent)e.UserState).Set();
+            //((AutoResetEvent)e.UserState).Set();
         }
 
         private static void PlayerCompletedCallback(object sender, DownloadDataCompletedEventArgs e)
         {
             if (e.Cancelled)
             {
-                ((AutoResetEvent)e.UserState).Set();
+                Console.WriteLine("Ping canceled.");
             }
 
             if (e.Error != null)
             {
                 Console.WriteLine("Ping failed:");
                 Console.WriteLine(e.Error.ToString());
-                ((AutoResetEvent)e.UserState).Set();
             }
-
-            byte[] data = (byte[])e.Result;
-            string result = System.Text.Encoding.UTF8.GetString(data);
-            string URL;
-
-            // EXAMPLE     ip=216.244.78.242&
-            Match m2 = Regex.Match(result, "(?<=ip=).*?(?=&)", RegexOptions.Singleline);
-            if (m2.Success)
+            else
             {
-                URL = m2.ToString();
-                DisplayResult(result, URL);
+                byte[] data = (byte[])e.Result;
+                string result = System.Text.Encoding.UTF8.GetString(data);
+                string URL;
+
+                // EXAMPLE     ip=216.244.78.242&
+                Match m2 = Regex.Match(result, "(?<=ip=).*?(?=&)", RegexOptions.Singleline);
+                if (m2.Success)
+                {
+                    URL = m2.ToString();
+                    DisplayResult(result, URL);
+                }
             }
 
             // Let the main thread resume.
-            ((AutoResetEvent)e.UserState).Set();
+            // UserToken is the AutoResetEvent object that the main thread  
+            // is waiting for.
+            //((AutoResetEvent)e.UserState).Set();
         }
 
         public static void DisplayReply(PingReply reply)
         {
+            Debug.WriteLine("DisplayReply");
             if (reply == null)
                 return;
 
-            Console.WriteLine("ping status: {0}", reply.Status);
+            //Console.WriteLine("ping status: {0}", reply.Status);
             if (reply.Status == IPStatus.Success)
             {
-                Console.WriteLine("Address: {0}", reply.Address.ToString());
-                Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
-                Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
-                Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
-                Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
+                //Console.WriteLine("Address: {0}", reply.Address.ToString());
+                //Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
+               // Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
+                //Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
+                //Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
                 Server dzServer = new Server();
+                dzServer.IP_Address = reply.Address.ToString();
                 dzServer.PingSpeed = reply.RoundtripTime.ToString();
 
-
+                Console.WriteLine(" update Server {0} withPing: {1}", dzServer.IP_Address, dzServer.PingSpeed);
                 Servers.AddOrUpdate(reply.Address.ToString(), dzServer, (key, existingVal) =>
                 {
-                    Console.WriteLine(" writeServerHistoryList:Servers1 " + Servers);
                     // If this delegate is invoked, then the key already exists.
                     try
                     {
                         existingVal.PingSpeed = dzServer.PingSpeed;
+
                         return existingVal;
                     }
                     catch (ArgumentException e)
@@ -779,14 +784,15 @@ namespace DayZServer
                         return existingVal;
                     }
                 });
-                List<Server> serversList = new List<Server>();
-                serversList = Servers.Values.ToList() as List<Server>;
+                //List<Server> serversList = new List<Server>();
+                //serversList = Servers.Values.ToList() as List<Server>;
             }
         }
 
 
         public static void DisplayResult(string result, string IP)
         {
+            Debug.WriteLine("DisplayResult");
             if (result == null)
                 return;
 
@@ -805,7 +811,7 @@ namespace DayZServer
             else
             {
                 playerhtml = "<a href=\"https://github.com/DayZServerApp/DayZServer/releases\" target=\"_blank\" > Unavailable </a>";
-            }
+        }
 
 
             List<DayZPlayer> list = new List<DayZPlayer>();
@@ -870,9 +876,9 @@ namespace DayZServer
             dzServer.UserCount = userCount;
             dzServer.playersList = list;
 
+            Console.WriteLine(" update Server: {0} withPlayerslist {1}", dzServer.IP_Address, dzServer.UserCount );
             Servers.AddOrUpdate(IP, dzServer, (key, existingVal) =>
             {
-                Console.WriteLine(" writeServerHistoryList:Servers1 " + Servers);
                 // If this delegate is invoked, then the key already exists.
                 try
                 {
