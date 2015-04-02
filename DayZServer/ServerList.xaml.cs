@@ -52,6 +52,8 @@ namespace DayZServer
             steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
             dm.startDataManager();
+            DataManager.Server currentServer = dm.getCurrentServerList();
+            selectedIP = currentServer.IP_Address;
         }
 
         public void updateServerList()
@@ -79,19 +81,11 @@ namespace DayZServer
                         serverList.ItemsSource = dm.getList();
                         //serverList.ItemsSource = dm.getServerList();
 
-                        //if (userList.Items.Count == 0)
-                        //{
-                        //    DataManager.Server serverobj = dm.getCurrentServerList();
-                        //    updateUserList(serverobj);
-                        //    selectedIP = serverobj.IP_Address;
 
-                        //}
-                        //else
-                        //{
 
-                        //    DataManager.Server serverobj = dm.getServerByIP(selectedIP);
-                        //    updateUserList(serverobj);
-                        //}
+                            
+                            //updateUserList(dm.userList(selectedIP));
+
 
                         if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
                         {
@@ -224,15 +218,7 @@ namespace DayZServer
 
         private void ClearHistory(object sender, RoutedEventArgs e)
         {
-            string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
-            string path = System.IO.Path.Combine(appDataPath, "DayZServer");
-            string serverhistorypath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzhistory.txt");
-            if (File.Exists(serverhistorypath))
-            {
-                File.Delete(serverhistorypath);
-
-            }
-
+            dm.deleteServerHistory();
         }
 
         public void writeAppPath(string dayzpath)
@@ -417,7 +403,8 @@ namespace DayZServer
         public void updateUserList(DataManager.Server obj)
         {
 
-
+this.Dispatcher.Invoke((Action)(() =>
+                {
             //if (userList.Items.Count != 0)
             //{
             string dgSortDescriptionUser = null;
@@ -437,8 +424,15 @@ namespace DayZServer
                     break;
                 }
             }
-
-            userList.ItemsSource = obj.playersList;
+            try
+            {
+                userList.ItemsSource = obj.playersList;
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+            }
+            
 
             if (!string.IsNullOrEmpty(dgSortDescriptionUser) && dgSortDirectionUser != null)
             {
@@ -451,11 +445,16 @@ namespace DayZServer
                 }
                 catch (Exception err)
                 {
-                    Console.WriteLine(err.Message);
+                    //Console.WriteLine(err.Message);
+                    //DataManager.Server currentServer = dm.getCurrentServerList();
+                    //selectedIP = currentServer.IP_Address;
+                    //updateUserList(dm.userList(selectedIP));
                 }
 
 
             }
+
+                }));
 
             //}
             //else

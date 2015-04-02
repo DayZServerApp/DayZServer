@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayZServer", "DayZServer\DayZServer.csproj", "{B5C624FC-39B0-4ED0-814F-00AF9606C494}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSQLib", "..\..\DayZeroLauncher\source\SSQLib\SSQLib.csproj", "{3F273B18-3C15-420B-BD8F-DED3E4E52996}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,16 @@ Global
 		{B5C624FC-39B0-4ED0-814F-00AF9606C494}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{B5C624FC-39B0-4ED0-814F-00AF9606C494}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B5C624FC-39B0-4ED0-814F-00AF9606C494}.Release|x86.ActiveCfg = Release|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3F273B18-3C15-420B-BD8F-DED3E4E52996}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
