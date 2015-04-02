@@ -13,12 +13,9 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Net;
-using Microsoft;
-using System.Collections.Concurrent;
-using SSQLib;
 using System.Collections;
 using System.Timers;
+using QueryMaster;
 
 
 namespace DayZServer
@@ -68,6 +65,7 @@ namespace DayZServer
             dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile"); // TODO: crashes if DayZ is not loaded
             dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
             configpath = dirs[0];
+            serverInfo();
 
             if (!Directory.Exists(path))
             {
@@ -552,7 +550,26 @@ namespace DayZServer
 
               try
                 {
-                   
+
+                    //QueryMaster.Server server = ServerQuery.GetServerInstance(EngineType.Source, "63.143.40.74", 2302);
+                    //QueryMaster.ServerInfo info = server.GetInfo();
+                    //Console.WriteLine(info.Map);
+
+
+
+
+
+
+
+
+
+                    //var server = new DZXServer("63.143.40.74:2302", 2302, "", "", 27016);
+                    //ServerQueryClient _queryClient = new ServerQueryClient(server, "63.143.40.74:2302", 27016);
+                    
+                    //ServerQueryResult serverResult = _queryClient.Execute();
+                    //List<Player> plist =  serverResult.Players;
+                    //Console.WriteLine("Players: " + plist);
+
 
 //System.Net.IPAddress hostIPAddress1 = System.Net.IPAddress.Parse("62.210.177.22");
 //IPEndPoint endpoint = new IPEndPoint(hostIPAddress1, int.Parse("2602"));

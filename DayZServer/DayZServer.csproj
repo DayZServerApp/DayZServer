@@ -75,12 +75,18 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.BZip2">
+      <HintPath>ServerQuery\Ionic.BZip2.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="QueryMaster">
+      <HintPath>ServerQuery\QueryMaster.dll</HintPath>
     </Reference>
     <Reference Include="SteamKit2">
       <HintPath>..\packages\SteamKit2.1.6.2\lib\net40\SteamKit2.dll</HintPath>
@@ -109,12 +115,6 @@
     <Compile Include="ServerList.xaml.cs">
       <DependentUpon>ServerList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ServerQuery\BindableBase.cs" />
-    <Compile Include="ServerQuery\ExtensionMethods.cs" />
-    <Compile Include="ServerQuery\Player.cs" />
-    <Compile Include="ServerQuery\Server.cs" />
-    <Compile Include="ServerQuery\ServerQueryClient.cs" />
-    <Compile Include="ServerQuery\ServerQueryResult.cs" />
     <Compile Include="SteamAccess.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -236,10 +236,7 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="SSQLib\SSQLib.csproj">
-      <Project>{3f273b18-3c15-420b-bd8f-ded3e4e52996}</Project>
-      <Name>SSQLib</Name>
-    </ProjectReference>
+    <Folder Include="ServerQuery\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
