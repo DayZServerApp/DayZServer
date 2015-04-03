@@ -137,6 +137,15 @@ namespace DayZServer
             System.Diagnostics.Process.Start(URL);
         }
 
+        private void player_click(object sender, RoutedEventArgs e)
+        {
+            string IP = ((Button)sender).Tag as string;
+            string Name = ((Button)sender).Content as string;
+            string URL = "http://www.gametracker.com/player/" + Name + "/" + IP + "/";
+
+            System.Diagnostics.Process.Start(URL);
+        }
+
         private void Join_Click(object sender, RoutedEventArgs e)
         {
             string IPAddress = ((Button)sender).Tag.ToString();

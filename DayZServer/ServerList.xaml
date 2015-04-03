@@ -111,7 +111,7 @@
                     <Image Source="images/appicon.png" Width="75" />
                 </Button>
 
-                <Button  ToolTip="Steam Login Disabled" Click="steam_click" Width="104" Height="55" Cursor="No" Background="{x:Null}" BorderBrush="{x:Null}">
+                <Button  ToolTip="Steam Login Disabled" Click="steam_click" Width="104" Height="55" Cursor="No" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Hidden">
                     <Image Source="images/sits_large_noborder.png" Width="93" Height="39" />
                 </Button>
 
@@ -121,12 +121,12 @@
                     <Button  Click="Link_Click" Tag="http://www.gametracker.com/games/dayz/" Width="118" Height="50" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
                         <Image Source="images/gtlogo.png" Width="108" Height="38" />
                     </Button>
-                    <DataGrid x:Name="userList" Height="318" Width="117" AutoGenerateColumns="False" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Background="{x:Null}" Canvas.Top="55">
+                    <DataGrid x:Name="userList" Height="318" Width="117" AutoGenerateColumns="False" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Background="{x:Null}" Canvas.Top="55">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Width="90"  Header="Players" SortMemberPath="UserName" SortDirection="Ascending">
+                            <DataGridTemplateColumn Width="90"  Header="Players" SortMemberPath="Name" SortDirection="Ascending">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Click="Link_Click" Tag="{Binding Href}"   Width="90" Height="30" Cursor="Hand" Content="{Binding UserName}" BorderBrush="{x:Null}" FontSize="11" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
+                                        <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="11" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -246,7 +246,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Players" Width="auto" SortMemberPath="UserCount" IsReadOnly="True" >
+                <DataGridTemplateColumn Header="Players" Width="auto" SortMemberPath="UserTotal" IsReadOnly="True" >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding UserCount}" Foreground="#FF9B9B9C" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
