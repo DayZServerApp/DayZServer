@@ -1,7 +1,7 @@
 # DayZServer
 **This is the official source code for DayZServer**
 
-**[Download DayZServer](https://github.com/DayZServerApp/DayZServer/releases/download/1.3/DayZServer1_3.zip)**
+**[Download DayZServer](https://github.com/DayZServerApp/DayZServer/releases)**
 
 ![dayzserver1 3](https://cloud.githubusercontent.com/assets/8209975/6989260/298eb3be-da1f-11e4-83ae-70f036eba0f0.png)
 
