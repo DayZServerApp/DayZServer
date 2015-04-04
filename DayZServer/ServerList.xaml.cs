@@ -1,27 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using SteamKit2;
-using DayZServer;
 using System.IO;
-using System.Threading;
 using System.Timers;
 using Steam;
-using System.Data;
 using System.ComponentModel;
-using System.Net.NetworkInformation;
 using System.Diagnostics;
-using System.Net;
 
 
 namespace DayZServer
@@ -39,6 +26,7 @@ namespace DayZServer
         private static System.Timers.Timer checkProfileForNewServerTimer;
         public string selectedIP;
         public static DataManager dm = new DataManager();
+        
 
         public Window1()
         {
@@ -80,11 +68,17 @@ namespace DayZServer
                         }
                         serverList.ItemsSource = dm.getList();
                         //serverList.ItemsSource = dm.getServerList();
-
-
-
-                            
-                            //updateUserList(dm.userList(selectedIP));
+                        DataManager.Server currentServer = dm.getCurrentServerList();
+                        if (currentServer != null)
+                        if (selectedIP == currentServer.IP_Address)
+                        {
+                            updateUserList(dm.userList(currentServer.IP_Address));
+                        }
+                        else
+                        {
+                            updateUserList(dm.userList(selectedIP));
+                        }
+                        
 
 
                         if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
@@ -129,6 +123,11 @@ namespace DayZServer
                 Console.WriteLine("The process failed: {0}", err.ToString());
             }
             //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+        }
+
+         private void GT_Click(object sender, RoutedEventArgs e)
+        {
+            dm.getGTList();
         }
 
         private void Link_Click(object sender, RoutedEventArgs e)

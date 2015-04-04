@@ -118,7 +118,7 @@
             </ToolBar>
             <ToolBar HorizontalAlignment="Right" Height="403" VerticalAlignment="Top" Width="121" Margin="0,329,-121,-708" Background="{x:Null}">
                 <Canvas Height="373" VerticalAlignment="Top" Width="119" >
-                    <Button  Click="Link_Click" Tag="http://www.gametracker.com/games/dayz/" Width="118" Height="50" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Button  Click="GT_Click" Width="118" Height="50" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
                         <Image Source="images/gtlogo.png" Width="108" Height="38" />
                     </Button>
                     <DataGrid x:Name="userList" Height="318" Width="117" AutoGenerateColumns="False" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Background="{x:Null}" Canvas.Top="55">
@@ -326,7 +326,7 @@
             <TextBox Height="33" Canvas.Left="10" TextWrapping="Wrap" Text="Unable to locate where you installed DayZ" Canvas.Top="12" Width="496"  Background="{x:Null}" Foreground="#FF3E3E3E" FontSize="18" BorderBrush="{x:Null}"/>
             <Button x:Name="browse" Content="Browse" Canvas.Left="364" Canvas.Top="118" Width="142" Height="37" Click="browse_click" FontSize="18" BorderBrush="{x:Null}"/>
         </Canvas>
-
+       
     </DockPanel>
 
 </Window>

@@ -1,19 +1,14 @@
-﻿using Microsoft;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Collections;
+using System.Threading.Tasks;
 using System.Timers;
 using QueryMaster;
 
@@ -49,6 +44,9 @@ namespace DayZServer
         private static System.Timers.Timer PingTimer;
         private static System.Timers.Timer PlayerTimer;
         static int pingLoopInProgress = 0;
+        public QueryMaster.Server server;
+        public QueryMaster.ServerInfo info;
+        public System.Collections.ObjectModel.ReadOnlyCollection<Player> players;
 
         public DataManager()
         {
@@ -83,9 +81,9 @@ namespace DayZServer
             PingTimer.Elapsed += PingTimedEvent;
             PingTimer.Enabled = true;
 
-            PlayerTimer = new System.Timers.Timer(10000);
-            PlayerTimer.Elapsed += PlayerTimedEvent;
-            PlayerTimer.Enabled = true;
+            //PlayerTimer = new System.Timers.Timer(10000);
+            //PlayerTimer.Elapsed += PlayerTimedEvent;
+            //PlayerTimer.Enabled = true;
             
         }
 
@@ -104,7 +102,7 @@ namespace DayZServer
             public DateTime Date { get; set; }
             public string Favorite { get; set; }
             public string Current { get; set; }
-            public string PingSpeed { get; set; }
+            public long PingSpeed { get; set; }
             public string UserCount { get; set; }
             public int UserTotal { get; set; }
             public List<DayZPlayer> playersList { get; set; }
@@ -131,6 +129,8 @@ namespace DayZServer
             public int specport { get; set; }
         }
 
+
+
         public class Response
         {
             public bool success { get; set; }
@@ -155,7 +155,24 @@ namespace DayZServer
             GamePort = FullIPAddress.Substring(FullIPAddress.LastIndexOf(':') + 1);
             IPAddress = FullIPAddress.Substring(0, FullIPAddress.LastIndexOf(":"));
             version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
-            
+
+            bool result = !IPAddress.Any(x => char.IsLetter(x));
+            if (!result)
+            {
+                string domain = IPAddress;
+                IPAddress[] ip_Addresses = Dns.GetHostAddresses(domain);
+                string ips = string.Empty;
+                foreach (IPAddress ipAddress in ip_Addresses)
+                {
+                    IPAddress = ips;
+                    Console.WriteLine("Address from host name: " + IPAddress);
+                }
+            }
+          
+                
+          
+
+
             if (File.Exists(serverhistorypath))
             {
                 string temphistory;
@@ -187,11 +204,12 @@ namespace DayZServer
                                 match.IP_Address = IPAddress;
                                 match.FullIP_Address = FullIPAddress;
                                 match.Current = "1";
-                                match.PingSpeed = "Accessing...";
+                                match.PingSpeed = 1000;
                                 match.UserCount = "Accessing...";
                                 match.Favorite = match.Favorite;
                                 match.QueryPort = match.QueryPort;
                                 match.Game_Port = match.Game_Port;
+                                match.playersList = null;
                                 server_list[index] = match;
                                 string listjson = JsonConvert.SerializeObject(server_list.ToArray());
                                 var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
@@ -219,10 +237,11 @@ namespace DayZServer
                                 Date = DateTime.Now,
                                 Favorite = "0",
                                 Current = "1",
-                                PingSpeed = "Accessing...",
+                                PingSpeed = 10000,
                                 UserCount = "Accessing...",
                                 QueryPort = 0,
                                 Game_Port = GamePort,
+                                playersList = null,
                             });
                             
                             string listjson = JsonConvert.SerializeObject(server_list.ToArray());
@@ -255,10 +274,11 @@ namespace DayZServer
                             Date = DateTime.Now,
                             Favorite = "0",
                             Current = "1",
-                            PingSpeed = "Accessing...",
+                            PingSpeed = 1000,
                             UserCount = "Accessing...",
                             QueryPort = 0,
                             Game_Port = GamePort,
+                            playersList = null,
                         });
                 
                         string listjson = JsonConvert.SerializeObject(server_list.ToArray());
@@ -355,7 +375,20 @@ namespace DayZServer
                     temphistory = sr.ReadToEnd();
                     sr.Close();
                     fs.Close();
-                    server_list = JsonConvert.DeserializeObject<List<Server>>(temphistory);
+                    try
+                    {
+                        server_list = JsonConvert.DeserializeObject<List<Server>>(temphistory);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception" + e);
+                        server_list.Clear();
+                        serversList.Clear();
+                        Servers.Clear();
+                        File.Delete(serverhistorypath);
+                        return null;
+                    }
+                    
                 }
                 try
                 {
@@ -375,6 +408,11 @@ namespace DayZServer
 
         public Server getCurrentServerList()
         {
+            if (server_list == null)
+            {
+                server_list = new List<Server>();
+            }
+            
             if (server_list.Count == 0)
             {
                 try
@@ -388,14 +426,22 @@ namespace DayZServer
                 }
             }
 
-            Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
-            int indexCurrent = server_list.FindIndex(x => x.Current == "1");
-            if (matchCurrent != null)
+            try
             {
-                return matchCurrent;
+                Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
+                int indexCurrent = server_list.FindIndex(x => x.Current == "1");
+                if (matchCurrent != null)
+                {
+                    return matchCurrent;
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch (Exception e)
             {
+                Console.WriteLine("Exception" + e);
                 return null;
             }
         }
@@ -605,10 +651,12 @@ namespace DayZServer
             Interlocked.Increment(ref pingLoopInProgress);
             if (pingLoopInProgress == 1)
             {
+                if(server_list != null)
                 lock (server_list)
                 {
                     try
                     {
+                        if (server_list != null)
                         getPing();
                     }
                     catch (Exception err)
@@ -625,18 +673,18 @@ namespace DayZServer
             Interlocked.Decrement(ref pingLoopInProgress);
         }
 
-        void PlayerTimedEvent(Object source, ElapsedEventArgs e)
-        {
-            try
-            {
-                getPlayer();
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine("The process failed: {0}", err.ToString());
-            }
-            //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
-        }
+        //void PlayerTimedEvent(Object source, ElapsedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        getPlayer();
+        //    }
+        //    catch (Exception err)
+        //    {
+        //        Console.WriteLine("The process failed: {0}", err.ToString());
+        //    }
+        //    //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+        //}
 
 
         public void getPing()
@@ -649,47 +697,51 @@ namespace DayZServer
             {
                 Console.WriteLine("Exception" + e);
             }
-
-            foreach (Server DayZServer in server_list)
-            {
-                Player(DayZServer);
-            }
+ 
+            Parallel.ForEach(server_list, new ParallelOptions 
+            { 
+                MaxDegreeOfParallelism = 5 
+            }, 
+            DayZServer => 
+            { 
+                Player(DayZServer); 
+            });
         }
 
-        public void getPlayer()
-        {
-            try
-            {
-                server_list = getServerList();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception" + e);
-            }
+        //public void getPlayer()
+        //{
+        //    try
+        //    {
+        //        server_list = getServerList();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("Exception" + e);
+        //    }
 
-            foreach (Server DayZServer in server_list)
-            {
-                Player(DayZServer);
-            }
-        }
+        //    foreach (Server DayZServer in server_list)
+        //    {
+        //        Player(DayZServer);
+        //    }
+        //}
 
-        public void Pinger(string IP)
-        {
-            if (IP.Length == 0)
-                throw new ArgumentException("Ping needs a host or IP Address.");
+        //public void Pinger(string IP)
+        //{
+        //    if (IP.Length == 0)
+        //        throw new ArgumentException("Ping needs a host or IP Address.");
 
-            string who = IP;
-            //AutoResetEvent waiter = new AutoResetEvent(false);
-            Ping pingSender = new Ping();
-            pingSender.PingCompleted += new PingCompletedEventHandler(PingCompletedCallback);
-            string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-            byte[] buffer = Encoding.ASCII.GetBytes(data);
-            int timeout = 12000;
-            PingOptions options = new PingOptions(64, true);
-            //Console.WriteLine("Time to live: {0}", options.Ttl);
-            //Console.WriteLine("Don't fragment: {0}", options.DontFragment);
-            pingSender.SendAsync(who, timeout, buffer, options); //, waiter);
-        }
+        //    string who = IP;
+        //    //AutoResetEvent waiter = new AutoResetEvent(false);
+        //    Ping pingSender = new Ping();
+        //    pingSender.PingCompleted += new PingCompletedEventHandler(PingCompletedCallback);
+        //    string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        //    byte[] buffer = Encoding.ASCII.GetBytes(data);
+        //    int timeout = 12000;
+        //    PingOptions options = new PingOptions(64, true);
+        //    //Console.WriteLine("Time to live: {0}", options.Ttl);
+        //    //Console.WriteLine("Don't fragment: {0}", options.DontFragment);
+        //    pingSender.SendAsync(who, timeout, buffer, options); //, waiter);
+        //}
 
         public void Player(Server DayZServer)
         {
@@ -706,12 +758,24 @@ namespace DayZServer
             }
             else
             {
-                QueryMaster.Server server = ServerQuery.GetServerInstance(EngineType.Source, DayZServer.IP_Address, DayZServer.QueryPort);
-                QueryMaster.ServerInfo info = server.GetInfo();
+                DataManager dm = new DataManager();
+                try
+                {
+                    dm.server = ServerQuery.GetServerInstance(EngineType.Source, DayZServer.IP_Address, DayZServer.QueryPort);
+                    dm.info = dm.server.GetInfo();
+                    dm.players = dm.server.GetPlayers();
+                    
+                }
+                catch (ArgumentException err)
+                {
+                    Console.WriteLine("Exception" + err);
 
-                System.Collections.ObjectModel.ReadOnlyCollection<Player> players = server.GetPlayers();
+                 
+                }
+
                 List<DayZPlayer> listZ = new List<DayZPlayer>();
-                foreach (Player Z in players)
+                if (dm.players != null)
+                foreach (Player Z in dm.players)
                 {
 
                     DayZPlayer i = new DayZPlayer();
@@ -729,24 +793,30 @@ namespace DayZServer
                     // If this delegate is invoked, then the key already exists.
                     try
                     {
-                        existingVal.UserTotal = players.Count;
-                        existingVal.PingSpeed = info.Ping.ToString();
+                        if (dm.players != null && dm.info != null) 
+                        { 
+                        existingVal.UserTotal = dm.players.Count;
+                        existingVal.PingSpeed = dm.info.Ping;
                         existingVal.playersList = listZ;
-                        existingVal.UserCount = players.Count.ToString() + "/" + info.MaxPlayers;
+                        existingVal.UserCount = dm.players.Count.ToString() + "/" + dm.info.MaxPlayers;
+                        }
                         return existingVal;
 
                     }
                     catch (ArgumentException err)
                     {
                         Console.WriteLine("Exception" + err);
-                        existingVal.UserTotal = players.Count;
-                        existingVal.PingSpeed = info.Ping.ToString();
+                        if (dm.players != null && dm.info != null) 
+                        { 
+                        existingVal.UserTotal = dm.players.Count;
+                        existingVal.PingSpeed = dm.info.Ping;
                         existingVal.playersList = listZ;
-                        existingVal.UserCount = players.Count.ToString() + "/" + info.MaxPlayers;
+                        existingVal.UserCount = dm.players.Count.ToString() + "/" + dm.info.MaxPlayers;
+                        }
                         return existingVal;
                     }
                 });
-
+                        //dm.server.Dispose();
                         serversList = Servers.Values.ToList() as List<Server>;
             }
 
@@ -756,26 +826,26 @@ namespace DayZServer
 
 
 
-        private static void PingCompletedCallback(object sender, PingCompletedEventArgs e)
-        {
-            if (e.Cancelled)
-            {
-                Console.WriteLine("Ping canceled.");
-            }
+        //private static void PingCompletedCallback(object sender, PingCompletedEventArgs e)
+        //{
+        //    if (e.Cancelled)
+        //    {
+        //        Console.WriteLine("Ping canceled.");
+        //    }
 
-            if (e.Error != null)
-            {
-                Console.WriteLine("Ping failed:");
-                Console.WriteLine(e.Error.ToString());
-            }
-            else
-            {
-                PingReply reply = e.Reply;
-                DisplayReply(reply);
-            }
+        //    if (e.Error != null)
+        //    {
+        //        Console.WriteLine("Ping failed:");
+        //        Console.WriteLine(e.Error.ToString());
+        //    }
+        //    else
+        //    {
+        //        PingReply reply = e.Reply;
+        //        DisplayReply(reply);
+        //    }
 
-            //((AutoResetEvent)e.UserState).Set();
-        }
+        //    //((AutoResetEvent)e.UserState).Set();
+        //}
 
         private static void PlayerCompletedCallback(object sender, DownloadDataCompletedEventArgs e)
         {
@@ -801,18 +871,38 @@ namespace DayZServer
                 List<Server> compareList = new List<Server>();
                 DataManager dm = new DataManager();
                 compareList = dm.getServerList();
-
-                if (steamservers != null) 
+               
+                if (steamservers != null && compareList != null) 
                     foreach (SteamServer steamServer in steamservers)
                     {
 
+                      
+                        
                         string serverip = steamServer.addr.Substring(0, steamServer.addr.IndexOf(":", StringComparison.Ordinal));
                         string queryport = steamServer.addr.Substring(steamServer.addr.LastIndexOf(':') + 1);
                         string steamgameport = steamServer.gameport.ToString();
                         ushort queryportnum = ushort.Parse(queryport);
-                        QueryMaster.Server server = ServerQuery.GetServerInstance(EngineType.Source, serverip, queryportnum);
-                        QueryMaster.ServerInfo info = server.GetInfo();
+                        if (queryportnum == 0) continue;
+                        
+                        try
+                        {
+
+                        
+                        dm.server = ServerQuery.GetServerInstance(EngineType.Source, serverip, queryportnum);
+                        QueryMaster.ServerInfo info = dm.server.GetInfo();
+                        
+
+                        
+
+                        }
+                        catch (Exception err)
+                        {
+
+                            Console.WriteLine("QueryMaster" + err); 
+                            continue;
+                        }
                         //Server matchCurrent = compareList.FirstOrDefault((x, y) => x.Game_Port == steamgameport);
+                        if (compareList == null) continue; 
                         Server matchCurrent = compareList.FirstOrDefault(p => p.IP_Address == serverip && p.Game_Port == steamgameport);
                         int indexCurrent = compareList.FindIndex(p => p.IP_Address == serverip && p.Game_Port == steamgameport);
                         if (matchCurrent != null)
@@ -839,12 +929,23 @@ namespace DayZServer
                             swadd.Close();
                             fswadd.Close();
                             dm.readHistoryfile();
-
-
-                            System.Collections.ObjectModel.ReadOnlyCollection<Player> players = server.GetPlayers();
+                            
                             List<DayZPlayer> listZ = new List<DayZPlayer>();
+                            try
+                            {
+                                
+                                dm.players = dm.server.GetPlayers();
+                                
+                                
+                            }
+                            catch (ArgumentException err)
+                            {
+                                Console.WriteLine("Exception" + err);
+                                continue;
+                            }
 
-                            foreach (Player Z in players)
+                            if ( dm.players != null)
+                            foreach (Player Z in dm.players)
                             {
 
                                 DayZPlayer i = new DayZPlayer();
@@ -855,33 +956,38 @@ namespace DayZServer
                             }
 
                             matchCurrent.QueryPort = queryportnum;
-
-
+                            if (dm.info == null) continue;
                             Servers.AddOrUpdate(matchCurrent.IP_Address, matchCurrent, (key, existingVal) =>
                             {
                                 // If this delegate is invoked, then the key already exists.
                                 try
                                 {
-                                    existingVal.UserTotal = players.Count;
-                                    existingVal.PingSpeed = info.Ping.ToString();
-                                    existingVal.QueryPort = queryportnum;
-                                    existingVal.playersList = listZ;
-                                    existingVal.UserCount = players.Count.ToString() + "/" + info.MaxPlayers;
+                                    if (dm.players != null && dm.info != null)
+                                    {
+                                        existingVal.UserTotal = dm.players.Count;
+                                        existingVal.PingSpeed = dm.info.Ping;
+                                        existingVal.QueryPort = queryportnum;
+                                        existingVal.playersList = listZ;
+                                        existingVal.UserCount = dm.players.Count.ToString() + "/" + dm.info.MaxPlayers;
+                                     }
                                     return existingVal;
 
                                 }
                                 catch (ArgumentException err)
                                 {
                                     Console.WriteLine("Exception" + err);
-                                    existingVal.UserTotal = players.Count;
-                                    existingVal.PingSpeed = info.Ping.ToString();
-                                    existingVal.QueryPort = queryportnum;
-                                    existingVal.playersList = listZ;
-                                    existingVal.UserCount = players.Count.ToString() + "/" + info.MaxPlayers;
+                                    if (dm.players != null && dm.info != null)
+                                    {
+                                        existingVal.UserTotal = dm.players.Count;
+                                        existingVal.PingSpeed = dm.info.Ping;
+                                        existingVal.QueryPort = queryportnum;
+                                        existingVal.playersList = listZ;
+                                        existingVal.UserCount = dm.players.Count.ToString() + "/" + dm.info.MaxPlayers;
+                                    }
                                     return existingVal;
                                 }
                             });
-
+                            //dm.server.Dispose();
                             dm.serversList = Servers.Values.ToList() as List<Server>;
 
 
@@ -906,8 +1012,7 @@ namespace DayZServer
             }    
                
 
-                string URL;
-
+               
             //    // EXAMPLE     ip=216.244.78.242&
             //    Match m2 = Regex.Match(result, "(?<=ip=).*?(?=&)", RegexOptions.Singleline);
             //    if (m2.Success)
@@ -923,45 +1028,279 @@ namespace DayZServer
             ////((AutoResetEvent)e.UserState).Set();
         }
 
-        public static void DisplayReply(PingReply reply)
+        public void getGTList()
         {
-            Debug.WriteLine("DisplayReply");
-            if (reply == null)
-                return;
+            WebClient webClient = new WebClient();
+            webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(GTCompletedCallback);
+            string strUrl = "http://www.gametracker.com/search/dayz/?&searchipp=50#search";
+            //byte[] reqHTML;
+            Uri uri = new Uri(strUrl);
+            webClient.DownloadDataAsync(uri);
+        }
 
-            //Console.WriteLine("ping status: {0}", reply.Status);
-            if (reply.Status == IPStatus.Success)
+        private static void GTCompletedCallback(object sender, DownloadDataCompletedEventArgs e)
+        {
+            if (e.Cancelled)
             {
-                //Console.WriteLine("Address: {0}", reply.Address.ToString());
-                //Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
-               // Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
-                //Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
-                //Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
-                Server dzServer = new Server();
-                dzServer.IP_Address = reply.Address.ToString();
-                dzServer.PingSpeed = reply.RoundtripTime.ToString();
+                Console.WriteLine("GT call canceled.");
+            }
 
-                Console.WriteLine(" update Server {0} withPing: {1}", dzServer.IP_Address, dzServer.PingSpeed);
-                Servers.AddOrUpdate(reply.Address.ToString(), dzServer, (key, existingVal) =>
+            if (e.Error != null)
+            {
+                Console.WriteLine("GT call failed.");
+                Console.WriteLine(e.Error.ToString());
+            }
+            else
+            {
+                byte[] data = (byte[])e.Result;
+                string result = System.Text.Encoding.UTF8.GetString(data);
+
+                Match m2 = Regex.Match(result, "(?<=Server Map).*?(?=Server Map)", RegexOptions.Singleline);
+                    if (m2.Success)
+                    {
+                        result = m2.ToString();
+
+                    }
+                else
                 {
-                    // If this delegate is invoked, then the key already exists.
-                    try
-                    {
-                        existingVal.PingSpeed = dzServer.PingSpeed;
+                    result = "<td><a href=\"/search/dayz/600/\"><img src=\"/images/game_icons16/dayz.png\" alt=\"DAYZ\"/></a></td><td><a class=\"c03serverlink\" href=\"/server_info/216.244.78.242:2802/\">\\DG Clan - SUPERSHARD #1 \\ Unlocked \\ High Loot \\ 24/7 day</a><a href=\"javascript:showPopupExternalLink('gt://joinGame:game=dayz&amp;ip=216.244.78.242&amp;port=2802');\"><img src=\"/images/global/btn_join.png\" alt=\"Join\"/></a></td><td>5/50</td><td></td><td><a href=\"/search/dayz/US/\"><img src=\"/images/flags/us.gif\" alt=\"\" class=\"item_16x11\"/></a></td><td><span class=\"ip\">216.244.78.242</span><span class=\"port\">:2802</span></td><td>DayZ_Auto</td>";
+                }
 
-                        return existingVal;
-                    }
-                    catch (ArgumentException e)
+                    List<DayZPlayer> GTlist = new List<DayZPlayer>();
+
+                    // 1.
+                    // Find all matches in file.
+                    MatchCollection m1 = Regex.Matches(result, @"(<a.*?>.*?</a>)",
+                        RegexOptions.Singleline);
+
+                    // 2.
+                    // Loop over each match.
+                    foreach (Match m in m1)
                     {
-                        Console.WriteLine("Exception" + e);
-                        existingVal.PingSpeed = dzServer.PingSpeed;
-                        return existingVal;
+                        string value = m.Groups[1].Value;
+                        DayZPlayer i = new DayZPlayer();
+
+                        // 3.
+                        // Get href attribute.
+                        Match m3 = Regex.Match(value, "href=\"/server_info/" + "(.*?)" + "/\"",
+                        RegexOptions.Singleline);
+
+                        if (m3.Success)
+                        {
+                            i.FullIP_Address = m3.Groups[1].Value.ToString();
+                        }
+
+                        // 4.
+                        // Remove inner tags from text.
+                        string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
+                        RegexOptions.Singleline);
+                        i.Name = t;
+                        if (i.FullIP_Address == null) continue;
+                        GTlist.Add(i);
+
                     }
+                    Console.WriteLine("Servers" + GTlist);
+                    DataManager dm = new DataManager();
+                    foreach (DayZPlayer GTServer in GTlist)
+                    {
+                        bool serverdata = !GTServer.FullIP_Address.Any(x => char.IsLetter(x));
+                        if (!serverdata)
+                          {
+                            continue;
+                          }
+                        
+                        dm.writeGTList(GTServer.Name, GTServer.FullIP_Address);
+                    }
+            }
+
+        }
+
+        public void writeGTList(string serverName, string fullIPAdress)
+        {
+            string defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString();
+            string[] dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile"); // TODO: crashes if DayZ is not loaded
+            dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
+            configpath = dirs[0];
+            var profileFileStream = new FileStream(configpath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var profileStremReader = new StreamReader(profileFileStream);
+            DayZProfile = profileStremReader.ReadToEnd();
+            profileStremReader.Close();
+            profileFileStream.Close();
+            servername = serverName;
+            FullIPAddress = fullIPAdress;
+            GamePort = FullIPAddress.Substring(FullIPAddress.LastIndexOf(':') + 1);
+            IPAddress = FullIPAddress.Substring(0, FullIPAddress.LastIndexOf(":"));
+            version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
+
+            //bool result = !IPAddress.Any(x => char.IsLetter(x));
+            //if (!result)
+            //{
+
+            //    Console.WriteLine(IPAddress);
+
+            //    IPAddress[] IPAddressResolve = Dns.GetHostAddresses(IPAddress);
+
+            //    foreach (IPAddress theaddress in IPAddressResolve)
+            //    {
+            //        Console.WriteLine(theaddress.ToString());
+            //        IPAddress = theaddress.ToString();
+            //    }
+            //}
+
+            if (File.Exists(serverhistorypath))
+            {
+                string temphistory;
+                try
+                {
+                    var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    var sr = new StreamReader(fs);
+                    temphistory = sr.ReadToEnd();
+                    sr.Close();
+                    fs.Close();
+                    server_list = JsonConvert.DeserializeObject<List<Server>>(temphistory);
+                    Server match = server_list.FirstOrDefault(x => x.IP_Address == IPAddress);
+                    int index = server_list.FindIndex(x => x.IP_Address == IPAddress);
+
+                    if (match != null)
+                    {
+                        if (match.Current == "0")
+                        {
+                            match.Current = "0";
+
+                        }   else
+                        {
+                            match.Current = "1";
+                        }
+                            
+                            match.Date = DateTime.Now;
+                            match.IP_Address = IPAddress;
+                            match.FullIP_Address = FullIPAddress;
+                            match.PingSpeed = 1000;
+                            match.UserCount = "Accessing...";
+                            match.Favorite = match.Favorite;
+                            match.QueryPort = match.QueryPort;
+                            match.Game_Port = match.Game_Port;
+                            match.playersList = null;
+                            server_list[index] = match;
+                            string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                            var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                            var sw = new StreamWriter(fsw);
+                            sw.Write(listjson);
+                            sw.Close();
+                            fsw.Close();
+                    }
+                    else
+                    {
+                        server_list.Add(new Server()
+                        {
+                            ServerName = servername,
+                            IP_Address = IPAddress,
+                            FullIP_Address = FullIPAddress,
+                            Date = DateTime.Now,
+                            Favorite = "0",
+                            Current = "0",
+                            PingSpeed = 1000,
+                            UserCount = "Accessing...",
+                            QueryPort = 0,
+                            Game_Port = GamePort,
+                            playersList = null,
+                        });
+
+                        string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                        var fswadd = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                        var swadd = new StreamWriter(fswadd);
+                        swadd.Write(listjson);
+                        swadd.Close();
+                        fswadd.Close();
+                    }
+
+                    readHistoryfile();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+            else
+            {
+                if (server_list == null)
+                {
+                    server_list = new List<Server>();
+                }
+
+                server_list.Add(new Server()
+                {
+                    ServerName = servername,
+                    IP_Address = IPAddress,
+                    FullIP_Address = FullIPAddress,
+                    Date = DateTime.Now,
+                    Favorite = "0",
+                    Current = "1",
+                    PingSpeed = 1000,
+                    UserCount = "Accessing...",
+                    QueryPort = 0,
+                    Game_Port = GamePort,
+                    playersList = null,
                 });
-                //List<Server> serversList = new List<Server>();
-                //serversList = Servers.Values.ToList() as List<Server>;
+
+                string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                var fswnew = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                var swnew = new StreamWriter(fswnew);
+                try
+                {
+                    swnew.Write(listjson);
+                    swnew.Close();
+                    fswnew.Close();
+                    readHistoryfile();
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
             }
         }
+
+
+
+        //public static void DisplayReply(PingReply reply)
+        //{
+        //    Debug.WriteLine("DisplayReply");
+        //    if (reply == null)
+        //        return;
+
+        //    //Console.WriteLine("ping status: {0}", reply.Status);
+        //    if (reply.Status == IPStatus.Success)
+        //    {
+        //        //Console.WriteLine("Address: {0}", reply.Address.ToString());
+        //        //Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
+        //       // Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
+        //        //Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
+        //        //Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
+        //        Server dzServer = new Server();
+        //        dzServer.IP_Address = reply.Address.ToString();
+        //        dzServer.PingSpeed = reply.RoundtripTime.ToString();
+
+        //        Console.WriteLine(" update Server {0} withPing: {1}", dzServer.IP_Address, dzServer.PingSpeed);
+        //        Servers.AddOrUpdate(reply.Address.ToString(), dzServer, (key, existingVal) =>
+        //        {
+        //            // If this delegate is invoked, then the key already exists.
+        //            try
+        //            {
+        //                existingVal.PingSpeed = dzServer.PingSpeed;
+
+        //                return existingVal;
+        //            }
+        //            catch (ArgumentException e)
+        //            {
+        //                Console.WriteLine("Exception" + e);
+        //                existingVal.PingSpeed = dzServer.PingSpeed;
+        //                return existingVal;
+        //            }
+        //        });
+        //        //List<Server> serversList = new List<Server>();
+        //        //serversList = Servers.Values.ToList() as List<Server>;
+        //    }
+        //}
 
 
         //public static void DisplayResult(string result, string IP)
@@ -988,39 +1327,39 @@ namespace DayZServer
         //}
 
 
-        //    List<DayZPlayer> list = new List<DayZPlayer>();
+            //List<DayZPlayer> list = new List<DayZPlayer>();
 
-        //    // 1.
-        //    // Find all matches in file.
-        //    MatchCollection m1 = Regex.Matches(playerhtml, @"(<a.*?>.*?</a>)",
-        //        RegexOptions.Singleline);
+            //// 1.
+            //// Find all matches in file.
+            //MatchCollection m1 = Regex.Matches(playerhtml, @"(<a.*?>.*?</a>)",
+            //    RegexOptions.Singleline);
 
-        //    // 2.
-        //    // Loop over each match.
-        //    foreach (Match m in m1)
-        //    {
-        //        string value = m.Groups[1].Value;
-                //DayZPlayer i = new DayZPlayer();
+            //// 2.
+            //// Loop over each match.
+            //foreach (Match m in m1)
+            //{
+            //    string value = m.Groups[1].Value;
+            //    DayZPlayer i = new DayZPlayer();
 
-                //// 3.
-                //// Get href attribute.
-                //Match m3 = Regex.Match(value, @"href=\""(.*?)\""",
-                //RegexOptions.Singleline);
+            //    // 3.
+            //    // Get href attribute.
+            //    Match m3 = Regex.Match(value, @"href=\""(.*?)\""",
+            //    RegexOptions.Singleline);
 
-                //if (m3.Success)
-                //{
-                //    i.Href = m3.Groups[1].Value.ToString();
-                //}
+            //    if (m3.Success)
+            //    {
+            //        i.Href = m3.Groups[1].Value.ToString();
+            //    }
 
-                //// 4.
-                //// Remove inner tags from text.
-                //string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
-                //RegexOptions.Singleline);
-                //i.Name = t;
+            //    // 4.
+            //    // Remove inner tags from text.
+            //    string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
+            //    RegexOptions.Singleline);
+            //    i.Name = t;
 
-                //list.Add(i);
+            //    list.Add(i);
 
-        //    }
+            //}
 
         //    int Start, End;
         //    string userCount;
