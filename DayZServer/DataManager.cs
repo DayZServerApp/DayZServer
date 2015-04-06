@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using QueryMaster;
+using DayZ;
 
 
 namespace DayZServer
@@ -42,7 +43,6 @@ namespace DayZServer
         static ConcurrentDictionary<string, Server> Servers = new ConcurrentDictionary<string, Server>();
         //static ConcurrentDictionary<string, Server> Players = new ConcurrentDictionary<string, Server>();
         private static System.Timers.Timer PingTimer;
-        private static System.Timers.Timer PlayerTimer;
         static int pingLoopInProgress = 0;
         public QueryMaster.Server server;
         public QueryMaster.ServerInfo info;
@@ -55,7 +55,10 @@ namespace DayZServer
             dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
             dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
             serverhistorypath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzhistory.txt");
-            //Console.WriteLine("Server History Path: " + serverhistorypath);
+
+            
+            
+ 
         }
 
         public void startDataManager()
@@ -64,6 +67,9 @@ namespace DayZServer
             dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile"); // TODO: crashes if DayZ is not loaded
             dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
             configpath = dirs[0];
+            DZA dza = new DZA();
+            dza.runDayZ();
+            
             
 
             if (!Directory.Exists(path))

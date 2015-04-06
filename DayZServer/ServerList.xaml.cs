@@ -9,6 +9,7 @@ using System.Timers;
 using Steam;
 using System.ComponentModel;
 using System.Diagnostics;
+using DayZ;
 
 
 namespace DayZServer
@@ -42,6 +43,7 @@ namespace DayZServer
             dm.startDataManager();
             DataManager.Server currentServer = dm.getCurrentServerList();
             selectedIP = currentServer.IP_Address;
+           
         }
 
         public void updateServerList()
@@ -306,6 +308,10 @@ namespace DayZServer
             string path = System.IO.Path.Combine(appDataPath, "DayZServer");
             DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
             string serverIP = obj.IP_Address;
+            string serverName = obj.ServerName;
+            DZA dza = new DZA();
+            dza.serverJoin(serverName, serverIP);
+            
 
 
 
@@ -471,6 +477,20 @@ this.Dispatcher.Invoke((Action)(() =>
             //}
 
 
+        }
+
+        private void OnApplicationExit(object sender, EventArgs e)
+        {
+            // When the application is exiting, write the application data to the 
+            // user file and close it.
+            
+
+            try
+            {
+                // Ignore any errors that might occur while closing the file handle.
+                
+            }
+            catch { }
         }
 
     }
