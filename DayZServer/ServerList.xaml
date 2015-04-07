@@ -111,7 +111,7 @@
                     <Image Source="images/appicon.png" Width="75" />
                 </Button>
 
-                <Button  ToolTip="Steam Login Disabled" Click="steam_click" Width="104" Height="55" Cursor="No" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Hidden">
+                <Button ToolTip="Steam Login Disabled" Click="steam_click" Width="104" Height="55" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
                     <Image Source="images/sits_large_noborder.png" Width="93" Height="39" />
                 </Button>
 
@@ -296,7 +296,7 @@
         </DataGrid>
         <Canvas x:Name="steamLogin" Height="212" VerticalAlignment="Top" Width="440" Margin="0,188,0,0" Background="#FFF3F4F6">
             <StackPanel Height="46" Canvas.Left="30" Canvas.Top="62">
-                <TextBox x:Name="userId" Height="35" TextWrapping="Wrap" Text="UserID" Width="200" Padding="5,4,5,5" FontSize="18" BorderBrush="#FFDADADA" Foreground="#FF747474" GotKeyboardFocus="userIdGotKeyboardFocus" LostKeyboardFocus="userIdLostKeyboardFocus"/>
+                <TextBox x:Name="userId" Height="35" TextWrapping="Wrap" Text="UserIDgoeshere" Width="200" Padding="5,4,5,5" FontSize="18" BorderBrush="#FFDADADA" Foreground="#FF747474" GotKeyboardFocus="userIdGotKeyboardFocus" LostKeyboardFocus="userIdLostKeyboardFocus"/>
             </StackPanel>
             <StackPanel Height="58" Canvas.Left="30" Canvas.Top="108" Width="200">
                 <PasswordBox x:Name="password"  Padding="5,10,5,5" PasswordChar="*" Height="35" BorderBrush="#FFDADADA" Password="asdfadsfasdf"/>

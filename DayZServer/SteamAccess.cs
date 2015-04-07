@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading;
 using Steam;
 using SteamKit2;
+using DayZServer.Events;
 
 //
 // Sample 6: SteamGuard
@@ -155,47 +156,19 @@ namespace Steam
             Console.WriteLine("Disconnected from Steam");
 
             isRunning = false;
+
+            UIEvents.OnUserHasDisconnected(callback);
         }
 
         static void OnLoggedOn(SteamUser.LoggedOnCallback callback)
         {
-            bool isSteamGuard = callback.Result == EResult.AccountLogonDenied;
-            bool is2FA = callback.Result == EResult.AccountLogonDeniedNeedTwoFactorCode;
-
-            if (isSteamGuard || is2FA)
-            {
-                Console.WriteLine("This account is SteamGuard protected!");
-
-                if (is2FA)
-                {
-                    Console.Write("Please enter your 2 factor auth code from your authenticator app: ");
-
-                }
-                else
-                {
-                    Console.Write("Please enter the auth code sent to the email at {0}: ", callback.EmailDomain);
-                    authCode = Console.ReadLine();
-
-                }
-
-                return;
-            }
-
-            if (callback.Result != EResult.OK)
-            {
-                Console.WriteLine("Unable to logon to Steam: {0} / {1}", callback.Result, callback.ExtendedResult);
-
+            if (callback.Result == EResult.OK)
+                isRunning = true;
+            else
                 isRunning = false;
-                return;
-            }
 
-            Console.WriteLine("Successfully logged on!");
-            
-
-
-            // at this point, we'd be able to perform actions on Steam
+            UIEvents.OnUserHasLoggedOn(callback);
         }
-
 
         static void OnAccountInfo(SteamUser.AccountInfoCallback callback)
         {
@@ -233,12 +206,15 @@ namespace Steam
                     steamFriends.AddFriend(friend.SteamID);
                 }
             }
+
+            UIEvents.OnFriendsList(callback);
         }
 
         static void OnFriendAdded(SteamFriends.FriendAddedCallback callback)
         {
             // someone accepted our friend request, or we accepted one
             Console.WriteLine("{0} is now a friend", callback.PersonaName);
+            UIEvents.OnFriendAdded(callback);
         }
 
         static void OnPersonaState(SteamFriends.PersonaStateCallback callback)
@@ -247,11 +223,13 @@ namespace Steam
 
             // for this sample we'll simply display the names of the friends
             Console.WriteLine("State change: {0}", callback.Name);
+            UIEvents.OnPersonaState(callback);
         }
 
         static void OnLoggedOff(SteamUser.LoggedOffCallback callback)
         {
             Console.WriteLine("Logged off of Steam: {0}", callback.Result);
+            UIEvents.OnUserHasLoggedOff(callback);
         }
 
         static void OnMachineAuth(SteamUser.UpdateMachineAuthCallback callback)
@@ -286,11 +264,7 @@ namespace Steam
             });
 
             Console.WriteLine("Done!");
+            UIEvents.OnUpdateMachineAuth(callback);
         }
-
-
-  
     }
-
-
 }

@@ -117,6 +117,7 @@
       <DependentUpon>ServerList.xaml</DependentUpon>
     </Compile>
     <Compile Include="SteamAccess.cs" />
+    <Compile Include="UIEvents.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

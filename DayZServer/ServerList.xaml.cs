@@ -7,10 +7,11 @@ using System.Windows.Media;
 using System.IO;
 using System.Timers;
 using Steam;
+using SteamKit2;
 using System.ComponentModel;
 using System.Diagnostics;
 using DayZ;
-
+using DayZServer.Events;
 
 namespace DayZServer
 {
@@ -40,10 +41,14 @@ namespace DayZServer
             checkProfileForNewServerTimer.Enabled = true;
             steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
+            authCodeBox.Visibility = System.Windows.Visibility.Hidden;
             dm.startDataManager();
             DataManager.Server currentServer = dm.getCurrentServerList();
             selectedIP = currentServer.IP_Address;
            
+            UIEvents.UserHasLoggedOn += UIEvents_UserHasLoggedOn;
+            UIEvents.UserHasLoggedOff += UIEvents_UserHasLoggedOff;
+            UIEvents.UserHasDisconnected += UIEvents_UserHasDisconnected;
         }
 
         public void updateServerList()
@@ -493,6 +498,74 @@ this.Dispatcher.Invoke((Action)(() =>
             catch { }
         }
 
+        void UIEvents_UserHasLoggedOff(SteamUser.LoggedOffCallback callbackStatus)
+        {
+            Debug.WriteLine("Steam User has Logged Off: " + callbackStatus.Result.ToString());
+        }
+
+        void UIEvents_UserHasDisconnected(SteamClient.DisconnectedCallback callbackStatus)
+        {
+            Debug.WriteLine("Steam User has Disconnected");
+            MessageBox.Show("Disconnected from Steam");
+        }
+
+        void UIEvents_UserHasLoggedOn(SteamUser.LoggedOnCallback callbackStatus)
+        {
+            Debug.WriteLine("Steam User has Logged On: " + callbackStatus.Result.ToString());
+            
+            bool isSteamGuard = callbackStatus.Result == SteamKit2.EResult.AccountLogonDenied;
+            bool is2FA = callbackStatus.Result == SteamKit2.EResult.AccountLogonDeniedNeedTwoFactorCode;
+
+            if (isSteamGuard || is2FA)
+            {
+                Console.WriteLine("This account is SteamGuard protected!");
+
+                if (is2FA)
+                {
+                    Console.Write("Please enter your 2 factor auth code from your authenticator app: ");
+                    authCodeBox.Visibility = System.Windows.Visibility.Visible;
+                }
+                else
+                {
+                    MessageBox.Show(String.Format("Please enter the auth code sent to the email at {0}: ", callbackStatus.EmailDomain));
+                    authCodeBox.Visibility = System.Windows.Visibility.Visible;
+                }
+
+                return;
+            }
+
+            switch (callbackStatus.Result)
+            {
+                case EResult.OK:
+                    Debug.WriteLine("Logged on!");
+                    MessageBox.Show("Logged onto Steam!", "Logon successful");
+                    steamLogin.Visibility = System.Windows.Visibility.Hidden;
+                    authCodeBox.Visibility = System.Windows.Visibility.Hidden;
+                        break;
+                case EResult.InvalidLoginAuthCode:
+                case EResult.ExpiredLoginAuthCode:
+                        Debug.WriteLine("Needing 2 factor auth code");
+                        authCodeBox.Visibility = System.Windows.Visibility.Visible;
+                        break;
+                case EResult.InvalidEmail:
+                case EResult.InvalidName:
+                        MessageBox.Show("Invalid Name", "Unable to Login");
+                        userId.Clear();
+                        userId.Focus();
+                        break;
+                case EResult.InvalidPassword:
+                        MessageBox.Show("Invalid Password", "Unable to Login");
+                        password.Clear();
+                        password.Focus();
+                        break;
+                case EResult.Fail:
+                case EResult.Invalid:
+                case EResult.AccountLogonDenied:
+                        Debug.WriteLine("Not logged on");
+                        MessageBox.Show("Unable to login", "Login Failure");
+                        break;
+            }
+        }
     }
 }
 
