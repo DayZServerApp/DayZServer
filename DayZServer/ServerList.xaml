@@ -294,6 +294,8 @@
             </DataGrid.Columns>
 
         </DataGrid>
+
+       
         <Canvas x:Name="steamLogin" Height="212" VerticalAlignment="Top" Width="440" Margin="0,188,0,0" Background="#FFF3F4F6">
             <StackPanel Height="46" Canvas.Left="30" Canvas.Top="62">
                 <TextBox x:Name="userId" Height="35" TextWrapping="Wrap" Text="UserID" Width="200" Padding="5,4,5,5" FontSize="18" BorderBrush="#FFDADADA" Foreground="#FF747474" GotKeyboardFocus="userIdGotKeyboardFocus" LostKeyboardFocus="userIdLostKeyboardFocus"/>
