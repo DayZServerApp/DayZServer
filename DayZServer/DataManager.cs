@@ -637,29 +637,29 @@ namespace DayZServer
 
         void PingTimedEvent(Object source, ElapsedEventArgs e)
         {
-            //Interlocked.Increment(ref pingLoopInProgress);
-            //if (pingLoopInProgress == 1)
-            //{
-            //    if(server_list != null)
-            //    lock (server_list)
-            //    {
-            //        try
-            //        {
-            //            if (server_list != null)
-            //            getPing();
-            //        }
-            //        catch (Exception err)
-            //        {
-            //            Debug.WriteLine("The process failed: {0}", err.ToString());
-            //        }
-            //        //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
-            //    }
-            //}
-            //else
-            //{
-            //    Debug.WriteLine("!!!!!!!!!!!! PING PROCESS ALREADY RUNNING !!!!!!!!!!!!");
-            //}
-            //Interlocked.Decrement(ref pingLoopInProgress);
+            Interlocked.Increment(ref pingLoopInProgress);
+            if (pingLoopInProgress == 1)
+            {
+                if (server_list != null)
+                    lock (server_list)
+                    {
+                        try
+                        {
+                            if (server_list != null)
+                                getPing();
+                        }
+                        catch (Exception err)
+                        {
+                            Debug.WriteLine("The process failed: {0}", err.ToString());
+                        }
+                        //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+                    }
+            }
+            else
+            {
+                Debug.WriteLine("!!!!!!!!!!!! PING PROCESS ALREADY RUNNING !!!!!!!!!!!!");
+            }
+            Interlocked.Decrement(ref pingLoopInProgress);
                     }
 
         //void PlayerTimedEvent(Object source, ElapsedEventArgs e)
@@ -687,13 +687,14 @@ namespace DayZServer
                 Console.WriteLine("Exception" + e);
             }
  
-            Parallel.ForEach(server_list, new ParallelOptions 
+            Parallel.ForEach(Servers, new ParallelOptions 
             { 
                 MaxDegreeOfParallelism = 5 
             }, 
             DayZServer => 
             { 
-                Player(DayZServer); 
+
+                Player(DayZServer.Value); 
             });
         }
 
