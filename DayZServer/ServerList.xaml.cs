@@ -33,9 +33,9 @@ namespace DayZServer
         public Window1()
         {
             InitializeComponent();
-            updateServerListTimer = new System.Timers.Timer(1000);
-            updateServerListTimer.Elapsed += OnServerListTimedEvent;
-            updateServerListTimer.Enabled = true;
+            //updateServerListTimer = new System.Timers.Timer(1000);
+            //updateServerListTimer.Elapsed += OnServerListTimedEvent;
+            //updateServerListTimer.Enabled = true;
             checkProfileForNewServerTimer = new System.Timers.Timer(4000);
             checkProfileForNewServerTimer.Elapsed += OnNewServerTimedEvent;
             checkProfileForNewServerTimer.Enabled = true;
@@ -43,7 +43,10 @@ namespace DayZServer
             browse_dialog.Visibility = Visibility.Hidden;
             authCodeBox.Visibility = System.Windows.Visibility.Hidden;
             dm.startDataManager();
+            updateServerList();
+        
             DataManager.Server currentServer = dm.getCurrentServerList();
+            
             selectedIP = currentServer.IP_Address;
            
             UIEvents.UserHasLoggedOn += UIEvents_UserHasLoggedOn;
@@ -51,12 +54,19 @@ namespace DayZServer
             UIEvents.UserHasDisconnected += UIEvents_UserHasDisconnected;
         }
 
+
+        private void updateData(object sender, EventArgs e)
+        {
+            Console.WriteLine("hey! hey! listen! a property of a chatter in my list has changed!");
+            updateServerList();
+
+        }
+
         public void updateServerList()
         {
             this.Dispatcher.Invoke((Action)(() =>
                 {
-                    if (dm.getList() != null)
-                    {
+
                         string dgSortDescription = null;
                         ListSortDirection? dgSortDirection = null;
                         int columnIndex = 0;
@@ -73,8 +83,10 @@ namespace DayZServer
                                 break;
                             }
                         }
-                        serverList.ItemsSource = dm.getList();
+                        serverList.ItemsSource = dm.Servers.Values;
+                        dm.Servers.PropertyChanged += updateData;
                         //serverList.ItemsSource = dm.getServerList();
+                        //PropertyGrid.ItemsSource = dm.Servers.Values;
                         DataManager.Server currentServer = dm.getCurrentServerList();
                         if (currentServer != null)
                         if (selectedIP == currentServer.IP_Address)
@@ -95,7 +107,7 @@ namespace DayZServer
                             view.SortDescriptions.Add(s);
                             serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
                         }
-                    }
+
 
                 }));
         }
@@ -108,14 +120,14 @@ namespace DayZServer
 
         void OnServerListTimedEvent(Object source, ElapsedEventArgs e)
         {
-            try
-            {
-                updateServerList();
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine("The process failed: {0}", err.ToString());
-            }
+            //try
+            //{
+            //    updateServerList();
+            //}
+            //catch (Exception err)
+            //{
+            //    Console.WriteLine("The process failed: {0}", err.ToString());
+            //}
             //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
         }
 
@@ -209,7 +221,7 @@ namespace DayZServer
                 DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
                 string favoriteServer = obj.FullIP_Address;
                 dm.updateFavorite(favoriteServer);
-                updateServerList();
+                //updateServerList();
 
             }));
         }
@@ -221,7 +233,7 @@ namespace DayZServer
             DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
             string deleteServer = obj.ServerName;
             dm.deleteServer(deleteServer);
-            updateServerList();
+            //updateServerList();
             }));
             //if (obj.IP_Address == selectedIP)
             //{
@@ -316,7 +328,7 @@ namespace DayZServer
             string serverName = obj.ServerName;
             DZA dza = new DZA();
             dza.serverJoin(serverName, serverIP);
-            
+
 
 
 
