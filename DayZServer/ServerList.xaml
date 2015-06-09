@@ -293,6 +293,11 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
 
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Server IP Address" Click="Copy_ServerIP"></MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
         </DataGrid>
 
        
