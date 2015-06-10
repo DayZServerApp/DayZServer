@@ -69,7 +69,9 @@ namespace DayZServer
             //to the DataGrid (and has subject and state as property)
             var server = (DayZServer.DataManager.Server)item.SelectedCells[0].Item;
 
-            Debug.WriteLine("Copy server IP: " + server.IP_Address);
+            var fullAddress = String.Format("{0}{1}", server.IP_Address, (server.QueryPort > 0 ? String.Format(":{0}", server.QueryPort) : ""));
+            Debug.WriteLine("Copy server - " + fullAddress);
+            Clipboard.SetText(fullAddress);
         }
 
         public void updateServerList()
