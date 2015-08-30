@@ -340,13 +340,14 @@ namespace DayZServer
 
                 if (server_list.Count == 0)
                 {
-                    var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    var sr = new StreamReader(fs);
-                    temphistory = sr.ReadToEnd();
-                    sr.Close();
-                    fs.Close();
+                    
                     try
                     {
+                        var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        var sr = new StreamReader(fs);
+                        temphistory = sr.ReadToEnd();
+                        sr.Close();
+                        fs.Close();
                         server_list = JsonConvert.DeserializeObject<List<Server>>(temphistory);
                     }
                     catch (Exception e)
