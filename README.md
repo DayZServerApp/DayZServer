@@ -23,17 +23,7 @@
 * Quick server populate from GT
 
 
-## Installation
-**Download the release from Github https://github.com/DayZServerApp/DayZServer/releases**
-* Unzip all the files into a folder. 
-* Run DayZServer.exe. 
-* Then play DayZ. 
-* **Note:** If you had a previous version you may need to clear the history by clicking on the trash icon. This will ensure the data storage is up to date.
-* **Note:** If you don't have DayZ installed you can still run the application by placing the files VG7.DayZProfile and VG7.vars.DayZProfile in a folder named DayZ at this path C:\Users\{Your_Personal_User_Directory}\Documents\DayZ
-
-## Usage
-
-Source code is C# .Net developed using Visual Studio 2013
+**Unzip all the files into a folder. Run DayZServer.exe. Then play DayZ. The application will show you a history of servers you have played on while also updating your current server in real-time.** 
 
 * Each time you join a new server DayZServer will save it for you.
 * The last server you were on is identified by the light blue highlight.  
@@ -46,7 +36,18 @@ Source code is C# .Net developed using Visual Studio 2013
 * Clicking the GT button on the right will populate the list with servers.
 * Clicking the DayZ button at the top right will open the DayZServer download page. You can check and see if there is a new version out. 
 * Clicking the trash can will delete the server list leaving only the last server you visited. 
-* Clicking the map button will open a DayZ map.
+* Clicking the map button will open a DayZ map. 
+
+
+## Installation
+**Download the release from Github https://github.com/DayZServerApp/DayZServer/releases**
+* Unzip all the files into a folder. 
+* Run DayZServer.exe. 
+* Then play DayZ. 
+
+## Usage
+
+Source code is C# .Net developed using Visual Studio 2013
 
 ## Contributing
 
