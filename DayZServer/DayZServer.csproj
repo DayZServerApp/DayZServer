@@ -107,6 +107,9 @@
     </ApplicationDefinition>
     <Compile Include="DataManager.cs" />
     <Compile Include="ObservableConcurrentDictionary.cs" />
+    <Compile Include="ServerHistory.xaml.cs">
+      <DependentUpon>ServerHistory.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ServerList.xaml.cs">
       <DependentUpon>ServerList.xaml</DependentUpon>
     </Compile>
@@ -123,6 +126,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ServerHistory.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ServerList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -10,7 +10,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
 using QueryMaster;
-
+using System.Threading;
+using System.Security.Permissions;
 
 namespace DayZServer
 {
@@ -19,6 +20,8 @@ namespace DayZServer
         public string defaultPath;
         public string[] dirs;
         public string configpath;
+        public string filepath;
+        public string directorypath;
         public string DayZProfile;
         public string servername;
         public string FullIPAddress;
@@ -60,9 +63,11 @@ namespace DayZServer
         {
             defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString();
             dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile"); // TODO: crashes if DayZ is not loaded
-            dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
-            configpath = dirs[0];
-
+            //dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
+            configpath = dirs[1];
+            filepath = new FileInfo(configpath).Name;
+            directorypath = new FileInfo(configpath).Directory.FullName;
+            ;
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -71,12 +76,14 @@ namespace DayZServer
                     writeAppPath(dayzpath);
                 }
             }
+            
 
-            readHistoryfile();
-            // writeServerHistoryList();
             PingTimer = new System.Timers.Timer(4000);
             PingTimer.Elapsed += PingTimedEvent;
             PingTimer.Enabled = true;
+            readHistoryfile();
+            writeServerHistoryList();
+            WatchChanges();
         }
 
         public List<Server> getList()
@@ -130,6 +137,58 @@ namespace DayZServer
         public class RootObject
         {
             public Response response { get; set; }
+        }
+
+
+        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+        public void WatchChanges()
+        {
+            //string[] args = System.Environment.GetCommandLineArgs();
+
+            //// If a directory is not specified, exit program.
+            //if (args.Length != 2)
+            //{
+            //    // Display the proper way to call the program.
+            //    Console.WriteLine("Usage: Watcher.exe (directory)");
+            //    return;
+            //}
+
+            // Create a new FileSystemWatcher and set its properties.
+            FileSystemWatcher watcher = new FileSystemWatcher();
+            watcher.Path = directorypath;
+            /* Watch for changes in LastAccess and LastWrite times, and
+               the renaming of files or directories. */
+            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+                                   | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            // Only watch text files.
+            watcher.Filter = filepath;
+
+            // Add event handlers.
+            watcher.Changed += new FileSystemEventHandler(OnChanged);
+            watcher.Created += new FileSystemEventHandler(OnChanged);
+            watcher.Deleted += new FileSystemEventHandler(OnChanged);
+            watcher.Renamed += new RenamedEventHandler(OnRenamed);
+
+            // Begin watching.
+            watcher.EnableRaisingEvents = true;
+
+            // Wait for the user to quit the program.
+            Console.WriteLine("Press \'q\' to quit the sample.");
+            while (Console.Read() != 'q') ;
+        }
+
+        // Define the event handlers.
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
+            // Specify what is done when a file is changed, created, or deleted.
+            Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+            writeServerHistoryList();
+        }
+
+        private void OnRenamed(object source, RenamedEventArgs e)
+        {
+            // Specify what is done when a file is renamed.
+            Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
         }
 
         public void writeServerHistoryList()
@@ -186,6 +245,8 @@ namespace DayZServer
                                 writeServerMemory(matchCurrent);
                             }
 
+                        }
+
                             match.Date = DateTime.Now;
                             match.IP_Address = IPAddress;
                             match.FullIP_Address = FullIPAddress;
@@ -204,7 +265,7 @@ namespace DayZServer
                             sw.Write(listjson);
                             sw.Close();
                             fsw.Close();
-                        }
+                        
                     }
                     else
                     {
@@ -289,9 +350,11 @@ namespace DayZServer
         public void readHistoryfile()
         {
             server_list = getServerList();
+            if(server_list != null) { 
             foreach (Server DayZServer in server_list)
             {
                 writeServerMemory(DayZServer);
+            }
             }
         }
 
@@ -599,29 +662,29 @@ namespace DayZServer
 
         void PingTimedEvent(Object source, ElapsedEventArgs e)
         {
-            //Interlocked.Increment(ref pingLoopInProgress);
-            //if (pingLoopInProgress == 1)
-            //{
-            //    if(server_list != null)
-            //    lock (server_list)
-            //    {
-            //        try
-            //        {
-            //            if (server_list != null)
-            //            getPing();
-            //        }
-            //        catch (Exception err)
-            //        {
-            //            Debug.WriteLine("The process failed: {0}", err.ToString());
-            //        }
-            //        //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
-            //    }
-            //}
-            //else
-            //{
-            //    Debug.WriteLine("!!!!!!!!!!!! PING PROCESS ALREADY RUNNING !!!!!!!!!!!!");
-            //}
-            //Interlocked.Decrement(ref pingLoopInProgress);
+            Interlocked.Increment(ref pingLoopInProgress);
+            if (pingLoopInProgress == 1)
+            {
+                if (server_list != null)
+                    lock (server_list)
+                    {
+                        try
+                        {
+                            if (server_list != null)
+                                getPing();
+                        }
+                        catch (Exception err)
+                        {
+                            Debug.WriteLine("The process failed: {0}", err.ToString());
+                        }
+                        //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+                    }
+            }
+            else
+            {
+                Debug.WriteLine("!!!!!!!!!!!! PING PROCESS ALREADY RUNNING !!!!!!!!!!!!");
+            }
+            Interlocked.Decrement(ref pingLoopInProgress);
         }
 
         //void PlayerTimedEvent(Object source, ElapsedEventArgs e)
@@ -730,10 +793,12 @@ namespace DayZServer
                         i.FullIP_Address = DayZServer.FullIP_Address;
 
                         listZ.Add(i);
-                        //Console.WriteLine("Name : " + Z.Name + "\nScore : " + Z.Score + "\nTime : " + Z.Time);
+                        Console.WriteLine("Name : " + Z.Name + "\nScore : " + Z.Score + "\nTime : " + Z.Time);
                     }
                 }
-
+                DayZServer.UserCount = dm.info.Players.ToString();
+                DayZServer.PingSpeed = dm.info.Ping;
+                DayZServer.playersList = listZ;
                 Servers.UpdateWithNotification(DayZServer.IP_Address, DayZServer);
 
                 //dm.server.Dispose();
@@ -821,6 +886,8 @@ namespace DayZServer
                             matchCurrent.Favorite = matchCurrent.Favorite;
                             matchCurrent.QueryPort = queryportnum;
                             compareList[indexCurrent] = matchCurrent;
+                            //matchCurrent.PingSpeed = dm.server.Ping();
+                            //matchCurrent.UserCount = dm.server.GetPlayers().Count.ToString();
                             dm.writeServerMemory(matchCurrent);
 
                             string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
@@ -858,13 +925,21 @@ namespace DayZServer
                                     listZ.Add(i);
                                     //Console.WriteLine("Name : " + Z.Name + "\nScore : " + Z.Score + "\nTime : " + Z.Time);
                                 }
-
+                            //if (dm.info.) { matchCurrent.PingSpeed = dm.info.Ping;}
+                            var type = dm.info.GetType();
+                            if (type.GetMethod("Ping") != null)
+                            {
+                                matchCurrent.PingSpeed = dm.info.Ping;
+                            }
+                            
+                            matchCurrent.UserCount = dm.info.Players.ToString();
+                            matchCurrent.playersList = listZ;
                             matchCurrent.QueryPort = queryportnum;
                             if (dm.info == null) continue;
                             dm.Servers.UpdateWithNotification(matchCurrent.IP_Address, matchCurrent);
                             //dm.server.Dispose();
                             dm.serversList = dm.Servers.Values.ToList() as List<Server>;
-
+                            
                         }
 
                         //if (info.Address == steamServer.addr)

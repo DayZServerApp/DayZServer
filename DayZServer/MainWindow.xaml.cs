@@ -38,7 +38,7 @@ namespace DayZServer
         {
             InitializeComponent();
 
-            aTimer = new System.Timers.Timer(4000);
+            aTimer = new System.Timers.Timer(200000);
             // Hook up the Elapsed event for the timer. 
             aTimer.Elapsed += OnTimedEvent;
             aTimer.Enabled = true;

@@ -239,7 +239,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed" SortDirection="Descending">
+                <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding PingSpeed}" Foreground="#FF9B9B9C" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />

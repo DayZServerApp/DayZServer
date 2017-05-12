@@ -1,0 +1,334 @@
+﻿<Window x:Class="DayZServer.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DayZServer" Width="1024" Height="768" WindowStartupLocation="Manual" WindowState="Maximized" Icon="images/icon.png" xmlns:local="DayZServer">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="AlternatingRowBackground" Value="#FFF3F3F3"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+        </Style>
+        <Style TargetType="{x:Type DataGridRow}">
+            <!--<Style.Triggers>
+                <DataTrigger Binding="{Binding Current}" Value="1">
+                    <Setter Property="Background" Value="#f2f9fc" />
+                </DataTrigger>
+            </Style.Triggers>-->
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Transparent" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveBorderBrushKey}" Color="Transparent" />
+            </Style.Resources>
+        </Style>
+        <Style TargetType="{x:Type DataGridCell}">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{x:Null}" />
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="firstStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                        BorderThickness="0" 
+                        Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="images/checkoff.png" Stretch="Uniform"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="BorderBrush">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="images/checkoff.png" Stretch="Uniform"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="deleteStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                        BorderThickness="0" 
+                        Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="images/deleteon.png" Stretch="Uniform"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="BorderBrush">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="images/deleteoff.png" Stretch="Uniform"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+
+    <DockPanel Margin="0,0,2,0">
+
+        <ToolBarTray Height="737" VerticalAlignment="Top" Width="121" HorizontalAlignment="Right" Orientation="Vertical" DockPanel.Dock="Right" Background="{x:Null}">
+            <ToolBar HorizontalAlignment="Right" Height="355" VerticalAlignment="Top" Width="108" Margin="0,0,-114,-331" Background="{x:Null}">
+
+                <Button  ToolTip="DayZServer" Width="91" Click="Link_Click" Tag="https://github.com/DayZServerApp/DayZServer/releases" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" >
+                    <Image Source="images/button.png"/>
+                </Button>
+                <Button Click="ClearHistory" ToolTip="Clear All Servers" Width="94" Height="87" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Image Source="images/All-Clear-Icon.png" Width="94" Height="77" />
+                </Button>
+                <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map" Width="92" Height="87" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Image Source="images/appicon.png" Width="75" />
+                </Button>
+
+                <Button  ToolTip="Steam Login Disabled" Click="steam_click" Width="104" Height="55" Cursor="No" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Hidden">
+                    <Image Source="images/sits_large_noborder.png" Width="93" Height="39" />
+                </Button>
+
+            </ToolBar>
+            <ToolBar HorizontalAlignment="Right" Height="403" VerticalAlignment="Top" Width="121" Margin="0,329,-121,-708" Background="{x:Null}">
+                <Canvas Height="373" VerticalAlignment="Top" Width="119" >
+                    <Button  Click="GT_Click" Width="118" Height="50" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
+                        <Image Source="images/gtlogo.png" Width="108" Height="38" />
+                    </Button>
+                    <DataGrid x:Name="userList" Height="318" Width="117" AutoGenerateColumns="False" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Background="{x:Null}" Canvas.Top="55">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Width="90"  Header="Players" SortMemberPath="Name" SortDirection="Ascending">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="11" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Canvas>
+            </ToolBar>
+        </ToolBarTray>
+        <Canvas Height="58" VerticalAlignment="Top" DockPanel.Dock="Top" HorizontalAlignment="Left" Width="721" >
+            <Canvas.Background>
+                <ImageBrush ImageSource="images/header.png" Stretch="Uniform"/>
+            </Canvas.Background>
+            <Label Content="Standalone Version 2" Canvas.Left="148" Canvas.Top="33" Width="181" Foreground="White" Height="25" FontSize="14" Opacity="0.7"/>
+        </Canvas>
+
+
+        <DataGrid  Name="serverList" SelectedIndex="{Binding AssetMainGridSelectedIndex,Mode=TwoWay}" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Transparent" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Transparent" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveBorderBrushKey}" Color="Transparent" />
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Current}" Value="1">
+                            <Setter Property="Background" Value="#f2f9fc" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="55" SortMemberPath="Favorite" Header="Favorite">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button x:Name="favoriteButton" Height="32" Click="favorite_Click" Tag="{Binding}" VerticalAlignment="Center" Width="32" Cursor="Hand">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource firstStyle}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Favorite}" Value="1">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <ImageBrush ImageSource="images/checkon.png" Stretch="Uniform"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Favorite}" Value="0">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <ImageBrush ImageSource="images/checkoff.png" Stretch="Uniform"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Server Name" Width="auto" SortMemberPath="ServerName" IsReadOnly="True" MinWidth="400">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ServerName}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="18" Margin="10" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="IP Address" Width="150" SortMemberPath="IP_Address">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding IP_Address}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date" SortDirection="Descending">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Date}" Foreground="#FF9B9B9C" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="JoinServer" Content="Join" Height="25" VerticalAlignment="Center" Width="60" BorderBrush="{x:Null}" Tag="{Binding}" Foreground="#FF919191" Cursor="Hand" Padding="10,1,10,3"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="server_Details" Content="Players" Height="25" VerticalAlignment="Center" Width="60" BorderBrush="{x:Null}" Tag="{Binding}" Foreground="#FF919191" Cursor="Hand" Padding="1,1,1,3">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding UserCount}" Value="Unavailable">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed" SortDirection="Descending">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding PingSpeed}" Foreground="#FF9B9B9C" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Players" Width="auto" SortMemberPath="UserTotal" IsReadOnly="True" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding UserCount}" Foreground="#FF9B9B9C" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding UserCount}" Value="Unavailable">
+                                                <Setter Property="Cursor" Value="No" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="55">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button x:Name="deleteButton" Height="32" Click="delete_Click" Tag="{Binding}" VerticalAlignment="Center" Width="32" Cursor="Hand">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource deleteStyle}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Current}" Value="0">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <ImageBrush ImageSource="images/deleteoff.png" Stretch="Uniform"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Current}" Value="1">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <ImageBrush ImageSource="images/deletedisabled.png" Stretch="Uniform"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
+
+       
+        <Canvas x:Name="steamLogin" Height="212" VerticalAlignment="Top" Width="440" Margin="0,188,0,0" Background="#FFF3F4F6">
+            <StackPanel Height="46" Canvas.Left="30" Canvas.Top="62">
+                <TextBox x:Name="userId" Height="35" TextWrapping="Wrap" Text="UserID" Width="200" Padding="5,4,5,5" FontSize="18" BorderBrush="#FFDADADA" Foreground="#FF747474" GotKeyboardFocus="userIdGotKeyboardFocus" LostKeyboardFocus="userIdLostKeyboardFocus"/>
+            </StackPanel>
+            <StackPanel Height="58" Canvas.Left="30" Canvas.Top="108" Width="200">
+                <PasswordBox x:Name="password"  Padding="5,10,5,5" PasswordChar="*" Height="35" BorderBrush="#FFDADADA" Password="asdfadsfasdf"/>
+            </StackPanel>
+            <StackPanel Height="58" Canvas.Left="255" Canvas.Top="84" Width="152">
+                <TextBox x:Name="authCodeBox" Height="35" TextWrapping="Wrap" Text="Auth Code" Padding="5,4,5,5" FontSize="18" BorderBrush="#FFDADADA" Foreground="#FF747474"/>
+            </StackPanel>
+            <StackPanel Height="40" Canvas.Left="197" Canvas.Top="158" Width="220" Orientation="Horizontal">
+                <Button Content="Login"  Height="35" BorderBrush="{x:Null}" Width="100" Margin="0,2,15,2" FontSize="18" Foreground="#FF636363" Click="login_click"/>
+                <Button Content="Cancel" Height="35" BorderBrush="{x:Null}" Width="100" Margin="0,2" FontSize="18" Foreground="#FF636363" Click="cancelLogin_Click"/>
+            </StackPanel>
+            <Canvas Height="47" Width="440">
+                <Image Source="images/globalheader_logo.png" HorizontalAlignment="Right" Height="47" Width="111" Canvas.Left="319" />
+                <Label Content="Login" Canvas.Left="10" Canvas.Top="6" Foreground="White" Width="134" FontSize="18"/>
+                <Label x:Name="statusMessage" Content="" Canvas.Left="72" Canvas.Top="12" Width="242" Foreground="White"/>
+                <Canvas.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF7AAE35" Offset="0"/>
+                        <GradientStop Color="#FF47661F" Offset="1"/>
+                    </LinearGradientBrush>
+                </Canvas.Background>
+            </Canvas>
+        </Canvas>
+        <Canvas x:Name="browse_dialog" Height="207" Canvas.Left="28" Canvas.Top="58" Width="516" Background="#FFF0F0F0" Margin="42,191,24,255" >
+            <Button x:Name="cancel_button" Content="Cancel" Canvas.Left="364" Canvas.Top="160" Width="142" Height="37" Click="cancel_click" FontSize="18" BorderBrush="{x:Null}"/>
+            <TextBox Height="66" Canvas.Left="10" TextWrapping="Wrap" Text="Browse and find the location of DayZ.exe and try again. &#xA;The game should be in the steam folder &#xA;\Steam\SteamApps\common\DayZ\DayZ.exe" Canvas.Top="50" Width="496" Background="{x:Null}" Foreground="#FF6A6A6A" FontSize="16" BorderBrush="{x:Null}"/>
+            <TextBox Height="33" Canvas.Left="10" TextWrapping="Wrap" Text="Unable to locate where you installed DayZ" Canvas.Top="12" Width="496"  Background="{x:Null}" Foreground="#FF3E3E3E" FontSize="18" BorderBrush="{x:Null}"/>
+            <Button x:Name="browse" Content="Browse" Canvas.Left="364" Canvas.Top="118" Width="142" Height="37" Click="browse_click" FontSize="18" BorderBrush="{x:Null}"/>
+        </Canvas>
+       
+    </DockPanel>
+
+</Window>
