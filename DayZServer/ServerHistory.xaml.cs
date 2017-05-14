@@ -9,6 +9,7 @@ using System.Timers;
 using Steam;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 using ToastNotifications;
 using ToastNotifications.Lifetime;
@@ -40,20 +41,25 @@ namespace DayZServer
         private static System.Timers.Timer checkProfileForNewServerTimer;
         public string selectedIP;
         public static DataManager dm = new DataManager();
+        public static DataGrid innerDataGrid = new DataGrid();
 
 
         public ServerHistory()
         {
             InitializeComponent();
+           
             //checkProfileForNewServerTimer = new System.Timers.Timer(8000);
             //checkProfileForNewServerTimer.Elapsed += OnNewServerTimedEvent;
             //checkProfileForNewServerTimer.Enabled = true;
+
             steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
             dm.Servers.PropertyChanged += updateData;
             dm.startDataManager();
-
-            //dm.startDataManager();
+            //serverList.RowDetailsVisibilityChanged += serverList_RowDetailsVisibilityChanged;
+           
+            //serverList.DataContext = dm.Servers;
+            serverList.ItemsSource = dm.Servers.Values;
             //updateServerList();
 
             //DataManager.Server currentServer = dm.getCurrentServerList();
@@ -62,8 +68,8 @@ namespace DayZServer
 
         }
 
-
         
+
 
 
         //private async void getServerHistory()
@@ -71,7 +77,7 @@ namespace DayZServer
         //    await Task.Run(() => startDataManager());
         //    DataManager.Server currentServer = dm.getCurrentServerList();
         //    if (currentServer != null) { selectedIP = currentServer.IP_Address; }
-           
+
         //    updateServerList();
         //    // Update the UI with results
         //}
@@ -125,13 +131,14 @@ namespace DayZServer
                 //    if (row.DetailsTemplate != null)
                 //    {
                 //        dgVisibility = row.DetailsVisibility;
-                //        dgRowDescription = row.Uid;
+                //        dgRowDescription = row.Name;
 
                 //        break;
                 //    }
                 //}
 
                 serverList.ItemsSource = dm.Servers.Values;
+                
 
                 
 
@@ -155,13 +162,7 @@ namespace DayZServer
                     view.SortDescriptions.Add(s);
                     serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
                 }
-                if (!string.IsNullOrEmpty(dgRowDescription) && dgVisibility != null)
-                {
-                    //DataGridRow s = new DataGridRow();
-                    //CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
-                    //view.SortDescriptions.Add(s);
-                    //serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
-                }
+               
             }));
 
         }
@@ -484,6 +485,7 @@ namespace DayZServer
             }
         }
 
+
         private void server_Details(object sender, RoutedEventArgs e)
         {
             string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
@@ -503,11 +505,123 @@ namespace DayZServer
                 }
         }
 
+        //private void server_Details(object sender, RoutedEventArgs e)
+        //{
+        //    string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+        //    string path = System.IO.Path.Combine(appDataPath, "DayZServer");
+        //    DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
+
+
+
+        //    //selectedIP = obj.IP_Address;
+        //    //updateUserList(obj);
+
+        //    for (var vis = sender as Visual; vis != null; vis = VisualTreeHelper.GetParent(vis) as Visual)
+        //        if (vis is DataGridRow)
+        //        {
+        //            var row = (DataGridRow)vis;
+
+        //            if (row.DetailsVisibility == Visibility.Visible)
+        //            {
+        //                obj.Details = false;
+        //                dm.Servers.UpdateWithNotification(obj.IP_Address, obj);
+        //                dm.UpdateHistory();
+        //            }
+        //            else
+        //            {
+        //                obj.Details = true;
+        //                dm.Servers.UpdateWithNotification(obj.IP_Address, obj);
+        //                dm.UpdateHistory();
+        //            }
+        //            break;
+
+        //        }
+        //}
+
+
+
+
+
+        //void serverList_RowDetailsVisibilityChanged(object sender, DataGridRowDetailsEventArgs e)
+        //{
+
+
+        //    innerDataGrid = e.DetailsElement as DataGrid;
+        //    DataManager.Server obj = e.Row.DataContext as DataManager.Server;
+        //    if (obj != null && innerDataGrid != null)
+        //    {
+        //        UpdateUserList(innerDataGrid, obj);
+        //    }
+
+
+        //}
+
+
+        //public void UpdateUserList(DataGrid detailsDataGrid, DataManager.Server obj)
+        //{
+        //    this.Dispatcher.Invoke((Action)(() =>
+        //    {
+        //        string dgSortDescriptionUser = null;
+        //        ListSortDirection? dgSortDirectionUser = null;
+        //        int columnIndexUser = 0;
+
+
+        //        foreach (DataGridColumn column in detailsDataGrid.Columns)
+        //        {
+        //            columnIndexUser++;
+
+        //            if (column.SortDirection != null)
+        //            {
+        //                dgSortDirectionUser = column.SortDirection;
+        //                dgSortDescriptionUser = column.SortMemberPath;
+
+        //                break;
+        //            }
+        //        }
+        //        try
+        //        {
+        //            if (obj != null) { detailsDataGrid.ItemsSource = obj.playersList; }
+
+        //        }
+        //        catch (Exception err)
+        //        {
+        //            Console.WriteLine(err.Message);
+        //        }
+
+
+        //        if (!string.IsNullOrEmpty(dgSortDescriptionUser) && dgSortDirectionUser != null)
+        //        {
+        //            SortDescription sUser = new SortDescription(dgSortDescriptionUser, dgSortDirectionUser.Value);
+        //            CollectionView viewUser = (CollectionView)CollectionViewSource.GetDefaultView(detailsDataGrid.ItemsSource);
+        //            try
+        //            {
+
+        //            }
+        //            catch (Exception err)
+        //            {
+        //                Console.WriteLine(err.Message);
+
+        //            }
+
+
+        //        }
+
+        //    }));
+        //}
+
+
+
+
+
+
         public void updateUserList(DataManager.Server obj)
         {
 
             this.Dispatcher.Invoke((Action)(() =>
                             {
+
+
+
 
                                 string dgSortDescriptionUser = null;
                                 ListSortDirection? dgSortDirectionUser = null;
@@ -528,8 +642,8 @@ namespace DayZServer
                                 }
                                 try
                                 {
-                                    if(obj != null) { userList.ItemsSource = obj.playersList; }
-                                   
+                                    if (obj != null) { userList.ItemsSource = obj.playersList; }
+
                                 }
                                 catch (Exception err)
                                 {

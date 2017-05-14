@@ -4,6 +4,7 @@
         Title="DayZServer" Width="1024" Height="768" WindowStartupLocation="Manual" WindowState="Maximized" Icon="images/icon.png" xmlns:local="DayZServer">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <Style TargetType="{x:Type DataGrid}">
             <Setter Property="AlternatingRowBackground" Value="#FFF3F3F3"/>
             <Setter Property="AutoGenerateColumns" Value="False"/>
@@ -174,7 +175,7 @@
         </Canvas>
 
 
-        <DataGrid  Name="serverList" SelectedIndex="{Binding AssetMainGridSelectedIndex,Mode=TwoWay}" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
+        <DataGrid  Name="serverList"  EnableColumnVirtualization="True" EnableRowVirtualization="True"  SelectedIndex="{Binding AssetMainGridSelectedIndex,Mode=TwoWay}" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="BorderThickness" Value="0"/>
@@ -182,6 +183,7 @@
             </DataGrid.CellStyle>
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
+                    <Setter Property="DetailsVisibility" Value="{Binding Details, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <Style.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
                         <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
@@ -200,11 +202,11 @@
                 <DataGridTemplateColumn Width="55" SortMemberPath="Favorite" Header="Favorite">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button x:Name="favoriteButton" Height="32" Click="favorite_Click" Tag="{Binding}" VerticalAlignment="Center" Width="32" Cursor="Hand">
+                            <Button x:Name="favoriteButton" Height="32" Click="favorite_Click" Tag="{Binding PresentationTraceSources.TraceLevel=High}" VerticalAlignment="Center" Width="32" Cursor="Hand">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource firstStyle}">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Favorite}" Value="1">
+                                            <DataTrigger Binding="{Binding Favorite }" Value="1">
                                                 <Setter Property="Background">
                                                     <Setter.Value>
                                                         <ImageBrush ImageSource="images/checkon.png" Stretch="Uniform"/>
@@ -238,15 +240,11 @@
                             <Button x:Name="deleteButton" Height="32" Click="Copy_ServerIP" Tag="{Binding}" VerticalAlignment="Center" Width="32" Cursor="Hand">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource copyStyle}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Current}" Value="0">
-                                                <Setter Property="Background">
-                                                    <Setter.Value>
-                                                        <ImageBrush ImageSource="images/copyoff.png" Stretch="Uniform"/>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-                                        </Style.Triggers>
+                                        <Setter Property="Background">
+                                            <Setter.Value>
+                                                <ImageBrush ImageSource="images/copyoff.png" Stretch="Uniform"/>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
                                 </Button.Style>
                             </Button>
@@ -346,7 +344,39 @@
             </DataGrid.Columns>
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
+                    <!--<DataGrid Name="listDetails" CanUserAddRows="False" EnableRowVirtualization="True" EnableColumnVirtualization="true"   GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Height="300">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn  Header="Players" SortMemberPath="Name" SortDirection="Ascending">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="20" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>-->
+
                     <TextBlock Text="{Binding ServerName}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="18" Margin="10" />
+                    
+                    
+                    <!--<DockPanel Background="GhostWhite" Height="200">
+                        <Grid Margin="10">
+                            <ItemsControl Name="icTodoList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="100" />
+                                            </Grid.ColumnDefinitions>
+                                            <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding ServerName}" BorderBrush="{x:Null}" FontSize="20" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
+                                            
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </DockPanel>-->
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>
         </DataGrid>

@@ -126,6 +126,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BooleanToVisibilityConverter.cs" />
     <Compile Include="DataManager.cs" />
     <Compile Include="ObservableConcurrentDictionary.cs" />
     <Compile Include="ServerHistory.xaml.cs">

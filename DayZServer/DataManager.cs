@@ -48,6 +48,7 @@ namespace DayZServer
         public static string tester;
         public static string currentIP;
         public ObservableConcurrentDictionary<string, Server> Servers = new ObservableConcurrentDictionary<string, Server>();
+        
         //static ConcurrentDictionary<string, Server> Players = new ConcurrentDictionary<string, Server>();
         private static System.Timers.Timer PingTimer;
         static int pingLoopInProgress = 0;
@@ -117,6 +118,7 @@ namespace DayZServer
             public long PingSpeed { get; set; }
             public long UserCount { get; set; }
             public int UserTotal { get; set; }
+            public bool Details { get; set; }
             public List<DayZPlayer> playersList { get; set; }
         }
 
@@ -216,6 +218,7 @@ namespace DayZServer
             profileServer.QueryPort = 0;
             profileServer.Game_Port = GamePort;
             profileServer.playersList = null;
+            profileServer.Details = false;
         }
 
 
@@ -326,12 +329,13 @@ namespace DayZServer
                         {
                             matchCurrent.Current = "0";
                         }
+                        
                         await Task.Run(() => ServerToDictionary(profileServer));
                         await Task.Run(() => UpdateHistory());
                     }
                     else
                     {
-                        await Task.Run(() => ServerToDictionary(match));
+                            await Task.Run(() => ServerToDictionary(match));
                     }
 
                 }
@@ -343,7 +347,7 @@ namespace DayZServer
             }
         }
 
-        private async Task UpdateHistory()
+        public async Task UpdateHistory()
         {
             List<Server> historyList = Servers.Values.ToList();
             string listjson = JsonConvert.SerializeObject(historyList.ToArray());
@@ -1102,6 +1106,7 @@ namespace DayZServer
                         match.Favorite = "1";
                     }
 
+
                     await Task.Run(() => ServerToDictionary(match));
                     await Task.Run(() => UpdateHistory());
                 }
@@ -1336,6 +1341,7 @@ namespace DayZServer
             gtServer.QueryPort = 0;
             gtServer.Game_Port = GamePort;
             gtServer.playersList = null;
+            gtServer.Details = false;
 
 
 
@@ -1356,7 +1362,23 @@ namespace DayZServer
                                 {
                                     match.Current = "1";
                                 }
-                                await Task.Run(() => ServerToDictionary(match));
+                                if (match.Favorite == "1")
+                                {
+                                    match.Favorite = "1";
+                                }
+                                else if (match.Favorite == "0")
+                                {
+                                    match.Favorite = "0";
+                                }
+                                if (match.Details)
+                                {
+                                    match.Details = true;
+                                }
+                                else if (!match.Details)
+                                {
+                                    match.Details = false;
+                                }
+                            await Task.Run(() => ServerToDictionary(match));
                                 await Task.Run(() => UpdateHistory());
                             }
                             else
