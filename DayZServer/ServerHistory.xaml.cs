@@ -10,6 +10,10 @@ using Steam;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using ToastNotifications;
+using ToastNotifications.Lifetime;
+using ToastNotifications.Messages;
+using ToastNotifications.Position;
 
 
 namespace DayZServer
@@ -17,6 +21,22 @@ namespace DayZServer
 
     public partial class ServerHistory : Window
     {
+        Notifier notifier = new Notifier(cfg =>
+        {
+            cfg.PositionProvider = new WindowPositionProvider(
+                parentWindow: Application.Current.MainWindow,
+                corner: Corner.TopRight,
+                offsetX: 150,
+                offsetY: 30);
+
+            cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
+                notificationLifetime: TimeSpan.FromSeconds(3),
+                maximumNotificationCount: MaximumNotificationCount.FromCount(5));
+
+            cfg.Dispatcher = Application.Current.Dispatcher;
+        });
+
+
         private static System.Timers.Timer checkProfileForNewServerTimer;
         public string selectedIP;
         public static DataManager dm = new DataManager();
@@ -177,6 +197,7 @@ namespace DayZServer
             DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
             string fullAddress = obj.FullIP_Address;
             Clipboard.SetText(fullAddress);
+            notifier.ShowSuccess("Copied: " + fullAddress);
 
         }
 
