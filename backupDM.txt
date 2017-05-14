@@ -1,0 +1,1034 @@
+ [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+        public void WatchProfileChanges()
+        {
+
+            FileSystemWatcher watcherProfile = new FileSystemWatcher();
+            watcherProfile.Path = directorypathProfile;
+            /* Watch for changes in LastAccess and LastWrite times, and
+               the renaming of files or directories. */
+            watcherProfile.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+                                   | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            // Only watch text files.
+            watcherProfile.Filter = filepathProfile;
+
+            // Add event handlers.
+            watcherProfile.Changed += new FileSystemEventHandler(OnProfileChanged);
+            watcherProfile.Created += new FileSystemEventHandler(OnProfileChanged);
+            watcherProfile.Deleted += new FileSystemEventHandler(OnProfileChanged);
+            watcherProfile.Renamed += new RenamedEventHandler(OnProfileRenamed);
+
+            // Begin watching.
+            watcherProfile.EnableRaisingEvents = true;
+            WatchHistoryChanges();
+            // Wait for the user to quit the program.
+            Console.WriteLine("Press \'q\' to quit the sample.");
+            while (Console.Read() != 'q') ;
+            
+        }
+
+        // Define the event handlers.
+        private void OnProfileChanged(object source, FileSystemEventArgs e)
+        {
+            // Specify what is done when a file is changed, created, or deleted.
+            Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+            writeServerHistoryList();
+        }
+
+        private void OnProfileRenamed(object source, RenamedEventArgs e)
+        {
+            // Specify what is done when a file is renamed.
+            Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
+        }
+
+        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+        public void WatchHistoryChanges()
+        {
+
+            FileSystemWatcher watcherHistory = new FileSystemWatcher();
+            watcherHistory.Path = directorypathHistory;
+            /* Watch for changes in LastAccess and LastWrite times, and
+               the renaming of files or directories. */
+            watcherHistory.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+                                   | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            // Only watch text files.
+            watcherHistory.Filter = filepathHistory;
+
+            // Add event handlers.
+            watcherHistory.Changed += new FileSystemEventHandler(OnHistoryChanged);
+            watcherHistory.Created += new FileSystemEventHandler(OnHistoryChanged);
+            watcherHistory.Deleted += new FileSystemEventHandler(OnHistoryChanged);
+            watcherHistory.Renamed += new RenamedEventHandler(OnHistoryRenamed);
+
+            // Begin watching.
+            watcherHistory.EnableRaisingEvents = true;
+
+            // Wait for the user to quit the program.
+            Console.WriteLine("Press \'q\' to quit the sample.");
+            while (Console.Read() != 'q') ;
+        }
+
+        // Define the event handlers.
+        private void OnHistoryChanged(object source, FileSystemEventArgs e)
+        {
+            // Specify what is done when a file is changed, created, or deleted.
+            Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+            getCurrentServerList();
+        }
+
+        private void OnHistoryRenamed(object source, RenamedEventArgs e)
+        {
+            // Specify what is done when a file is renamed.
+            Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
+        }
+
+        public void writeServerHistoryList()
+        {
+            Debug.WriteLine("writeServerHistoryList");
+            var profileFileStream = new FileStream(configpath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var profileStremReader = new StreamReader(profileFileStream);
+            DayZProfile = profileStremReader.ReadToEnd();
+            profileStremReader.Close();
+            profileFileStream.Close();
+            servername = DayZProfile.Split(new string[] { "lastMPServerName=\"" }, StringSplitOptions.None)[1].Split(new string[] { "\";" }, StringSplitOptions.None)[0].Trim();
+            FullIPAddress = DayZProfile.Split(new string[] { "lastMPServer=\"" }, StringSplitOptions.None)[1].Split(new string[] { "\";" }, StringSplitOptions.None)[0].Trim();
+            GamePort = FullIPAddress.Substring(FullIPAddress.LastIndexOf(':') + 1);
+            IPAddress = FullIPAddress.Substring(0, FullIPAddress.LastIndexOf(":"));
+            version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
+
+            bool result = !IPAddress.Any(x => char.IsLetter(x));
+            if (!result)
+            {
+                string domain = IPAddress;
+                IPAddress[] ip_Addresses = Dns.GetHostAddresses(domain);
+                string ips = string.Empty;
+                foreach (IPAddress ipAddress in ip_Addresses)
+                {
+                    IPAddress = ips;
+                    Console.WriteLine("Address from host name: " + IPAddress);
+                }
+            }
+
+            if (File.Exists(serverhistorypath))
+            {
+                string temphistory;
+                try
+                {
+                    var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    var sr = new StreamReader(fs);
+                    temphistory = sr.ReadToEnd();
+                    sr.Close();
+                    fs.Close();
+                    server_list = JsonConvert.DeserializeObject<List<Server>>(temphistory);
+                    Server match = server_list.FirstOrDefault(x => x.IP_Address == IPAddress);
+                    int index = server_list.FindIndex(x => x.IP_Address == IPAddress);
+
+                    if (match != null)
+                    {
+                        if (match.Current == "0")
+                        {
+                            Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
+                            int indexCurrent = server_list.FindIndex(x => x.Current == "1");
+                            if (matchCurrent != null)
+                            {
+                                matchCurrent.Current = "0";
+                                server_list[indexCurrent] = matchCurrent;
+                                writeServerMemory(matchCurrent);
+                            }
+
+                        }
+
+                            match.Date = DateTime.Now;
+                            match.IP_Address = IPAddress;
+                            match.FullIP_Address = FullIPAddress;
+                            match.Current = "1";
+                            match.PingSpeed = 1000;
+                            match.UserCount = "Accessing...";
+                            match.Favorite = match.Favorite;
+                            match.QueryPort = match.QueryPort;
+                            match.Game_Port = match.Game_Port;
+                            match.playersList = null;
+                            writeServerMemory(match);
+                            server_list[index] = match;
+                            string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                            var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                            var sw = new StreamWriter(fsw);
+                            sw.Write(listjson);
+                            sw.Close();
+                            fsw.Close();
+                        
+                    }
+                    else
+                    {
+                        Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
+                        int indexCurrent = server_list.FindIndex(x => x.Current == "1");
+                        if (matchCurrent != null)
+                        {
+                            matchCurrent.Current = "0";
+                            server_list[indexCurrent] = matchCurrent;
+                            writeServerMemory(matchCurrent);
+                        }
+
+                        Server newserver = new Server();
+                        newserver.ServerName = servername;
+                        newserver.IP_Address = IPAddress;
+                        newserver.FullIP_Address = FullIPAddress;
+                        newserver.Date = DateTime.Now;
+                        newserver.Favorite = "0";
+                        newserver.Current = "1";
+                        newserver.PingSpeed = 10000;
+                        newserver.UserCount = "Accessing...";
+                        newserver.QueryPort = 0;
+                        newserver.Game_Port = GamePort;
+                        newserver.playersList = null;
+
+                        server_list.Add(newserver);
+                        writeServerMemory(newserver);
+
+                        string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                        var fswadd = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                        var swadd = new StreamWriter(fswadd);
+                        swadd.Write(listjson);
+                        swadd.Close();
+                        fswadd.Close();
+                    }
+                    //readHistoryfile();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+            else
+            {
+                if (server_list == null)
+                {
+                    server_list = new List<Server>();
+                }
+
+                Server newserver = new Server();
+                newserver.ServerName = servername;
+                newserver.IP_Address = IPAddress;
+                newserver.FullIP_Address = FullIPAddress;
+                newserver.Date = DateTime.Now;
+                newserver.Favorite = "0";
+                newserver.Current = "1";
+                newserver.PingSpeed = 10000;
+                newserver.UserCount = "Accessing...";
+                newserver.QueryPort = 0;
+                newserver.Game_Port = GamePort;
+                newserver.playersList = null;
+                server_list.Add(newserver);
+                writeServerMemory(newserver);
+
+                string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                var fswnew = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                var swnew = new StreamWriter(fswnew);
+                try
+                {
+                    swnew.Write(listjson);
+                    swnew.Close();
+                    fswnew.Close();
+                    //readHistoryfile();
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+        }
+
+        public void readHistoryfile()
+        {
+            server_list = getServerList();
+            if(server_list != null) { 
+            foreach (Server DayZServer in server_list)
+            {
+                writeServerMemory(DayZServer);
+            }
+            }
+        }
+
+        public void removeHistoryfile()
+        {
+            server_list = getServerList();
+            foreach (Server DayZServer in server_list)
+            {
+                removeServerMemory(DayZServer);
+            }
+            File.Delete(serverhistorypath);
+        }
+
+        public void writeServerMemory(Server DayZServer)
+        {
+            Console.WriteLine(" update Server: {0} current: {1}, favorite: {2}", DayZServer.IP_Address, DayZServer.Current, DayZServer.Favorite);
+            Servers.UpdateWithNotification(DayZServer.IP_Address, DayZServer);
+
+            serversList = Servers.Values.ToList();
+        }
+
+        public void removeServerMemory(Server DayZServer)
+        {
+            Server dzServer = new Server();
+            dzServer.Date = DayZServer.Date;
+            dzServer.ServerName = DayZServer.ServerName;
+            dzServer.IP_Address = DayZServer.IP_Address;
+            dzServer.FullIP_Address = DayZServer.FullIP_Address;
+            dzServer.Current = DayZServer.Current;
+            dzServer.Favorite = DayZServer.Favorite;
+            dzServer.PingSpeed = DayZServer.PingSpeed;
+            dzServer.UserCount = DayZServer.UserCount;
+            dzServer.Game_Port = DayZServer.Game_Port;
+            Servers.TryRemoveWithNotification(DayZServer.IP_Address, out DayZServer);
+            serversList = Servers.Values.ToList() as List<Server>;
+        }
+
+        public List<Server> getServerList()
+        {
+            if (server_list == null)
+                server_list = new List<Server>();
+
+            if (File.Exists(serverhistorypath))
+            {
+                string temphistory;
+
+                if (server_list.Count == 0)
+                {
+                    var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    var sr = new StreamReader(fs);
+                    temphistory = sr.ReadToEnd();
+                    sr.Close();
+                    fs.Close();
+                    try
+                    {
+                        server_list = JsonConvert.DeserializeObject<List<Server>>(temphistory);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception" + e);
+                        server_list.Clear();
+                        serversList.Clear();
+                        // Servers.Clear();
+                        File.Delete(serverhistorypath);
+                        return null;
+                    }
+                }
+            }
+
+            return server_list;
+        }
+
+        public Server getCurrentServerList()
+        {
+            if (server_list == null)
+                server_list = new List<Server>();
+
+            if (server_list.Count == 0)
+            {
+                try
+                {
+                    server_list = getServerList();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                    return null;
+                }
+            }
+
+            try
+            {
+                Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
+                int indexCurrent = server_list.FindIndex(x => x.Current == "1");
+                if (matchCurrent != null)
+                {
+                    return matchCurrent;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception" + e);
+                return null;
+            }
+        }
+
+        public Server userList(string ip)
+        {
+            Server matchPlayers = serversList.FirstOrDefault(x => x.IP_Address == ip);
+            int indexCurrent = server_list.FindIndex(x => x.IP_Address == ip);
+            if (matchPlayers != null)
+            {
+                return matchPlayers;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Server getServerByIP(string ip)
+        {
+            if (server_list.Count == 0)
+            {
+                try
+                {
+                    server_list = getServerList();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                    return null;
+                }
+            }
+
+            Server matchCurrent = server_list.FirstOrDefault(x => x.IP_Address == ip);
+            if (matchCurrent != null)
+            {
+                return matchCurrent;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void writeAppPath(string dayzpath)
+        {
+            try
+            {
+                string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+                string path = System.IO.Path.Combine(appDataPath, "DayZServer");
+                string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
+
+                using (StreamWriter sw = File.CreateText(dayzapppath))
+                {
+                    if (sw.BaseStream != null)
+                    {
+                        sw.WriteLine(dayzpath);
+                        sw.Close();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception" + e);
+            }
+        }
+
+        String readAppPath(string dayzapppath)
+        {
+            if (File.Exists(dayzapppath))
+            {
+                try
+                {
+                    using (StreamReader sreader = new StreamReader(File.OpenRead(dayzapppath)))
+                    {
+                        String line = sreader.ReadToEnd();
+                        sreader.Close();
+                        return line;
+                    }
+                }
+                catch (Exception e)
+                {
+                    return dayzpath;
+                }
+            }
+            else
+            {
+                writeAppPath(dayzpath);
+                return dayzpath;
+            }
+        }
+
+        public void updateFavorite(string favoriteServer)
+        {
+            if (server_list == null)
+                server_list = new List<Server>();
+
+            if (server_list.Count == 0)
+            {
+                try
+                {
+                    server_list = getServerList();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+
+            Server match = server_list.FirstOrDefault(x => x.FullIP_Address == favoriteServer);
+            int index = server_list.FindIndex(x => x.FullIP_Address == favoriteServer);
+
+            if (match != null)
+            {
+                if (match.Favorite == "1")
+                {
+                    match.Favorite = "0";
+                }
+                else if (match.Favorite == "0")
+                {
+                    match.Favorite = "1";
+                }
+
+                server_list[index] = match;
+                string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                var sw = new StreamWriter(fsw);
+                try
+                {
+                    sw.Write(listjson);
+                    sw.Close();
+                    fsw.Close();
+                    writeServerMemory(match);
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+        }
+
+        public void deleteServer(string deleteServer)
+        {
+            if (server_list == null)
+            {
+                server_list = new List<Server>();
+            }
+
+            if (server_list.Count == 0)
+            {
+                try
+                {
+                    server_list = getServerList();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+
+            Server match = server_list.FirstOrDefault(x => x.ServerName == deleteServer);
+            int index = server_list.FindIndex(x => x.ServerName == deleteServer);
+
+            if (match != null)
+            {
+                server_list.RemoveAt(index);
+                string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                var sw = new StreamWriter(fsw);
+                try
+                {
+                    sw.Write(listjson);
+                    sw.Close();
+                    fsw.Close();
+                    removeServerMemory(match);
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+        }
+
+        public void deleteServerHistory()
+        {
+            try
+            {
+                removeHistoryfile();
+                server_list.Clear();
+                serversList.Clear();
+                //Servers.Clear();
+                File.Delete(serverhistorypath);
+                writeServerHistoryList();
+
+
+            }
+            catch (ArgumentException e)
+            {
+                Console.WriteLine("Exception" + e);
+            }
+        }
+
+        void PingTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            Interlocked.Increment(ref pingLoopInProgress);
+            if (pingLoopInProgress == 1)
+            {
+                if (server_list != null)
+                    lock (server_list)
+                    {
+                        try
+                        {
+                            if (server_list != null)
+                                getPing();
+                        }
+                        catch (Exception err)
+                        {
+                            Debug.WriteLine("The process failed: {0}", err.ToString());
+                        }
+                        //Console.WriteLine("The Elapsed event was raised at {0}", e.SignalTime);
+                    }
+            }
+            else
+            {
+                Debug.WriteLine("!!!!!!!!!!!! PING PROCESS ALREADY RUNNING !!!!!!!!!!!!");
+            }
+            Interlocked.Decrement(ref pingLoopInProgress);
+        }
+
+
+        public void getPing()
+        {
+            try
+            {
+                server_list = getServerList();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception" + e);
+            }
+
+            Parallel.ForEach(server_list, new ParallelOptions
+            {
+                MaxDegreeOfParallelism = 10
+            },
+            DayZServer =>
+            {
+                Player(DayZServer);
+            });
+        }
+
+
+
+        public void Player(Server DayZServer)
+        {
+            if (DayZServer.QueryPort == 0)
+            {
+                WebClient webClient = new WebClient();
+                webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(PlayerCompletedCallback);
+                //string strUrl = "http://cache.www.gametracker.com/components/html0/?host=" + FullIP + "&currentPlayersHeight=300&showCurrPlayers=1";
+                string strUrl = "http://api.steampowered.com/ISteamApps/GetServersAtAddress/v1?addr=" + DayZServer.IP_Address + "&format=json";
+                //byte[] reqHTML;
+                Uri uri = new Uri(strUrl);
+                webClient.DownloadDataAsync(uri);
+            }
+            else
+            {
+                DataManager dm = new DataManager();
+                try
+                {
+                    dm.server = ServerQuery.GetServerInstance(EngineType.Source, DayZServer.IP_Address, DayZServer.QueryPort);
+                    dm.info = dm.server.GetInfo();
+                    dm.players = dm.server.GetPlayers();
+                }
+                catch (ArgumentException err)
+                {
+                    Console.WriteLine("Exception" + err);
+                }
+
+                List<DayZPlayer> listZ = new List<DayZPlayer>();
+                if (dm.players != null)
+                {
+                    foreach (Player Z in dm.players)
+                    {
+
+                        DayZPlayer i = new DayZPlayer();
+                        i.Name = Z.Name;
+                        i.FullIP_Address = DayZServer.FullIP_Address;
+
+                        listZ.Add(i);
+                        Console.WriteLine("Name : " + Z.Name + "\nScore : " + Z.Score + "\nTime : " + Z.Time);
+                    }
+                }
+
+                if (dm.info != null)
+                {
+
+                        DayZServer.PingSpeed = dm.info.Ping;
+
+                        DayZServer.UserCount = dm.info.Players.ToString();
+                   
+                }
+                DayZServer.playersList = listZ;
+                Servers.UpdateWithNotification(DayZServer.IP_Address, DayZServer);
+
+                //dm.server.Dispose();
+                serversList = Servers.Values.ToList() as List<Server>;
+            }
+        }
+
+
+
+        private static void PlayerCompletedCallback(object sender, DownloadDataCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                Console.WriteLine("Steam call canceled.");
+            }
+
+            if (e.Error != null)
+            {
+                Console.WriteLine("Steam call failed.");
+                Console.WriteLine(e.Error.ToString());
+            }
+            else
+            {
+                byte[] data = (byte[])e.Result;
+                string result = System.Text.Encoding.UTF8.GetString(data);
+                RootObject rootObject = new RootObject();
+                rootObject = JsonConvert.DeserializeObject<RootObject>(result);
+
+                Console.WriteLine(rootObject.response.servers);
+                List<SteamServer> steamservers = rootObject.response.servers;
+                List<Server> compareList = new List<Server>();
+                DataManager dm = new DataManager();
+                compareList = dm.getServerList();
+
+                if (steamservers != null && compareList != null)
+                {
+                    foreach (SteamServer steamServer in steamservers)
+                    {
+                        string serverip = steamServer.addr.Substring(0, steamServer.addr.IndexOf(":", StringComparison.Ordinal));
+                        string queryport = steamServer.addr.Substring(steamServer.addr.LastIndexOf(':') + 1);
+                        string steamgameport = steamServer.gameport.ToString();
+                        ushort queryportnum = ushort.Parse(queryport);
+                        if (queryportnum == 0) continue;
+
+                        try
+                        {
+                            dm.server = ServerQuery.GetServerInstance(EngineType.Source, serverip, queryportnum);
+                            QueryMaster.ServerInfo info = dm.server.GetInfo();
+                        }
+                        catch (Exception err)
+                        {
+
+                            Console.WriteLine("QueryMaster" + err);
+                            continue;
+                        }
+                        //Server matchCurrent = compareList.FirstOrDefault((x, y) => x.Game_Port == steamgameport);
+                        if (compareList == null) continue;
+                        Server matchCurrent = compareList.FirstOrDefault(p => p.IP_Address == serverip && p.Game_Port == steamgameport);
+                        int indexCurrent = compareList.FindIndex(p => p.IP_Address == serverip && p.Game_Port == steamgameport);
+                        if (matchCurrent != null)
+                        {
+                            matchCurrent.Date = matchCurrent.Date;
+                            matchCurrent.IP_Address = matchCurrent.IP_Address;
+                            matchCurrent.FullIP_Address = matchCurrent.FullIP_Address;
+                            matchCurrent.Current = matchCurrent.Current;
+                            matchCurrent.Favorite = matchCurrent.Favorite;
+                            matchCurrent.QueryPort = queryportnum;
+                            compareList[indexCurrent] = matchCurrent;
+                            //matchCurrent.PingSpeed = dm.server.Ping();
+                            //matchCurrent.UserCount = dm.server.GetPlayers().Count.ToString();
+                            dm.writeServerMemory(matchCurrent);
+
+                            string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+                            string path = System.IO.Path.Combine(appDataPath, "DayZServer");
+                            string serverhistorypath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzhistory.txt");
+                            string listjson = JsonConvert.SerializeObject(compareList.ToArray());
+                            var fswadd = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                            var swadd = new StreamWriter(fswadd);
+                            swadd.Write(listjson);
+                            swadd.Close();
+                            fswadd.Close();
+                            //dm.readHistoryfile();
+
+                            List<DayZPlayer> listZ = new List<DayZPlayer>();
+                            try
+                            {
+
+                                dm.players = dm.server.GetPlayers();
+
+
+                            }
+                            catch (ArgumentException err)
+                            {
+                                Console.WriteLine("Exception" + err);
+                                continue;
+                            }
+
+                            if (dm.players != null)
+                                foreach (Player Z in dm.players)
+                                {
+
+                                    DayZPlayer i = new DayZPlayer();
+                                    i.Name = Z.Name;
+                                    i.FullIP_Address = matchCurrent.FullIP_Address;
+                                    listZ.Add(i);
+                                    //Console.WriteLine("Name : " + Z.Name + "\nScore : " + Z.Score + "\nTime : " + Z.Time);
+                                }
+                            //if (dm.info.) { matchCurrent.PingSpeed = dm.info.Ping;}
+                            if(dm.info != null) { 
+                            var type = dm.info.GetType();
+                            matchCurrent.PingSpeed = dm.info.Ping;
+                            matchCurrent.UserCount = dm.info.Players.ToString();
+                            }
+                            matchCurrent.playersList = listZ;
+                            matchCurrent.QueryPort = queryportnum;
+                            if (dm.info == null) continue;
+                            dm.Servers.UpdateWithNotification(matchCurrent.IP_Address, matchCurrent);
+                            //dm.server.Dispose();
+                            dm.serversList = dm.Servers.Values.ToList();
+                            
+                        }
+
+                        //if (info.Address == steamServer.addr)
+                        //{
+
+                        //    break;
+                        //}
+                    }
+                }
+            }
+
+            //    // EXAMPLE     ip=216.244.78.242&
+            //    Match m2 = Regex.Match(result, "(?<=ip=).*?(?=&)", RegexOptions.Singleline);
+            //    if (m2.Success)
+            //    {
+            //        URL = m2.ToString();
+            //        DisplayResult(result, URL);
+            //    }
+            //}
+
+            //// Let the main thread resume.
+            //// UserToken is the AutoResetEvent object that the main thread  
+            //// is waiting for.
+            ////((AutoResetEvent)e.UserState).Set();
+        }
+
+        public void getGTList()
+        {
+            WebClient webClient = new WebClient();
+            string _UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
+            webClient.Headers["Accept"] = "application/x-ms-application, image/jpeg, application/xaml+xml, image/gif, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
+            webClient.Headers["User-Agent"] = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; MDDC)";
+            
+            webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(GTCompletedCallback);
+            string strUrl = "https://www.gametracker.com/search/dayz/US/?sort=4&order=DESC&searchipp=50#search";
+            //byte[] reqHTML;
+            Uri uri = new Uri(strUrl);
+            webClient.DownloadDataAsync(uri);
+        }
+
+        private static void GTCompletedCallback(object sender, DownloadDataCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                Console.WriteLine("GT call canceled.");
+            }
+
+            if (e.Error != null)
+            {
+                Console.WriteLine("GT call failed.");
+                Console.WriteLine(e.Error.ToString());
+            }
+            else
+            {
+                byte[] data = (byte[])e.Result;
+                string result = System.Text.Encoding.UTF8.GetString(data);
+
+                Match m2 = Regex.Match(result, "(?<=Server Map).*?(?=Server Map)", RegexOptions.Singleline);
+                if (m2.Success)
+                {
+                    result = m2.ToString();
+                }
+                else
+                {
+                    result = "<td><a href=\"/search/dayz/600/\"><img src=\"/images/game_icons16/dayz.png\" alt=\"DAYZ\"/></a></td><td><a class=\"c03serverlink\" href=\"/server_info/216.244.78.242:2802/\">\\DG Clan - SUPERSHARD #1 \\ Unlocked \\ High Loot \\ 24/7 day</a><a href=\"javascript:showPopupExternalLink('gt://joinGame:game=dayz&amp;ip=216.244.78.242&amp;port=2802');\"><img src=\"/images/global/btn_join.png\" alt=\"Join\"/></a></td><td>5/50</td><td></td><td><a href=\"/search/dayz/US/\"><img src=\"/images/flags/us.gif\" alt=\"\" class=\"item_16x11\"/></a></td><td><span class=\"ip\">216.244.78.242</span><span class=\"port\">:2802</span></td><td>DayZ_Auto</td>";
+                }
+
+                List<DayZPlayer> GTlist = new List<DayZPlayer>();
+
+                // 1.
+                // Find all matches in file.
+                MatchCollection m1 = Regex.Matches(result, @"(<a.*?>.*?</a>)",
+                    RegexOptions.Singleline);
+
+                // 2.
+                // Loop over each match.
+                foreach (Match m in m1)
+                {
+                    string value = m.Groups[1].Value;
+                    DayZPlayer i = new DayZPlayer();
+
+                    // 3.
+                    // Get href attribute.
+                    Match m3 = Regex.Match(value, "href=\"/server_info/" + "(.*?)" + "/\"",
+                    RegexOptions.Singleline);
+
+                    if (m3.Success)
+                    {
+                        i.FullIP_Address = m3.Groups[1].Value.ToString();
+                    }
+
+                    // 4.
+                    // Remove inner tags from text.
+                    string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
+                    RegexOptions.Singleline);
+                    i.Name = t;
+                    if (i.FullIP_Address == null) continue;
+                    GTlist.Add(i);
+                }
+                Console.WriteLine("Servers" + GTlist);
+                DataManager dm = new DataManager();
+                foreach (DayZPlayer GTServer in GTlist)
+                {
+                    bool serverdata = !GTServer.FullIP_Address.Any(x => char.IsLetter(x));
+                    if (!serverdata)
+                    {
+                        continue;
+                    }
+
+                    dm.writeGTList(GTServer.Name, GTServer.FullIP_Address);
+                }
+            }
+        }
+
+        public void writeGTList(string serverName, string fullIPAdress)
+        {
+            string defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString();
+            string[] dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile"); // TODO: crashes if DayZ is not loaded
+            //dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
+            configpath = dirs[1];
+            var profileFileStream = new FileStream(configpath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var profileStremReader = new StreamReader(profileFileStream);
+            DayZProfile = profileStremReader.ReadToEnd();
+            profileStremReader.Close();
+            profileFileStream.Close();
+            servername = serverName;
+            FullIPAddress = fullIPAdress;
+            GamePort = FullIPAddress.Substring(FullIPAddress.LastIndexOf(':') + 1);
+            IPAddress = FullIPAddress.Substring(0, FullIPAddress.LastIndexOf(":"));
+            version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
+
+            //bool result = !IPAddress.Any(x => char.IsLetter(x));
+            //if (!result)
+            //{
+
+            //    Console.WriteLine(IPAddress);
+
+            //    IPAddress[] IPAddressResolve = Dns.GetHostAddresses(IPAddress);
+
+            //    foreach (IPAddress theaddress in IPAddressResolve)
+            //    {
+            //        Console.WriteLine(theaddress.ToString());
+            //        IPAddress = theaddress.ToString();
+            //    }
+            //}
+
+            if (File.Exists(serverhistorypath))
+            {
+                string temphistory;
+                try
+                {
+                    var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    var sr = new StreamReader(fs);
+                    temphistory = sr.ReadToEnd();
+                    sr.Close();
+                    fs.Close();
+                    server_list = JsonConvert.DeserializeObject<List<Server>>(temphistory);
+                    Server match = server_list.FirstOrDefault(x => x.IP_Address == IPAddress);
+                    int index = server_list.FindIndex(x => x.IP_Address == IPAddress);
+
+                    if (match != null)
+                    {
+                        if (match.Current == "0")
+                        {
+                            match.Current = "0";
+                        }
+                        else
+                        {
+                            match.Current = "1";
+                        }
+
+                        match.Date = DateTime.Now;
+                        match.IP_Address = IPAddress;
+                        match.FullIP_Address = FullIPAddress;
+                        match.PingSpeed = 1000;
+                        match.UserCount = "Accessing...";
+                        match.Favorite = match.Favorite;
+                        match.QueryPort = match.QueryPort;
+                        match.Game_Port = match.Game_Port;
+                        match.playersList = null;
+                        server_list[index] = match;
+                        string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                        var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                        var sw = new StreamWriter(fsw);
+                        sw.Write(listjson);
+                        sw.Close();
+                        fsw.Close();
+                    }
+                    else
+                    {
+                        Server newserver = new Server();
+                        newserver.ServerName = servername;
+                        newserver.IP_Address = IPAddress;
+                        newserver.FullIP_Address = FullIPAddress;
+                        newserver.Date = DateTime.Now;
+                        newserver.Favorite = "0";
+                        newserver.Current = "0";
+                        newserver.PingSpeed = 10000;
+                        newserver.UserCount = "Accessing...";
+                        newserver.QueryPort = 0;
+                        newserver.Game_Port = GamePort;
+                        newserver.playersList = null;
+                        writeServerMemory(newserver);
+                        server_list.Add(newserver);
+
+                        string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                        var fswadd = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                        var swadd = new StreamWriter(fswadd);
+                        swadd.Write(listjson);
+                        swadd.Close();
+                        fswadd.Close();
+                    }
+
+                    //readHistoryfile();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+            else
+            {
+                if (server_list == null)
+                {
+                    server_list = new List<Server>();
+                }
+
+                Server newserver = new Server();
+                newserver.ServerName = servername;
+                newserver.IP_Address = IPAddress;
+                newserver.FullIP_Address = FullIPAddress;
+                newserver.Date = DateTime.Now;
+                newserver.Favorite = "0";
+                newserver.Current = "1";
+                newserver.PingSpeed = 10000;
+                newserver.UserCount = "Accessing...";
+                newserver.QueryPort = 0;
+                newserver.Game_Port = GamePort;
+                newserver.playersList = null;
+                writeServerMemory(newserver);
+                server_list.Add(newserver);
+
+                string listjson = JsonConvert.SerializeObject(server_list.ToArray());
+                var fswnew = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+                var swnew = new StreamWriter(fswnew);
+                try
+                {
+                    swnew.Write(listjson);
+                    swnew.Close();
+                    fswnew.Close();
+                    // readHistoryfile();
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            }
+        }

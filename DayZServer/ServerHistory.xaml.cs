@@ -30,9 +30,9 @@ namespace DayZServer
             //checkProfileForNewServerTimer.Enabled = true;
             steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
-            getServerHistory();
             dm.Servers.PropertyChanged += updateData;
-            dm.writeServerHistoryList();
+            dm.startDataManager();
+
             //dm.startDataManager();
             //updateServerList();
 
@@ -46,29 +46,29 @@ namespace DayZServer
         
 
 
-        private async void getServerHistory()
-        {
-            await Task.Run(() => startDataManager());
-            DataManager.Server currentServer = dm.getCurrentServerList();
-            if (currentServer != null) { selectedIP = currentServer.IP_Address; }
-            serverList.ItemsSource = dm.Servers.Values;
-            updateServerList();
-            // Update the UI with results
-        }
+        //private async void getServerHistory()
+        //{
+        //    await Task.Run(() => startDataManager());
+        //    DataManager.Server currentServer = dm.getCurrentServerList();
+        //    if (currentServer != null) { selectedIP = currentServer.IP_Address; }
+           
+        //    updateServerList();
+        //    // Update the UI with results
+        //}
 
-        private async Task startDataManager()
-        {
-            dm.startDataManager();
-            //updateServerList();
+        //private async Task startDataManager()
+        //{
+        //    dm.startDataManager();
+        //    //updateServerList();
 
-        }
+        //}
 
 
         private async void updateServerList()
         {
             await Task.Run(() => Dispatch());
 
-            serverList.ItemsSource = dm.Servers.Values;
+            //serverList.ItemsSource = dm.Servers.Values;
 
             // Update the UI with results
         }
@@ -79,8 +79,11 @@ namespace DayZServer
             {
 
                 string dgSortDescription = null;
+                string dgRowDescription = null;
                 ListSortDirection? dgSortDirection = null;
+                Visibility? dgVisibility = Visibility.Hidden;
                 int columnIndex = 0;
+                int rowIndex = 0;
 
                 foreach (DataGridColumn column in serverList.Columns)
                 {
@@ -94,22 +97,36 @@ namespace DayZServer
                         break;
                     }
                 }
+
+                //foreach (DataGridRow row in serverList.Items)
+                //{
+                //    rowIndex++;
+
+                //    if (row.DetailsTemplate != null)
+                //    {
+                //        dgVisibility = row.DetailsVisibility;
+                //        dgRowDescription = row.Uid;
+
+                //        break;
+                //    }
+                //}
+
                 serverList.ItemsSource = dm.Servers.Values;
 
                 
 
-                DataManager.Server currentServer = dm.getCurrentServerList();
-                if (currentServer != null)
-                {
-                    if (selectedIP == currentServer.IP_Address)
-                    {
-                        updateUserList(dm.userList(currentServer.IP_Address));
-                    }
-                    else
-                    {
-                        updateUserList(dm.userList(selectedIP));
-                    }
-                }
+                //DataManager.Server currentServer = dm.getCurrentServerList();
+                //if (currentServer != null)
+                //{
+                //    if (selectedIP == currentServer.IP_Address)
+                //    {
+                //        updateUserList(dm.userList(currentServer.IP_Address));
+                //    }
+                //    else
+                //    {
+                //        updateUserList(dm.userList(selectedIP));
+                //    }
+                //}
 
                 if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
                 {
@@ -117,6 +134,13 @@ namespace DayZServer
                     CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
                     view.SortDescriptions.Add(s);
                     serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
+                }
+                if (!string.IsNullOrEmpty(dgRowDescription) && dgVisibility != null)
+                {
+                    //DataGridRow s = new DataGridRow();
+                    //CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
+                    //view.SortDescriptions.Add(s);
+                    //serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
                 }
             }));
 
@@ -133,51 +157,67 @@ namespace DayZServer
 
         public void Copy_ServerIP(object sender, RoutedEventArgs e)
         {
-            //Get the clicked MenuItem
-            var menuItem = (MenuItem)sender;
+            ////Get the clicked MenuItem
+            //var menuItem = (MenuItem)sender;
 
-            //Get the ContextMenu to which the menuItem belongs
-            var contextMenu = (ContextMenu)menuItem.Parent;
+            ////Get the ContextMenu to which the menuItem belongs
+            //var contextMenu = (ContextMenu)menuItem.Parent;
 
-            //Find the placementTarget
-            var item = (DataGrid)contextMenu.PlacementTarget;
+            ////Find the placementTarget
+            //var item = (DataGrid)contextMenu.PlacementTarget;
 
-            //Get the underlying item, that you cast to your object that is bound
-            //to the DataGrid (and has subject and state as property)
-            var server = (DayZServer.DataManager.Server)item.SelectedCells[0].Item;
+            ////Get the underlying item, that you cast to your object that is bound
+            ////to the DataGrid (and has subject and state as property)
+            //var server = (DayZServer.DataManager.Server)item.SelectedCells[0].Item;
 
-            var fullAddress = String.Format("{0}{1}", server.IP_Address, (server.QueryPort > 0 ? String.Format(":{0}", server.QueryPort) : ""));
-            Debug.WriteLine("Copy server - " + fullAddress);
+            //var fullAddress = String.Format("{0}{1}", server.IP_Address, (server.QueryPort > 0 ? String.Format(":{0}", server.QueryPort) : ""));
+            //Debug.WriteLine("Copy server - " + fullAddress);
+            //Clipboard.SetText(fullAddress);
+
+            DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
+            string fullAddress = obj.FullIP_Address;
             Clipboard.SetText(fullAddress);
+
         }
+
+
+        //private void DataGrid_CopyingRowClipboardContent(object sender, DataGridRowClipboardEventArgs e)
+        //{
+        //    var menuItem = (MenuItem)sender;
+        //    var contextMenu = (ContextMenu)menuItem.Parent;
+        //    var item = (DataGrid)contextMenu.PlacementTarget;
+        //    var currentCell = e.ClipboardRowContent[serverList.CurrentCell.Column.DisplayIndex].item;
+        //    e.ClipboardRowContent.Clear();
+        //    e.ClipboardRowContent.Add(currentCell);
+        //}
 
         //public void updateServerList()
         //{
-           
+
         //}
 
-        public void checkProfileForNewServer()
-        {
-            dm.writeServerHistoryList();
-        }
+        //public void checkProfileForNewServer()
+        //{
+        //    dm.writeServerHistoryList();
+        //}
 
-        void OnServerListTimedEvent(Object source, ElapsedEventArgs e)
-        {
+        //void OnServerListTimedEvent(Object source, ElapsedEventArgs e)
+        //{
 
-        }
+        //}
 
-        void OnNewServerTimedEvent(Object source, ElapsedEventArgs e)
-        {
-            try
-            {
-                checkProfileForNewServer();
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine("The process failed: {0}", err.ToString());
-            }
+        //void OnNewServerTimedEvent(Object source, ElapsedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        checkProfileForNewServer();
+        //    }
+        //    catch (Exception err)
+        //    {
+        //        Console.WriteLine("The process failed: {0}", err.ToString());
+        //    }
 
-        }
+        //}
 
         private void GT_Click(object sender, RoutedEventArgs e)
         {
@@ -192,9 +232,12 @@ namespace DayZServer
 
         private void player_click(object sender, RoutedEventArgs e)
         {
+
+
             string IP = ((Button)sender).Tag as string;
             string Name = ((Button)sender).Content as string;
             string URL = "http://www.gametracker.com/player/" + Name + "/" + IP + "/";
+
 
             System.Diagnostics.Process.Start(URL);
         }
@@ -251,11 +294,11 @@ namespace DayZServer
         private void favorite_Click(object sender, RoutedEventArgs e)
         {
 
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.Invoke((Action)(async () =>
             {
                 DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
                 string favoriteServer = obj.FullIP_Address;
-                dm.updateFavorite(favoriteServer);
+                await dm.updateFavorite(favoriteServer);
 
 
             }));
@@ -428,6 +471,15 @@ namespace DayZServer
 
             selectedIP = obj.IP_Address;
             updateUserList(obj);
+
+            for (var vis = sender as Visual; vis != null; vis = VisualTreeHelper.GetParent(vis) as Visual)
+                if (vis is DataGridRow)
+                {
+                    var row = (DataGridRow)vis;
+                    row.DetailsVisibility =
+                        row.DetailsVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                    break;
+                }
         }
 
         public void updateUserList(DataManager.Server obj)
