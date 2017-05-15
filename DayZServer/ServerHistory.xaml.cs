@@ -54,12 +54,12 @@ namespace DayZServer
         });
 
 
-        private static System.Timers.Timer checkProfileForNewServerTimer;
+        
         public string selectedIP;
         public static DataManager dm = new DataManager();
         public static DataGrid innerDataGrid = new DataGrid();
         public static DataManager.Server selectedServer = new DataManager.Server();
-        TimeSpan _measureGap = TimeSpan.FromSeconds(3);
+        private TimeSpan _measureGap = TimeSpan.FromMilliseconds(15);
 
 
         public ServerHistory()
@@ -78,7 +78,7 @@ namespace DayZServer
             
             //serverList.DataContext = dm.Servers;
             serverList.ItemsSource = dm.Servers.Values;
-            
+            DataContext = this;
             //updateServerList();
 
             //DataManager.Server currentServer = dm.getCurrentServerList();
@@ -88,14 +88,25 @@ namespace DayZServer
         }
 
 
-
         public double MeasureGap
         {
-            get { return _measureGap.TotalSeconds; }
-            set { _measureGap = TimeSpan.FromSeconds(value); }
+            get { return _measureGap.TotalMilliseconds; }
+            set
+            {
+                _measureGap = TimeSpan.FromMilliseconds(value);
+                OnPropertyChanged(value);
+            }
+            //set { DataManager.PingTimer.Interval = TimeSpan.FromMilliseconds(value).TotalMilliseconds; }
+            
         }
 
+     
 
+        public void OnPropertyChanged(double propertyName)
+        {
+            DataManager.PingTimer.Interval = propertyName * 1000;
+
+        }
 
 
         //private async void getServerHistory()

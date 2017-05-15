@@ -19,11 +19,11 @@ namespace DayZServer
 {
     public class DataManager
     {
-        public string defaultPath;
-        public string[] dirs;
-        public string configpath;
-        public string filepathProfile;
-        public string directorypathProfile;
+        public string myDocumentsPath;
+        public string[] profile;
+        public string profilepath;
+        public string fileNameProfile;
+        public string directoryPathProfile;
         public string filepathHistory;
         public string directorypathHistory;
         public string DayZProfile;
@@ -32,8 +32,8 @@ namespace DayZServer
         public string GamePort;
         public string IPAddress;
         public string version;
-        public string appDataPath;
-        public string path;
+        public string localApplicationPath;
+        public string dayZServerAppPath;
         public string dayzapppath;
         public string dayzpath;
         public string serverhistorypath;
@@ -48,69 +48,10 @@ namespace DayZServer
         public static string tester;
         public static string currentIP;
         public ObservableConcurrentDictionary<string, Server> Servers = new ObservableConcurrentDictionary<string, Server>();
-        
-
-        //static ConcurrentDictionary<string, Server> Players = new ConcurrentDictionary<string, Server>();
         public static System.Timers.Timer PingTimer;
         private static System.Timers.Timer PingTimer2;
         static int pingLoopInProgress = 0;
-        //public QueryMaster.ServerInfo info;
-        
 
-
-
-        public DataManager()
-        {
-            appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
-            path = System.IO.Path.Combine(appDataPath, "DayZServer");
-            dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
-            dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
-            serverhistorypath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzhistory.txt");
-            filepathHistory = new FileInfo(serverhistorypath).Name;
-            directorypathHistory = new FileInfo(serverhistorypath).Directory.FullName;
-            //Console.WriteLine("Server History Path: " + serverhistorypath);
-        }
-
-        public void startDataManager()
-        {
-            defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).ToString();
-            dirs = Directory.GetFiles(defaultPath + @"\DayZ", "*.DayZProfile"); // TODO: crashes if DayZ is not loaded
-            //dirs = dirs.Where(w => w != dirs[1]).ToArray(); // crashes if there is only 1 profile
-            configpath = dirs[1];
-            filepathProfile = new FileInfo(configpath).Name;
-            directorypathProfile = new FileInfo(configpath).Directory.FullName;
-            ;
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-                if (!File.Exists(dayzapppath))
-                {
-                    writeAppPath(dayzpath);
-                }
-            }
-            ProfileCheck();
-            PingTimer = new System.Timers.Timer(15000);
-            PingTimer.Elapsed += PingTimedEvent;
-            PingTimer.Enabled = true;
-            PingTimer2 = new System.Timers.Timer(3000);
-            PingTimer2.Elapsed += PingTimedEvent;
-            PingTimer2.Enabled = true;
-            
-
-
-
-            //WatchProfileChanges();
-
-
-        }
-
-
-
-
-        public List<Server> getList()
-        {
-            return serversList;
-        }
 
         public class Server
         {
@@ -181,6 +122,125 @@ namespace DayZServer
         }
 
 
+        public DataManager()
+        {
+
+        }
+
+        private async Task FileSetup()
+        {
+            dayZServerAppPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DayZServer"); //gets C:\Users\<User>\AppData\Local\DayZServer
+            dayzapppath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dayZServerAppPath, "dayzapppath.txt"); //path to config that identifies where DayZ is installed
+            serverhistorypath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dayZServerAppPath, "dayzhistory.txt"); //path to list that DayZ history is saved to
+
+            if (!Directory.Exists(dayZServerAppPath))
+            {
+                await Task.Run(() => Directory.CreateDirectory(dayZServerAppPath));
+                await Task.Run(() => WriteFile(dayzapppath));
+                await Task.Run(() => WriteFile(serverhistorypath));
+            }
+            else
+            {
+                if (!File.Exists(dayzapppath))
+                {
+                    await Task.Run(() => WriteFile(dayzapppath));
+                }
+                if (!File.Exists(serverhistorypath))
+                {
+                    await Task.Run(() => WriteFile(serverhistorypath));
+                }
+            }
+            
+            myDocumentsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DayZ");  //gets C:\Users\<User>\Documents\DayZ ****//Change to DayZ for Production
+
+            if (!Directory.Exists(myDocumentsPath))
+            {
+                await Task.Run(() => Directory.CreateDirectory(myDocumentsPath));
+                string dummyProfileDirectory = Path.Combine(Environment.CurrentDirectory, @"Profile\");
+                await Task.Run(() => ExtractEmbeddedResource(myDocumentsPath, "DayZServer", "VG7.DayZProfile"));
+                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars")).ToArray();
+                if (profile != null)
+                {
+                    profilepath = profile[0];
+                    fileNameProfile = new FileInfo(profilepath).Name;
+                    directoryPathProfile = new FileInfo(profilepath).Directory.FullName;
+                }
+            }
+            else
+            {
+                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars")).ToArray();
+                if (profile != null)
+                {
+                    profilepath = profile[0];
+                    fileNameProfile = new FileInfo(profilepath).Name;
+                    directoryPathProfile = new FileInfo(profilepath).Directory.FullName;
+                }
+            }
+        }
+
+        public void WriteFile(string pathName)
+        {
+            try
+            {
+                using (StreamWriter sw = File.CreateText(pathName))
+                {
+                    if (sw.BaseStream != null)
+                    {
+                        sw.WriteLine(dayzpath);
+                        sw.Close();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not write file: " + pathName + " : " + e);
+            }
+        }
+
+
+        private static void ExtractEmbeddedResource(string outputDir, string resourceLocation, string file)
+        {
+           
+            using (Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceLocation + @"." + file))
+            {
+                using (FileStream fileStream = new FileStream(Path.Combine(outputDir, file), FileMode.Create))
+                {
+                if (stream != null)
+                    { 
+                    for (int i = 0; i < stream.Length; i++)
+                        {
+                            fileStream.WriteByte((byte)stream.ReadByte());
+                        }
+                        fileStream.Close();
+                    }
+                }
+            }
+        }
+
+
+        public async Task startDataManager()
+        {
+            await Task.Run(() => FileSetup());
+            await Task.Run(() => ProfileCheck());
+            PingTimer = new System.Timers.Timer(15000);
+            PingTimer.Elapsed += PingTimedEvent;
+            PingTimer.Enabled = true;
+            PingTimer2 = new System.Timers.Timer(3000);
+            PingTimer2.Elapsed += PingTimedEvent;
+            PingTimer2.Enabled = true;
+        }
+
+
+
+
+        public List<Server> getList()
+        {
+            return serversList;
+        }
+
+
+
+
 
         private async void ProfileCheck()
         {
@@ -193,7 +253,7 @@ namespace DayZServer
 
         private async Task CheckingProfile()
         {
-            var profileFileStream = new FileStream(configpath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var profileFileStream = new FileStream(profilepath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var profileStremReader = new StreamReader(profileFileStream);
             await Task.Run(() => DayZProfile = profileStremReader.ReadToEnd());
             profileStremReader.Close();
@@ -235,63 +295,33 @@ namespace DayZServer
 
 
 
-            private async void HistoryCheck()
-            {
-                await Task.Run(() => CheckingHistory());
-                // Update the UI with results
-            }
+        private async Task CheckingHistory()
+        {
 
-            private async Task CheckingHistory()
+            try
             {
-                if (!Directory.Exists(path))
-                {
-                    try
-                    {
-                        await Task.Run(() => Directory.CreateDirectory(path));
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Error Creating DayZServer Directory" + e);
-                    }
-
-            }
-            else if (!File.Exists(serverhistorypath))
-            {
-                try
-                {
-                    await Task.Run(() => writeAppPath(serverhistorypath));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error Creating dayzhistory.txt" + e);
-                }
-            }
+                var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var sr = new StreamReader(fs);
+                await Task.Run(() => temphistory = sr.ReadToEnd());
+                sr.Close();
+                fs.Close();
+                serverHistory = JsonConvert.DeserializeObject<List<Server>>(temphistory);
                 
-                else
+                foreach (Server dayZServer in serverHistory)
                 {
-                    try
+                    Server match = serversList.FirstOrDefault(x => x.IP_Address == dayZServer.IP_Address);
+                    if (match == null)
                     {
-                        var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        var sr = new StreamReader(fs);
-                        await Task.Run(() => temphistory = sr.ReadToEnd());
-                        sr.Close();
-                        fs.Close();
-                        serverHistory = JsonConvert.DeserializeObject<List<Server>>(temphistory);
-                        //serversList = Servers.Values.ToList();
-                    foreach (Server dayZServer in serverHistory)
-                        {
-                            Server match = serversList.FirstOrDefault(x => x.IP_Address == dayZServer.IP_Address);
-                            if (match == null) { 
-                            ServerToDictionary(dayZServer);
-                            }
-                        }
-                }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Error Reading dayzhistory.txt" + e);
+                        ServerToDictionary(dayZServer);
                     }
                 }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error Reading dayzhistory.txt" + e);
+            }
+
+        }
 
 
 
@@ -376,13 +406,13 @@ namespace DayZServer
         {
 
             FileSystemWatcher watcherProfile = new FileSystemWatcher();
-            watcherProfile.Path = directorypathProfile;
+            watcherProfile.Path = directoryPathProfile;
             /* Watch for changes in LastAccess and LastWrite times, and
                the renaming of files or directories. */
             watcherProfile.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
                                    | NotifyFilters.FileName | NotifyFilters.DirectoryName;
             // Only watch text files.
-            watcherProfile.Filter = filepathProfile;
+            watcherProfile.Filter = fileNameProfile;
 
             // Add event handlers.
             watcherProfile.Changed += new FileSystemEventHandler(OnProfileChanged);
@@ -418,6 +448,7 @@ namespace DayZServer
 
         void PingTimedEvent(Object source, ElapsedEventArgs e)
         {
+            string pingtime = PingTimer.Interval.ToString();
             PingTimer2.Enabled = false;
             Interlocked.Increment(ref pingLoopInProgress);
             if (pingLoopInProgress == 1)
@@ -1056,28 +1087,31 @@ namespace DayZServer
         //    }
         //}
 
-        public void writeAppPath(string dayzpath)
-        {
-            try
-            {
-                string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
-                string path = System.IO.Path.Combine(appDataPath, "DayZServer");
-                string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
 
-                using (StreamWriter sw = File.CreateText(dayzapppath))
-                {
-                    if (sw.BaseStream != null)
-                    {
-                        sw.WriteLine(dayzpath);
-                        sw.Close();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception" + e);
-            }
-        }
+
+
+        //public void writeProfilePath(string profilepath)
+        //{
+        //    try
+        //    {
+        //        string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+        //        string path = System.IO.Path.Combine(appDataPath, "DayZServer");
+        //        string dayzapppath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path, "dayzapppath.txt");
+
+        //        using (StreamWriter sw = File.CreateText(dayzapppath))
+        //        {
+        //            if (sw.BaseStream != null)
+        //            {
+        //                sw.WriteLine(dayzpath);
+        //                sw.Close();
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("Exception" + e);
+        //    }
+        //}
 
         //String readAppPath(string dayzapppath)
         //{
