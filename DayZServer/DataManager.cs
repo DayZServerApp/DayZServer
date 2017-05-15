@@ -49,8 +49,10 @@ namespace DayZServer
         public static string currentIP;
         public ObservableConcurrentDictionary<string, Server> Servers = new ObservableConcurrentDictionary<string, Server>();
         
+
         //static ConcurrentDictionary<string, Server> Players = new ConcurrentDictionary<string, Server>();
-        private static System.Timers.Timer PingTimer;
+        public static System.Timers.Timer PingTimer;
+        private static System.Timers.Timer PingTimer2;
         static int pingLoopInProgress = 0;
         //public QueryMaster.ServerInfo info;
         
@@ -86,19 +88,24 @@ namespace DayZServer
                     writeAppPath(dayzpath);
                 }
             }
-
-
-           ProfileCheck();
-            
-
-            PingTimer = new System.Timers.Timer(10000);
+            ProfileCheck();
+            PingTimer = new System.Timers.Timer(15000);
             PingTimer.Elapsed += PingTimedEvent;
             PingTimer.Enabled = true;
+            PingTimer2 = new System.Timers.Timer(3000);
+            PingTimer2.Elapsed += PingTimedEvent;
+            PingTimer2.Enabled = true;
+            
+
+
 
             //WatchProfileChanges();
 
 
         }
+
+
+
 
         public List<Server> getList()
         {
@@ -120,12 +127,15 @@ namespace DayZServer
             public int UserTotal { get; set; }
             public bool Details { get; set; }
             public List<DayZPlayer> playersList { get; set; }
+            public bool IsPrivate { get; set; }
+            public long MaxPlayers { get; set; }
         }
 
         public class DayZPlayer
         {
             public string Name { get; set; }
             public string FullIP_Address { get; set; }
+            public string Time { get; set; }
 
         }
 
@@ -215,6 +225,8 @@ namespace DayZServer
             profileServer.Current = "1";
             profileServer.PingSpeed = 10000;
             profileServer.UserCount = 0;
+            profileServer.IsPrivate = false;
+            profileServer.MaxPlayers = 0;
             profileServer.QueryPort = 0;
             profileServer.Game_Port = GamePort;
             profileServer.playersList = null;
@@ -406,6 +418,7 @@ namespace DayZServer
 
         void PingTimedEvent(Object source, ElapsedEventArgs e)
         {
+            PingTimer2.Enabled = false;
             Interlocked.Increment(ref pingLoopInProgress);
             if (pingLoopInProgress == 1)
             {
@@ -520,6 +533,7 @@ namespace DayZServer
                     DayZPlayer i = new DayZPlayer();
                     i.Name = dzPlayer.Name;
                     i.FullIP_Address = dayZServer.FullIP_Address;
+                    i.Time = new DateTime(dzPlayer.Time.Ticks).ToString("HH:mm:ss");
                     playerList.Add(i);
                     //Console.WriteLine("Name : " + dzPlayer.Name + "\nScore : " + dzPlayer.Score + "\nTime : " + dzPlayer.Time + "\nServer : " + serverInfo.Name + "\nUser Count : " + serverInfo.Players + "\nPing : " + serverInfo.Ping);
                 }
@@ -529,6 +543,8 @@ namespace DayZServer
             {
                 dayZServer.PingSpeed = serverInfo.Ping;
                 dayZServer.UserCount = serverInfo.Players;
+                dayZServer.IsPrivate = serverInfo.IsPrivate;
+                dayZServer.MaxPlayers = serverInfo.MaxPlayers;
             }
             dayZServer.playersList = playerList;
             ServerToDictionary(dayZServer);
@@ -1338,6 +1354,8 @@ namespace DayZServer
             gtServer.Current = "0";
             gtServer.PingSpeed = 10000;
             gtServer.UserCount = 0;
+            gtServer.IsPrivate = false;
+            gtServer.MaxPlayers = 0;
             gtServer.QueryPort = 0;
             gtServer.Game_Port = GamePort;
             gtServer.playersList = null;

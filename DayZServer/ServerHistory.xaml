@@ -4,7 +4,7 @@
         Title="DayZServer" Width="1024" Height="768" WindowStartupLocation="Manual" WindowState="Maximized" Icon="images/icon.png" xmlns:local="DayZServer">
 
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <!--<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>-->
         <Style TargetType="{x:Type DataGrid}">
             <Setter Property="AlternatingRowBackground" Value="#FFF3F3F3"/>
             <Setter Property="AutoGenerateColumns" Value="False"/>
@@ -130,16 +130,42 @@
 
     <DockPanel Margin="0,0,2,0">
 
-        <ToolBarTray Height="737" VerticalAlignment="Top" Width="121" HorizontalAlignment="Right" Orientation="Vertical" DockPanel.Dock="Right" Background="{x:Null}">
-            <ToolBar HorizontalAlignment="Right" Height="355" VerticalAlignment="Top" Width="108" Margin="0,0,-114,-331" Background="{x:Null}">
+        <ToolBarTray Height="100" VerticalAlignment="Top" Width="300" HorizontalAlignment="Right" DockPanel.Dock="Right" Background="{x:Null}">
+            <ToolBar HorizontalAlignment="Right" Height="60" VerticalAlignment="Top" Width="310" Margin="-10,0,-24,-36" Background="{x:Null}">
+                <Canvas Width="282" >
+                    <Button  Click="GT_Click" Width="118" Height="50" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" Canvas.Left="164" Canvas.Top="5">
+                        <Image Source="images/gtlogo.png" Width="108" Height="38" />
+                    </Button>
+                    <Button Click="ClearHistory" ToolTip="Clear All Servers" Width="46"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" Canvas.Top="8">
+                        <Image Source="images/All-Clear-Icon.png" Width="94" Height="37" />
+                    </Button>
+                    <TextBlock Name="ActiveServerName"  Width="282" Height="50" Cursor="Hand"  FontSize="16" Foreground="#FF5B5B5B" Background="{x:Null}" Canvas.Top="55" Margin="10,10,0,0" />
+                    <Grid Canvas.Top="100">
+                        <DataGrid x:Name="userList" AutoGenerateColumns="False" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Background="{x:Null}" Canvas.Top="55" Margin="0,0,6,-675" VerticalAlignment="Top" HorizontalAlignment="Right" Height="800">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Width="180"  Header="Players" SortMemberPath="Name" SortDirection="Ascending">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="180" Height="50" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="20" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Width="100"  Header="Time" SortMemberPath="Name" SortDirection="Ascending">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Width="90" Height="50" Cursor="Hand" Text="{Binding Time}"  FontSize="14" Foreground="#FF5B5B5B" Background="{x:Null}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Canvas>
 
                 <Button  ToolTip="DayZServer" Width="91" Click="Link_Click" Tag="https://github.com/DayZServerApp/DayZServer/releases" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" >
                     <Image Source="images/button.png"/>
                 </Button>
-                <Button Click="ClearHistory" ToolTip="Clear All Servers" Width="94" Height="87" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
-                    <Image Source="images/All-Clear-Icon.png" Width="94" Height="77" />
-                </Button>
-                <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map" Width="92" Height="87" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
+                <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map" Width="92"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
                     <Image Source="images/appicon.png" Width="75" />
                 </Button>
 
@@ -148,30 +174,30 @@
                 </Button>
 
             </ToolBar>
-            <ToolBar HorizontalAlignment="Right" Height="403" VerticalAlignment="Top" Width="121" Margin="0,329,-121,-708" Background="{x:Null}">
-                <Canvas Height="373" VerticalAlignment="Top" Width="119" >
-                    <Button  Click="GT_Click" Width="118" Height="50" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}">
-                        <Image Source="images/gtlogo.png" Width="108" Height="38" />
-                    </Button>
-                    <DataGrid x:Name="userList" Height="318" Width="117" AutoGenerateColumns="False" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Background="{x:Null}" Canvas.Top="55">
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn Width="90"  Header="Players" SortMemberPath="Name" SortDirection="Ascending">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="11" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Canvas>
-            </ToolBar>
+
         </ToolBarTray>
         <Canvas Height="58" VerticalAlignment="Top" DockPanel.Dock="Top" HorizontalAlignment="Left" Width="721" >
             <Canvas.Background>
                 <ImageBrush ImageSource="images/header.png" Stretch="Uniform"/>
             </Canvas.Background>
             <Label Content="Standalone Version 2" Canvas.Left="148" Canvas.Top="33" Width="181" Foreground="White" Height="25" FontSize="14" Opacity="0.7"/>
+            <Grid Canvas.Left="488" Canvas.Top="14" Width="209">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <TextBlock Height="16" VerticalAlignment="Top">
+                        <Run Text="Current value:" />
+                        <Run Text="{Binding ElementName=MySlider, Path=Value}" />
+                    </TextBlock>
+                </StackPanel>
+
+                <Slider x:Name="MySlider" Grid.Row="1" 
+                        Minimum="1" Maximum="10" SmallChange="0.5" 
+                        Value="{Binding MeasureGap, Mode=TwoWay}" />
+            </Grid>
         </Canvas>
 
 
@@ -183,7 +209,7 @@
             </DataGrid.CellStyle>
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
-                    <Setter Property="DetailsVisibility" Value="{Binding Details, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <!--<Setter Property="DetailsVisibility" Value="{Binding Details, Converter={StaticResource BooleanToVisibilityConverter}}" />-->
                     <Style.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
                         <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
@@ -258,7 +284,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-               <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date" SortDirection="Descending">
+                <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date" SortDirection="Descending">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Date}" Foreground="#FF9B9B9C" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" />
@@ -313,6 +339,23 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Max" Width="auto" SortMemberPath="UserCount" IsReadOnly="True" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding MaxPlayers}" Foreground="#FF9B9B9C" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MaxPlayers}" Value="Unavailable">
+                                                <Setter Property="Cursor" Value="No" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn Width="55">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -342,9 +385,10 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
-            <DataGrid.RowDetailsTemplate>
+            <!--<DataGrid.RowDetailsTemplate>
                 <DataTemplate>
-                    <!--<DataGrid Name="listDetails" CanUserAddRows="False" EnableRowVirtualization="True" EnableColumnVirtualization="true"   GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Height="300">
+                    -->
+            <!--<DataGrid Name="listDetails" CanUserAddRows="False" EnableRowVirtualization="True" EnableColumnVirtualization="true"   GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Height="300">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn  Header="Players" SortMemberPath="Name" SortDirection="Ascending">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -355,11 +399,13 @@
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>-->
+            <!--
 
                     <TextBlock Text="{Binding ServerName}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="18" Margin="10" />
-                    
-                    
-                    <!--<DockPanel Background="GhostWhite" Height="200">
+
+
+                    -->
+            <!--<DockPanel Background="GhostWhite" Height="200">
                         <Grid Margin="10">
                             <ItemsControl Name="icTodoList">
                                 <ItemsControl.ItemTemplate>
@@ -377,11 +423,12 @@
                             </ItemsControl>
                         </Grid>
                     </DockPanel>-->
+            <!--
                 </DataTemplate>
-            </DataGrid.RowDetailsTemplate>
+            </DataGrid.RowDetailsTemplate>-->
         </DataGrid>
 
-       
+
         <Canvas x:Name="steamLogin" Height="212" VerticalAlignment="Top" Width="440" Margin="0,188,0,0" Background="#FFF3F4F6">
             <StackPanel Height="46" Canvas.Left="30" Canvas.Top="62">
                 <TextBox x:Name="userId" Height="35" TextWrapping="Wrap" Text="UserID" Width="200" Padding="5,4,5,5" FontSize="18" BorderBrush="#FFDADADA" Foreground="#FF747474" GotKeyboardFocus="userIdGotKeyboardFocus" LostKeyboardFocus="userIdLostKeyboardFocus"/>
@@ -414,7 +461,7 @@
             <TextBox Height="33" Canvas.Left="10" TextWrapping="Wrap" Text="Unable to locate where you installed DayZ" Canvas.Top="12" Width="496"  Background="{x:Null}" Foreground="#FF3E3E3E" FontSize="18" BorderBrush="{x:Null}"/>
             <Button x:Name="browse" Content="Browse" Canvas.Left="364" Canvas.Top="118" Width="142" Height="37" Click="browse_click" FontSize="18" BorderBrush="{x:Null}"/>
         </Canvas>
-       
+
     </DockPanel>
 </Window>
     
