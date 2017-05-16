@@ -128,6 +128,9 @@
     </ApplicationDefinition>
     <Compile Include="BooleanToVisibilityConverter.cs" />
     <Compile Include="DataManager.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ObservableConcurrentDictionary.cs" />
     <Compile Include="ServerHistory.xaml.cs">
       <DependentUpon>ServerHistory.xaml</DependentUpon>
@@ -137,6 +140,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ServerHistory.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

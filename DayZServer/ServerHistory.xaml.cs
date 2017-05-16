@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -23,6 +24,15 @@ namespace DayZServer
 
     public partial class ServerHistory : Window
     {
+
+      //*****ToDo Try to wire up observable concurrent dictionary correctly
+
+        //public ObservableConcurrentDictionary<string, DataManager.Server> Servers
+        //{
+        //    get { return this.Servers; }
+        //}
+
+
         Notifier copynotifier = new Notifier(cfg =>
         {
             cfg.PositionProvider = new WindowPositionProvider(
@@ -59,8 +69,13 @@ namespace DayZServer
         public static DataManager dm = new DataManager();
         public static DataGrid innerDataGrid = new DataGrid();
         public static DataManager.Server selectedServer = new DataManager.Server();
-        private TimeSpan _measureGap = TimeSpan.FromMilliseconds(20);
+        private TimeSpan _measureGap = TimeSpan.FromSeconds(8);
+       
 
+
+        DispatcherTimer _timer;
+        TimeSpan _time;
+        TimeSpan _timeset;
 
         public ServerHistory()
         {
@@ -72,18 +87,70 @@ namespace DayZServer
 
             //steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
-            dm.Servers.PropertyChanged += updateData;
+            //dm.Servers.PropertyChanged += updateData;
             dm.startDataManager();
             //serverList.RowDetailsVisibilityChanged += serverList_RowDetailsVisibilityChanged;
-            
+
             //serverList.DataContext = dm.Servers;
+
             serverList.ItemsSource = dm.Servers.Values;
             DataContext = this;
-            //updateServerList();
 
-            //DataManager.Server currentServer = dm.getCurrentServerList();
+            _time = _measureGap;
+            
+            //_timeset = TimeSpan.FromSeconds(20);
+            _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
+            {
+                //this.dateText.Text = DateTime.UtcNow.ToString("HH:mm:ss:fff", CultureInfo.InvariantCulture);
+                this.dateText.Text = _time.ToString(@"ss");
 
-            //if (currentServer != null) { selectedIP = currentServer.IP_Address; }
+                Console.WriteLine(_time.ToString());
+
+                if (_time == TimeSpan.Zero)
+                {
+                    _timer.Stop();
+                    _time = _measureGap;
+                    string dgSortDescription = null;
+                    string dgRowDescription = null;
+                    ListSortDirection? dgSortDirection = null;
+                    Visibility? dgVisibility = Visibility.Hidden;
+                    int columnIndex = 0;
+                    int rowIndex = 0;
+
+                    foreach (DataGridColumn column in serverList.Columns)
+                    {
+                        columnIndex++;
+
+                        if (column.SortDirection != null)
+                        {
+                            dgSortDirection = column.SortDirection;
+                            dgSortDescription = column.SortMemberPath;
+
+                            break;
+                        }
+                    }
+
+                    serverList.ItemsSource = dm.Servers.Values;
+                    if (selectedServer.ServerName == null)
+                    {
+                        selectedServer = dm.Servers.Values.FirstOrDefault(x => x.Current == "1");
+
+                    }
+                    updateUserList(selectedServer);
+
+                    if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
+                    {
+                        SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
+                        CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
+                        view.SortDescriptions.Add(s);
+                        serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
+                    }
+                    _timer.Start();
+                }
+                _time = _time.Add(TimeSpan.FromSeconds(-1));
+            }, this.Dispatcher);
+            _timer.Start();
+
 
         }
 
@@ -91,10 +158,11 @@ namespace DayZServer
 
         public double MeasureGap
         {
-            get { return _measureGap.TotalMilliseconds; }
+            get { return _measureGap.TotalSeconds; }
             set
             {
-                _measureGap = TimeSpan.FromMilliseconds(value);
+                _measureGap = TimeSpan.FromSeconds(value);
+
                 OnPropertyChanged(value);
             }
             //set { DataManager.PingTimer.Interval = TimeSpan.FromMilliseconds(value).TotalMilliseconds; }
@@ -106,7 +174,8 @@ namespace DayZServer
         public void OnPropertyChanged(double propertyName)
         {
             DataManager.PingTimer.Interval = propertyName * 1000;
-
+            _time = TimeSpan.FromSeconds(propertyName);
+            
         }
 
 
@@ -162,19 +231,6 @@ namespace DayZServer
                     }
                 }
 
-                //foreach (DataGridRow row in serverList.Items)
-                //{
-                //    rowIndex++;
-
-                //    if (row.DetailsTemplate != null)
-                //    {
-                //        dgVisibility = row.DetailsVisibility;
-                //        dgRowDescription = row.Name;
-
-                //        break;
-                //    }
-                //}
-
                 serverList.ItemsSource = dm.Servers.Values;
                 if (selectedServer.ServerName == null)
                 {
@@ -182,24 +238,6 @@ namespace DayZServer
                    
                 }
                 updateUserList(selectedServer);
-
-
-
-
-
-
-                //DataManager.Server currentServer = dm.getCurrentServerList();
-                //if (currentServer != null)
-                //{
-                //    if (selectedIP == currentServer.IP_Address)
-                //    {
-                //        updateUserList(dm.userList(currentServer.IP_Address));
-                //    }
-                //    else
-                //    {
-                //        updateUserList(dm.userList(selectedIP));
-                //    }
-                //}
 
                 if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
                 {
