@@ -127,105 +127,17 @@ namespace DayZServer
 
         }
 
-        private async Task FileSetup()
-        {
-            dayZServerAppPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DayZServer"); //gets C:\Users\<User>\AppData\Local\DayZServer
-            dayzapppath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dayZServerAppPath, "dayzapppath.txt"); //path to config that identifies where DayZ is installed
-            serverhistorypath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dayZServerAppPath, "dayzhistory.txt"); //path to list that DayZ history is saved to
-
-            if (!Directory.Exists(dayZServerAppPath))
-            {
-                await Task.Run(() => Directory.CreateDirectory(dayZServerAppPath));
-                await Task.Run(() => WriteFile(dayzapppath));
-                await Task.Run(() => WriteFile(serverhistorypath));
-            }
-            else
-            {
-                if (!File.Exists(dayzapppath))
-                {
-                    await Task.Run(() => WriteFile(dayzapppath));
-                }
-                if (!File.Exists(serverhistorypath))
-                {
-                    await Task.Run(() => WriteFile(serverhistorypath));
-                }
-            }
-            
-            myDocumentsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DayZ");  //gets C:\Users\<User>\Documents\DayZ ****//Change to DayZ for Production
-
-            if (!Directory.Exists(myDocumentsPath))
-            {
-                await Task.Run(() => Directory.CreateDirectory(myDocumentsPath));
-                string dummyProfileDirectory = Path.Combine(Environment.CurrentDirectory, @"Profile\");
-                await Task.Run(() => ExtractEmbeddedResource(myDocumentsPath, "DayZServer", "VG7.DayZProfile"));
-                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars")).ToArray();
-                if (profile != null)
-                {
-                    profilepath = profile[0];
-                    fileNameProfile = new FileInfo(profilepath).Name;
-                    directoryPathProfile = new FileInfo(profilepath).Directory.FullName;
-                }
-            }
-            else
-            {
-                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars")).ToArray();
-                if (profile != null)
-                {
-                    profilepath = profile[0];
-                    fileNameProfile = new FileInfo(profilepath).Name;
-                    directoryPathProfile = new FileInfo(profilepath).Directory.FullName;
-                }
-            }
-        }
-
-        public void WriteFile(string pathName)
-        {
-            try
-            {
-                using (StreamWriter sw = File.CreateText(pathName))
-                {
-                    if (sw.BaseStream != null)
-                    {
-                        sw.WriteLine(dayzpath);
-                        sw.Close();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Could not write file: " + pathName + " : " + e);
-            }
-        }
-
-
-        private static void ExtractEmbeddedResource(string outputDir, string resourceLocation, string file)
-        {
-           
-            using (Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceLocation + @"." + file))
-            {
-                using (FileStream fileStream = new FileStream(Path.Combine(outputDir, file), FileMode.Create))
-                {
-                if (stream != null)
-                    { 
-                    for (int i = 0; i < stream.Length; i++)
-                        {
-                            fileStream.WriteByte((byte)stream.ReadByte());
-                        }
-                        fileStream.Close();
-                    }
-                }
-            }
-        }
+        
 
 
         public async Task startDataManager()
         {
             await Task.Run(() => FileSetup());
             await Task.Run(() => ProfileCheck());
-            PingTimer = new System.Timers.Timer(15000);
+            PingTimer = new System.Timers.Timer(20000);
             PingTimer.Elapsed += PingTimedEvent;
             PingTimer.Enabled = true;
-            PingTimer2 = new System.Timers.Timer(3000);
+            PingTimer2 = new System.Timers.Timer(7000);
             PingTimer2.Elapsed += PingTimedEvent;
             PingTimer2.Enabled = true;
         }
@@ -584,9 +496,97 @@ namespace DayZServer
 
 
 
-        
+        private async Task FileSetup()
+        {
+            dayZServerAppPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DayZServer"); //gets C:\Users\<User>\AppData\Local\DayZServer
+            dayzapppath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dayZServerAppPath, "dayzapppath.txt"); //path to config that identifies where DayZ is installed
+            serverhistorypath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dayZServerAppPath, "dayzhistory.txt"); //path to list that DayZ history is saved to
 
-        
+            if (!Directory.Exists(dayZServerAppPath))
+            {
+                await Task.Run(() => Directory.CreateDirectory(dayZServerAppPath));
+                await Task.Run(() => WriteFile(dayzapppath));
+                await Task.Run(() => WriteFile(serverhistorypath));
+            }
+            else
+            {
+                if (!File.Exists(dayzapppath))
+                {
+                    await Task.Run(() => WriteFile(dayzapppath));
+                }
+                if (!File.Exists(serverhistorypath))
+                {
+                    await Task.Run(() => WriteFile(serverhistorypath));
+                }
+            }
+
+            myDocumentsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "DayZ");  //gets C:\Users\<User>\Documents\DayZ ****//Change to DayZ for Production
+
+            if (!Directory.Exists(myDocumentsPath))
+            {
+                await Task.Run(() => Directory.CreateDirectory(myDocumentsPath));
+                string dummyProfileDirectory = Path.Combine(Environment.CurrentDirectory, @"Profile\");
+                await Task.Run(() => ExtractEmbeddedResource(myDocumentsPath, "DayZServer", "VG7.DayZProfile"));
+                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars")).ToArray();
+                if (profile != null)
+                {
+                    profilepath = profile[0];
+                    fileNameProfile = new FileInfo(profilepath).Name;
+                    directoryPathProfile = new FileInfo(profilepath).Directory.FullName;
+                }
+            }
+            else
+            {
+                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars")).ToArray();
+                if (profile != null)
+                {
+                    profilepath = profile[0];
+                    fileNameProfile = new FileInfo(profilepath).Name;
+                    directoryPathProfile = new FileInfo(profilepath).Directory.FullName;
+                }
+            }
+        }
+
+        public void WriteFile(string pathName)
+        {
+            try
+            {
+                using (StreamWriter sw = File.CreateText(pathName))
+                {
+                    if (sw.BaseStream != null)
+                    {
+                        sw.WriteLine(dayzpath);
+                        sw.Close();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not write file: " + pathName + " : " + e);
+            }
+        }
+
+
+        private static void ExtractEmbeddedResource(string outputDir, string resourceLocation, string file)
+        {
+
+            using (Stream stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceLocation + @"." + file))
+            {
+                using (FileStream fileStream = new FileStream(Path.Combine(outputDir, file), FileMode.Create))
+                {
+                    if (stream != null)
+                    {
+                        for (int i = 0; i < stream.Length; i++)
+                        {
+                            fileStream.WriteByte((byte)stream.ReadByte());
+                        }
+                        fileStream.Close();
+                    }
+                }
+            }
+        }
+
+
 
 
 
@@ -1198,6 +1198,7 @@ namespace DayZServer
                 }
                 serversList = Servers.Values.ToList();
                 await Task.Run(() => UpdateHistory());
+                await Task.Run(() => ProfileCheck());
             }
             catch (ArgumentException e)
             {
@@ -1206,27 +1207,8 @@ namespace DayZServer
         }
 
 
-
-
-
-
-
-
-
         public async Task getGTList()
         {
-            //WebClient webClient = new WebClient();
-            //string _UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
-            //webClient.Headers["Accept"] = "application/x-ms-application, image/jpeg, application/xaml+xml, image/gif, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
-            //webClient.Headers["User-Agent"] = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; MDDC)";
-
-            //webClient.DownloadDataCompleted += new DownloadDataCompletedEventHandler(GTCompletedCallback);
-            //string strUrl = "https://www.gametracker.com/search/dayz/US/?sort=4&order=DESC&searchipp=50#search";
-            ////byte[] reqHTML;
-            //Uri uri = new Uri(strUrl);
-            //webClient.DownloadDataAsync(uri);
-
-
 
             byte[] data;
             WebClient webClient = new WebClient();

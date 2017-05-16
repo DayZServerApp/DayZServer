@@ -59,7 +59,7 @@ namespace DayZServer
         public static DataManager dm = new DataManager();
         public static DataGrid innerDataGrid = new DataGrid();
         public static DataManager.Server selectedServer = new DataManager.Server();
-        private TimeSpan _measureGap = TimeSpan.FromMilliseconds(15);
+        private TimeSpan _measureGap = TimeSpan.FromMilliseconds(20);
 
 
         public ServerHistory()
@@ -70,7 +70,7 @@ namespace DayZServer
             //checkProfileForNewServerTimer.Elapsed += OnNewServerTimedEvent;
             //checkProfileForNewServerTimer.Enabled = true;
 
-            steamLogin.Visibility = Visibility.Hidden;
+            //steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
             dm.Servers.PropertyChanged += updateData;
             dm.startDataManager();
@@ -86,6 +86,7 @@ namespace DayZServer
             //if (currentServer != null) { selectedIP = currentServer.IP_Address; }
 
         }
+
 
 
         public double MeasureGap
@@ -316,7 +317,7 @@ namespace DayZServer
 
         private void steam_click(object sender, RoutedEventArgs e)
         {
-            steamLogin.Visibility = Visibility.Visible;
+            //steamLogin.Visibility = Visibility.Visible;
         }
 
         private void userIdGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -342,20 +343,20 @@ namespace DayZServer
 
         private void login_click(object sender, RoutedEventArgs e)
         {
-            string steamid = userId.Text;
-            string steampassword = password.Password;
-            string steamAuthCode = authCodeBox.Text;
+            //string steamid = userId.Text;
+            //string steampassword = password.Password;
+            //string steamAuthCode = authCodeBox.Text;
 
-            string[] arr1 = new string[] { steamid, steampassword, steamAuthCode, steamAuthCode };
+            //string[] arr1 = new string[] { steamid, steampassword, steamAuthCode, steamAuthCode };
 
-            SteamAccess.Login(arr1);
+            //SteamAccess.Login(arr1);
         }
 
         private void cancelLogin_Click(object sender, RoutedEventArgs e)
         {
-            steamLogin.Visibility = Visibility.Hidden;
-            userId.Foreground = Brushes.LightGray;
-            userId.Text = "UserID";
+            //steamLogin.Visibility = Visibility.Hidden;
+            //userId.Foreground = Brushes.LightGray;
+            //userId.Text = "UserID";
         }
 
         private void favorite_Click(object sender, RoutedEventArgs e)
