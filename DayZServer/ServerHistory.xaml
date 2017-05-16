@@ -231,7 +231,8 @@
                 </Canvas.Background>
                 <Label Content="Standalone Version 2" Canvas.Left="148" Canvas.Top="31" Width="181" Foreground="White" Height="25" FontSize="14" Opacity="0.7"/>
                 <Grid Height="58" Width="700" Canvas.Right="0">
-                    <TextBlock Name="ActiveServerName" Height="40" Cursor="Hand" TextAlignment="Right"  FontSize="25" Foreground="#FF5B5B5B" Background="{x:Null}" Canvas.Top="55" Margin="10,10,20,11" />
+                    <TextBlock Name="ActiveServerName" Tag="{Binding}" Height="40" Cursor="Hand" TextAlignment="Right"  FontSize="25" Foreground="#FF5B5B5B" Background="{x:Null}" Canvas.Top="55" Margin="10,10,20,11"/>
+                    
                 </Grid>
 
             </Canvas>

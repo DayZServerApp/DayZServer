@@ -18,6 +18,7 @@ using ToastNotifications.Lifetime;
 using ToastNotifications.Messages;
 using ToastNotifications.Position;
 using System.Windows.Threading;
+using System.Windows.Navigation;
 
 namespace DayZServer
 {
@@ -80,11 +81,11 @@ namespace DayZServer
         public ServerHistory()
         {
             InitializeComponent();
-           
+
             //checkProfileForNewServerTimer = new System.Timers.Timer(8000);
             //checkProfileForNewServerTimer.Elapsed += OnNewServerTimedEvent;
             //checkProfileForNewServerTimer.Enabled = true;
-
+            ActiveServerName.MouseLeftButtonDown += new MouseButtonEventHandler(Hyperlink_RequestNavigate);
             //steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
             //dm.Servers.PropertyChanged += updateData;
@@ -694,8 +695,16 @@ namespace DayZServer
 
         //    }));
         //}
-     
 
+        private void Hyperlink_RequestNavigate(object sender, MouseButtonEventArgs e)
+        {
+
+            
+            string FullIP_Address = selectedServer.FullIP_Address;
+            string URL = "https://www.gametracker.com/server_info/" + FullIP_Address + "/";
+            Process.Start(URL);
+
+        }
 
 
 
