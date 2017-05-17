@@ -134,12 +134,14 @@ namespace DayZServer
         {
             await Task.Run(() => FileSetup());
             await Task.Run(() => ProfileCheck());
-            PingTimer = new System.Timers.Timer(20000);
+            PingTimer = new System.Timers.Timer(7000);
             PingTimer.Elapsed += PingTimedEvent;
             PingTimer.Enabled = true;
-            PingTimer2 = new System.Timers.Timer(7000);
+            PingTimer2 = new System.Timers.Timer(3000);
             PingTimer2.Elapsed += PingTimedEvent;
             PingTimer2.Enabled = true;
+
+
         }
 
 
@@ -165,7 +167,8 @@ namespace DayZServer
 
         private async Task CheckingProfile()
         {
-            var profileFileStream = new FileStream(profilepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            //var profileFileStream = new FileStream(profilepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            FileStream profileFileStream = WaitForFile(profilepath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var profileStremReader = new StreamReader(profileFileStream);
             await Task.Run(() => DayZProfile = profileStremReader.ReadToEnd());
             profileStremReader.Close();
@@ -205,6 +208,29 @@ namespace DayZServer
             profileServer.Details = false;
         }
 
+        FileStream WaitForFile(string fullPath, FileMode mode, FileAccess access, FileShare share)
+        {
+            for (int numTries = 0; numTries < 10; numTries++)
+            {
+                FileStream fs = null;
+                try
+                {
+                    fs = new FileStream(fullPath, mode, access, share);
+                    return fs;
+                }
+                catch (IOException)
+                {
+                    if (fs != null)
+                    {
+                        fs.Dispose();
+                    }
+                    Thread.Sleep(50);
+                }
+            }
+
+            return null;
+        }
+
 
 
         private async Task CheckingHistory()
@@ -221,11 +247,7 @@ namespace DayZServer
                 
                 foreach (Server dayZServer in serverHistory)
                 {
-                    Server match = serversList.FirstOrDefault(x => x.IP_Address == dayZServer.IP_Address);
-                    if (match == null)
-                    {
                         ServerToDictionary(dayZServer);
-                    }
                 }
             }
             catch (Exception e)
@@ -264,42 +286,52 @@ namespace DayZServer
 
         private async Task ProfileMatch()
         {
-            //serversList = Servers.Values.ToList();
-
-            if (serversList.Count != 0)
-            {
-                foreach (Server dayZServer in serversList)
+                try
                 {
-                    Server match = serversList.FirstOrDefault(x => x.IP_Address == profileServer.IP_Address);
-                    Server matchCurrent = serversList.FirstOrDefault(x => x.Current == "1");
-                    if (matchCurrent != null)
+
+                    server_list = serversList;
+                    Server match = server_list.FirstOrDefault(x => x.IP_Address == profileServer.IP_Address);
+                    Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
+
+                if (match != null)
                     {
-                        await Task.Run(() => ServerToDictionary(matchCurrent));
-                        //serversList = Servers.Values.ToList();
-                    }
-                    if (match == null)
-                    {
-                        if (matchCurrent != null)
+                        if (match.Current == "0")
                         {
-                            matchCurrent.Current = "0";
-                        }
-                        
-                        await Task.Run(() => ServerToDictionary(profileServer));
-                        await Task.Run(() => UpdateHistory());
-                    }
-                    else
-                    {
+                            if (matchCurrent != null)
+                            {
+                                matchCurrent.Current = "0";
+                                await Task.Run(() => ServerToDictionary(matchCurrent));
+                                await Task.Run(() => UpdateHistory());
+                            }
+
+                            match.Date = DateTime.Now;
                             await Task.Run(() => ServerToDictionary(match));
+                            await Task.Run(() => UpdateHistory());
+                        }
                     }
+                    else if (matchCurrent != null)
+                {
+                    matchCurrent.Current = "0";
+                    await Task.Run(() => ServerToDictionary(matchCurrent));
+                    await Task.Run(() => ServerToDictionary(profileServer));
+                    await Task.Run(() => UpdateHistory());
 
                 }
+                else
+                {
+                    server_list.Add(profileServer);
+                    await Task.Run(() => ServerToDictionary(profileServer));
+                    await Task.Run(() => UpdateHistory());
+                }
+                        
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
             }
-            else
-            {
-                await Task.Run(() => ServerToDictionary(profileServer));
-                await Task.Run(() => UpdateHistory());
-            }
-        }
+ 
 
         public async Task UpdateHistory()
         {
@@ -341,12 +373,15 @@ namespace DayZServer
 
         }
 
+       
+
 
         // Define the event handlers.
-        private void OnProfileChanged(object source, FileSystemEventArgs e)
+        private async void OnProfileChanged(object source, FileSystemEventArgs e)
         {
             // Specify what is done when a file is changed, created, or deleted.
             Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+            await Task.Delay(3000);
             ProfileCheck();
         }
 

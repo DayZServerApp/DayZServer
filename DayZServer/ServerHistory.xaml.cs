@@ -71,13 +71,13 @@ namespace DayZServer
         public static DataManager dm = new DataManager();
         public static DataGrid innerDataGrid = new DataGrid();
         public static DataManager.Server selectedServer = new DataManager.Server();
-        private TimeSpan _measureGap = TimeSpan.FromSeconds(8);
+        private TimeSpan _measureGap = TimeSpan.FromSeconds(7);
        
 
 
         DispatcherTimer _timer;
         TimeSpan _time;
-        TimeSpan _timeset;
+       
 
         public ServerHistory()
         {
