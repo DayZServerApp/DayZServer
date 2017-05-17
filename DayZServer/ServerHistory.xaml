@@ -342,7 +342,7 @@
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Favorite }" Value="1">
                                                     <Setter Property="Background">
-                                                        <Setter.Value>
+                                                        <Setter.Value >
                                                             <ImageBrush ImageSource="images/checkon.png" Stretch="Uniform"/>
                                                         </Setter.Value>
                                                     </Setter>

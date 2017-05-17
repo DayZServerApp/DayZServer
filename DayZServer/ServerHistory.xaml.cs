@@ -19,6 +19,7 @@ using ToastNotifications.Messages;
 using ToastNotifications.Position;
 using System.Windows.Threading;
 using System.Windows.Navigation;
+using System.Windows.Media.Imaging;
 
 namespace DayZServer
 {
@@ -404,9 +405,25 @@ namespace DayZServer
             this.Dispatcher.Invoke((Action)(async () =>
             {
                 DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
+                Button fButton = sender as Button;
+                ImageBrush checkon = new ImageBrush(new BitmapImage(new Uri(BaseUriHelper.GetBaseUri(this), "images/checkon.png")));
+                ImageBrush checkoff = new ImageBrush(new BitmapImage(new Uri(BaseUriHelper.GetBaseUri(this), "images/checkoff.png")));
+
+                //fButton.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/DayZServer;images/checkon.png")));
+
+                if (obj.Favorite == "0")
+                {
+                    fButton.Background = checkon;
+                }
+                else
+                {
+                    fButton.Background = checkoff;
+                }
+                
+
+
                 string favoriteServer = obj.FullIP_Address;
                 await dm.updateFavorite(favoriteServer);
-
 
             }));
         }
@@ -698,12 +715,9 @@ namespace DayZServer
 
         private void Hyperlink_RequestNavigate(object sender, MouseButtonEventArgs e)
         {
-
-            
             string FullIP_Address = selectedServer.FullIP_Address;
             string URL = "https://www.gametracker.com/server_info/" + FullIP_Address + "/";
             Process.Start(URL);
-
         }
 
 
