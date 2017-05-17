@@ -95,7 +95,7 @@ namespace DayZServer
 
             //serverList.DataContext = dm.Servers;
 
-            serverList.ItemsSource = dm.Servers.Values;
+            serverList.ItemsSource = dm.Servers;
             DataContext = this;
 
             _time = _measureGap;
@@ -132,10 +132,10 @@ namespace DayZServer
                         }
                     }
 
-                    serverList.ItemsSource = dm.Servers.Values;
+                    serverList.ItemsSource = dm.Servers;
                     if (selectedServer.ServerName == null)
                     {
-                        selectedServer = dm.Servers.Values.FirstOrDefault(x => x.Current == "1");
+                        selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
 
                     }
                     updateUserList(selectedServer);
@@ -233,10 +233,10 @@ namespace DayZServer
                     }
                 }
 
-                serverList.ItemsSource = dm.Servers.Values;
+                serverList.ItemsSource = dm.Servers;
                 if (selectedServer.ServerName == null)
                 {
-                   selectedServer = dm.Servers.Values.FirstOrDefault(x => x.Current == "1");
+                   selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
                    
                 }
                 updateUserList(selectedServer);
@@ -433,7 +433,7 @@ namespace DayZServer
             this.Dispatcher.Invoke((Action)(() =>
             {
                 DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
-                string deleteServer = obj.ServerName;
+                string deleteServer = obj.IP_Address;
                 dm.deleteServer(deleteServer);
 
             }));

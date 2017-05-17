@@ -47,7 +47,7 @@ namespace DayZServer
         public Server profileServer = new Server();
         public static string tester;
         public static string currentIP;
-        public ObservableConcurrentDictionary<string, Server> Servers = new ObservableConcurrentDictionary<string, Server>();
+        public ObservableCollection<Server> Servers = new ObservableCollection<Server>();
         public static System.Timers.Timer PingTimer;
         private static System.Timers.Timer PingTimer2;
         static int pingLoopInProgress = 0;
@@ -147,9 +147,9 @@ namespace DayZServer
 
 
 
-        public List<Server> getList()
+        public ObservableCollection<Server> getList()
         {
-            return serversList;
+            return Servers;
         }
 
 
@@ -261,20 +261,20 @@ namespace DayZServer
 
         //need to refactor so there are not two methods here
 
-        private async void ServerToDictionary(Server dayZServer)
+        private void ServerToDictionary(Server dayZServer)
         {
             // The await causes the handler to return immediately.
-            await System.Threading.Tasks.Task.Run(() => PushData(dayZServer));
-            serversList = Servers.Values.ToList();
-
-
+            PushData(dayZServer);
         }
 
-        private async System.Threading.Tasks.Task PushData(Server dayZServer)
+        private void PushData(Server dayZServer)
         {
             try
             {
-                await Task.Run(() => Servers.UpdateWithNotification(dayZServer.IP_Address, dayZServer));
+                Server serverMatch = Servers.FirstOrDefault(i => i.IP_Address == dayZServer.IP_Address);
+                if (serverMatch != null) { 
+                serverMatch = dayZServer;
+                }
             }
             catch (Exception e)
             {
@@ -288,10 +288,8 @@ namespace DayZServer
         {
                 try
                 {
-
-                    server_list = serversList;
-                    Server match = server_list.FirstOrDefault(x => x.IP_Address == profileServer.IP_Address);
-                    Server matchCurrent = server_list.FirstOrDefault(x => x.Current == "1");
+                    Server match = Servers.FirstOrDefault(x => x.IP_Address == profileServer.IP_Address);
+                    Server matchCurrent = Servers.FirstOrDefault(x => x.Current == "1");
 
                 if (match != null)
                     {
@@ -335,8 +333,7 @@ namespace DayZServer
 
         public async Task UpdateHistory()
         {
-            List<Server> historyList = Servers.Values.ToList();
-            string listjson = JsonConvert.SerializeObject(historyList.ToArray());
+            string listjson = JsonConvert.SerializeObject(Servers.ToArray());
             var fsw = new FileStream(serverhistorypath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
             var sw = new StreamWriter(fsw);
             await Task.Run(() => sw.Write(listjson));
@@ -412,7 +409,7 @@ namespace DayZServer
 
         public void getPing()
         {
-            Parallel.ForEach(serversList, new ParallelOptions
+            Parallel.ForEach(Servers, new ParallelOptions
                 {
                     MaxDegreeOfParallelism = 10
                 },
@@ -440,7 +437,7 @@ namespace DayZServer
                     List<SteamServer> steamservers = rootObject.response.servers;
                     
 
-                    if (steamservers != null && serversList != null)
+                    if (steamservers != null && Servers != null)
                     {
 
                         foreach (SteamServer steamServer in steamservers)
@@ -452,8 +449,8 @@ namespace DayZServer
                             if (queryportnum == 0) continue;
                             try
                             {
-                                if (serversList == null) continue;
-                                Server matchCurrent = serversList.FirstOrDefault(p => p.IP_Address == serverip && p.Game_Port == steamgameport);
+                                if (Servers == null) continue;
+                                Server matchCurrent = Servers.FirstOrDefault(p => p.IP_Address == serverip && p.Game_Port == steamgameport);
                                 
                                 if (matchCurrent != null)
                                 {
@@ -1178,7 +1175,7 @@ namespace DayZServer
 
             try
             {
-                Server match = serversList.FirstOrDefault(x => x.FullIP_Address == favoriteServer);
+                Server match = Servers.FirstOrDefault(x => x.FullIP_Address == favoriteServer);
 
                 if (match != null)
                 {
@@ -1202,17 +1199,17 @@ namespace DayZServer
             }
         }
 
-        public void deleteServer(string deleteServer)
+        public void deleteServer(string IP_Address)
         {
             try
             {
-                Server match = serversList.FirstOrDefault(x => x.ServerName == deleteServer);
+                
+                Server serverMatch = Servers.FirstOrDefault(i => i.IP_Address == IP_Address);
 
-            if (match != null)
-            {
-                Servers.TryRemoveWithNotification(match.IP_Address, out match);
-                serversList = Servers.Values.ToList();
-            }
+                if (serverMatch != null)
+                {
+                    Servers.Remove(serverMatch);
+                }
             }
             catch (ArgumentException e)
             {
@@ -1224,14 +1221,10 @@ namespace DayZServer
         {
             try
             {
-               
-                
-                foreach (Server dayZServer in serversList)
+                foreach (Server server in Servers)
                 {
-                    Server deletServer = dayZServer;
-                    Servers.TryRemoveWithNotification(dayZServer.IP_Address, out deletServer);
+                    Servers.Remove(server);
                 }
-                serversList = Servers.Values.ToList();
                 await Task.Run(() => UpdateHistory());
                 await Task.Run(() => ProfileCheck());
             }
@@ -1416,11 +1409,11 @@ namespace DayZServer
 
             try
                 {
-                    if (serversList.Count != 0)
+                    if (Servers.Count != 0)
                     {
-                        foreach (Server dayZServer in serversList)
+                        foreach (Server dayZServer in Servers)
                         {
-                            Server match = serversList.FirstOrDefault(x => x.IP_Address == gtServer.IP_Address);
+                            Server match = Servers.FirstOrDefault(x => x.IP_Address == gtServer.IP_Address);
                             if (match != null)
                             {
                                 if (match.Current == "0")
