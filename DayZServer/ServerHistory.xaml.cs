@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,12 +28,10 @@ namespace DayZServer
     public partial class ServerHistory : Window
     {
 
-      //*****ToDo Try to wire up observable concurrent dictionary correctly
+        //*****ToDo Try to wire up observable concurrent dictionary correctly
 
-        //public ObservableConcurrentDictionary<string, DataManager.Server> Servers
-        //{
-        //    get { return this.Servers; }
-        //}
+
+
 
 
         Notifier copynotifier = new Notifier(cfg =>
@@ -95,8 +94,9 @@ namespace DayZServer
 
             //serverList.DataContext = dm.Servers;
 
-            serverList.ItemsSource = dm.Servers;
+            //serverList.ItemsSource = dm.Servers;
             DataContext = this;
+            serverList.ItemsSource = dm.Servers;
 
             _time = _measureGap;
             
@@ -112,41 +112,41 @@ namespace DayZServer
                 {
                     _timer.Stop();
                     _time = _measureGap;
-                    string dgSortDescription = null;
-                    string dgRowDescription = null;
-                    ListSortDirection? dgSortDirection = null;
-                    Visibility? dgVisibility = Visibility.Hidden;
-                    int columnIndex = 0;
-                    int rowIndex = 0;
+                    //string dgSortDescription = null;
+                    //string dgRowDescription = null;
+                    //ListSortDirection? dgSortDirection = null;
+                    //Visibility? dgVisibility = Visibility.Hidden;
+                    //int columnIndex = 0;
+                    //int rowIndex = 0;
 
-                    foreach (DataGridColumn column in serverList.Columns)
-                    {
-                        columnIndex++;
+                    //foreach (DataGridColumn column in serverList.Columns)
+                    //{
+                    //    columnIndex++;
 
-                        if (column.SortDirection != null)
-                        {
-                            dgSortDirection = column.SortDirection;
-                            dgSortDescription = column.SortMemberPath;
+                    //    if (column.SortDirection != null)
+                    //    {
+                    //        dgSortDirection = column.SortDirection;
+                    //        dgSortDescription = column.SortMemberPath;
 
-                            break;
-                        }
-                    }
+                    //        break;
+                    //    }
+                    //}
 
-                    serverList.ItemsSource = dm.Servers;
-                    if (selectedServer.ServerName == null)
-                    {
-                        selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+                    //serverList.ItemsSource = dm.Servers;
+                    //if (selectedServer.ServerName == null)
+                    //{
+                    //    selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
 
-                    }
-                    updateUserList(selectedServer);
+                    //}
+                    //updateUserList(selectedServer);
 
-                    if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
-                    {
-                        SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
-                        CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
-                        view.SortDescriptions.Add(s);
-                        serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
-                    }
+                    //if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
+                    //{
+                    //    SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
+                    //    CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
+                    //    view.SortDescriptions.Add(s);
+                    //    serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
+                    //}
                     _timer.Start();
                 }
                 _time = _time.Add(TimeSpan.FromSeconds(-1));

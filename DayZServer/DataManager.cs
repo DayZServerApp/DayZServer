@@ -52,6 +52,10 @@ namespace DayZServer
         private static System.Timers.Timer PingTimer2;
         static int pingLoopInProgress = 0;
 
+ 
+
+
+
 
         public class Server
         {
@@ -275,6 +279,10 @@ namespace DayZServer
                 if (serverMatch != null) { 
                 serverMatch = dayZServer;
                 }
+                else
+                {
+                    Servers.Add(dayZServer);
+                }
             }
             catch (Exception e)
             {
@@ -317,7 +325,7 @@ namespace DayZServer
                 }
                 else
                 {
-                    server_list.Add(profileServer);
+                    
                     await Task.Run(() => ServerToDictionary(profileServer));
                     await Task.Run(() => UpdateHistory());
                 }
