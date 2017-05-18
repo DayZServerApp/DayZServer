@@ -5,7 +5,18 @@
 
     <Window.Resources>
         <!--<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>-->
+        <Style x:Key="currentText" TargetType="TextBlock">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Current}" Value="True">
+                    <Setter Property="Foreground" Value="Red"/>
 
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding Current}" Value="False">
+                    <Setter Property="Foreground" Value="Green"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="SliderRepeatButton" TargetType="RepeatButton">
             <Setter Property="SnapsToDevicePixels" Value="true" />
             <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -230,7 +241,7 @@
                     <ImageBrush ImageSource="images/header.png" Stretch="Uniform" AlignmentX="Left"/>
                 </Canvas.Background>
                 <Label Content="Standalone Version 2" Canvas.Left="148" Canvas.Top="31" Width="181" Foreground="White" Height="25" FontSize="14" Opacity="0.7"/>
-                <Grid Height="58" Width="700" Canvas.Right="0">
+               <Grid Height="58" Width="700" Canvas.Right="0">
                     <TextBlock Name="ActiveServerName" Tag="{Binding}" Height="40" Cursor="Hand" TextAlignment="Right"  FontSize="25" Foreground="#FF5B5B5B" Background="{x:Null}" Canvas.Top="55" Margin="10,10,20,11"/>
                     
                 </Grid>
@@ -246,40 +257,40 @@
                 </LinearGradientBrush>
             </Border.Background>
 
-<StackPanel>
+            <StackPanel>
 
-            <Grid Height="77" HorizontalAlignment="Stretch">
-                <Button  Click="GT_Click" Width="130" Height="55" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right">
-                    <Image Source="images/gtlogo.png" Width="120" Height="55" />
-                </Button>
-                <Button  ToolTip="DayZServer" Click="Link_Click" Tag="https://github.com/DayZServerApp/DayZServer/releases" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,139,0" >
-                    <Image Source="images/button.png" Height="48"/>
-                </Button>
-                <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,1,188,-1" >
-                    <Image Source="images/appicon.png" Width="75" Height="44" />
-                </Button>
-                <Button Click="ClearHistory" ToolTip="Clear All Servers" Width="46"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,301,0">
-                    <Image Source="images/All-Clear-Icon.png" Width="46" Height="45" />
-                </Button>
-                <Grid Canvas.Left="488" Canvas.Top="14" Width="209" HorizontalAlignment="Left" Margin="20,-6,0,6">
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                            
+                <Grid Height="77" HorizontalAlignment="Stretch">
+                    <Button  Click="GT_Click" Width="130" Height="55" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right">
+                        <Image Source="images/gtlogo.png" Width="120" Height="55" />
+                    </Button>
+                    <Button  ToolTip="DayZServer" Click="Link_Click" Tag="https://github.com/DayZServerApp/DayZServer/releases" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,139,0" >
+                        <Image Source="images/button.png" Height="48"/>
+                    </Button>
+                    <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,1,188,-1" >
+                        <Image Source="images/appicon.png" Width="75" Height="44" />
+                    </Button>
+                    <Button Click="ClearHistory" ToolTip="Clear All Servers" Width="46"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,301,0">
+                        <Image Source="images/All-Clear-Icon.png" Width="46" Height="45" />
+                    </Button>
+                    <Grid Canvas.Left="488" Canvas.Top="14" Width="209" HorizontalAlignment="Left" Margin="20,-6,0,6">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+
                         </StackPanel>
                         <Slider Style="{StaticResource Horizontal_Slider}" IsSnapToTickEnabled="True" x:Name="RefreshSlider" Grid.Row="1" Minimum="1" SmallChange="1" Value="{Binding Path=MeasureGap, Mode=TwoWay}" Maximum="60" TickFrequency="3" />
                         <!--<TextBlock Name="countdown" Foreground="YellowGreen" Height="16" Width="100" Margin="353,0,-244,23" Grid.Row="1"/>-->
-                            
+
                     </Grid>
                     <TextBlock Height="32" VerticalAlignment="Top" Foreground="YellowGreen" Width="293" HorizontalAlignment="Left" Margin="260,18,0,0"><Run Text="Refresh in  " FontSize="14" /><Run Name="countdown" Foreground="YellowGreen" FontSize="30" /><Run Text=" seconds" Foreground="YellowGreen" FontSize="14" /><!--<Run Text="{Binding Value, ElementName=RefreshSlider}" />--></TextBlock>
                     <Canvas x:Name="browse_dialog" Height="207"  Width="516" Background="#FF78A41E" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="510,-232,511,102" >
-                    <Button x:Name="cancel_button" Content="Cancel" Canvas.Left="364" Canvas.Top="160" Width="142" Height="37" Click="cancel_click" FontSize="18" BorderBrush="{x:Null}" Background="#FFBAF344"/>
-                    <TextBox Height="66" Canvas.Left="10" TextWrapping="Wrap" Text="Browse and find the location of DayZ.exe and try again. &#xA;The game should be in the steam folder &#xA;\Steam\SteamApps\common\DayZ\DayZ.exe" Canvas.Top="50" Width="496" Background="{x:Null}" Foreground="White" FontSize="16" BorderBrush="{x:Null}"/>
-                    <TextBox Height="33" Canvas.Left="10" TextWrapping="Wrap" Text="Unable to locate where you installed DayZ" Canvas.Top="12" Width="496"  Background="{x:Null}" Foreground="White" FontSize="18" BorderBrush="{x:Null}"/>
-                    <Button x:Name="browse" Content="Browse" Canvas.Left="364" Canvas.Top="118" Width="142" Height="37" Click="browse_click" FontSize="18" BorderBrush="{x:Null}" Background="#FFBAF344"/>
-                </Canvas>
+                        <Button x:Name="cancel_button" Content="Cancel" Canvas.Left="364" Canvas.Top="160" Width="142" Height="37" Click="cancel_click" FontSize="18" BorderBrush="{x:Null}" Background="#FFBAF344"/>
+                        <TextBox Height="66" Canvas.Left="10" TextWrapping="Wrap" Text="Browse and find the location of DayZ.exe and try again. &#xA;The game should be in the steam folder &#xA;\Steam\SteamApps\common\DayZ\DayZ.exe" Canvas.Top="50" Width="496" Background="{x:Null}" Foreground="White" FontSize="16" BorderBrush="{x:Null}"/>
+                        <TextBox Height="33" Canvas.Left="10" TextWrapping="Wrap" Text="Unable to locate where you installed DayZ" Canvas.Top="12" Width="496"  Background="{x:Null}" Foreground="White" FontSize="18" BorderBrush="{x:Null}"/>
+                        <Button x:Name="browse" Content="Browse" Canvas.Left="364" Canvas.Top="118" Width="142" Height="37" Click="browse_click" FontSize="18" BorderBrush="{x:Null}" Background="#FFBAF344"/>
+                    </Canvas>
                 </Grid>
 
 
@@ -293,14 +304,14 @@
                     <DataGridTemplateColumn  Header="Players" SortMemberPath="Name" SortDirection="Ascending" Width="250">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Click="player_click" Tag="{Binding FullIP_Address}"  Height="50" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="20" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
+                                <Button Click="player_click" Tag="{Binding FullIP_Address}"  Height="50" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="20" Foreground="#707071" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Time" SortMemberPath="Name" SortDirection="Ascending" Width="80">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Width="80" Height="50" Cursor="Hand" Text="{Binding Time}"  FontSize="16" Foreground="#FF5B5B5B" Background="{x:Null}" Margin="10,20,0,0" />
+                                <TextBlock Width="80" Height="50" Cursor="Hand" Text="{Binding Time}"  FontSize="16" Foreground="#707071" Background="{x:Null}" Margin="10,20,0,0" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -327,13 +338,13 @@
                         </Style.Resources>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Current}" Value="1">
-                                <Setter Property="Background" Value="#f2f9fc" />
+                                <Setter Property="Background" Value="YellowGreen"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="55" SortMemberPath="Favorite" Header="Favorite">
+                    <DataGridTemplateColumn Width="55" SortMemberPath="Favorite" SortDirection="Ascending" Header="Favorite">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button x:Name="favoriteButton" Height="32" Click="favorite_Click" Tag="{Binding PresentationTraceSources.TraceLevel=High}" VerticalAlignment="Center" Width="32" Cursor="Hand">
@@ -364,7 +375,7 @@
                     <DataGridTemplateColumn Header="Server Name" Width="auto" SortMemberPath="ServerName" IsReadOnly="True" MinWidth="400">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ServerName}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="18" Margin="10" />
+                                <TextBlock Text="{Binding ServerName}" Foreground="#707071" Cursor="Arrow" FontSize="18" Margin="10" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -388,14 +399,15 @@
                     <DataGridTemplateColumn Header="IP Address" Width="150" SortMemberPath="IP_Address">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding IP_Address}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" />
+                                <TextBlock Text="{Binding IP_Address}" Foreground="#747576" Cursor="Arrow" Style="{StaticResource currentText}" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0"/>
+
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date" SortDirection="Descending">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Date}" Foreground="#FF9B9B9C" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Date}" Foreground="#747576" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -426,14 +438,25 @@
                     <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed" SortDirection="Descending">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding PingSpeed}" Foreground="#FF9B9B9C" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding PingSpeed}" Foreground="#747576" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="Black"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Current}" Value="True">
+                                                    <Setter Property="Foreground" Value="Black"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Players" Width="auto" SortMemberPath="UserCount" IsReadOnly="True" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding UserCount}" Foreground="#FF9B9B9C" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
+                                <TextBlock Text="{Binding UserCount}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
@@ -450,7 +473,7 @@
                     <DataGridTemplateColumn Header="Max" Width="auto" SortMemberPath="UserCount" IsReadOnly="True" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding MaxPlayers}" Foreground="#FF9B9B9C" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
+                                <TextBlock Text="{Binding MaxPlayers}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
@@ -501,7 +524,7 @@
                             <DataGridTemplateColumn  Header="Players" SortMemberPath="Name" SortDirection="Ascending">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="20" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
+                                        <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="20" Foreground="#707071" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -509,7 +532,7 @@
                     </DataGrid>-->
                 <!--
 
-                    <TextBlock Text="{Binding ServerName}" Foreground="#FF5B5B5B" Cursor="Arrow" FontSize="18" Margin="10" />
+                    <TextBlock Text="{Binding ServerName}" Foreground="#707071" Cursor="Arrow" FontSize="18" Margin="10" />
 
 
                     -->
@@ -523,7 +546,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="100" />
                                             </Grid.ColumnDefinitions>
-                                            <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding ServerName}" BorderBrush="{x:Null}" FontSize="20" Foreground="#FF5B5B5B" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
+                                            <Button Click="player_click" Tag="{Binding FullIP_Address}"   Width="90" Height="30" Cursor="Hand" Content="{Binding ServerName}" BorderBrush="{x:Null}" FontSize="20" Foreground="#707071" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
                                             
                                         </Grid>
                                     </DataTemplate>
