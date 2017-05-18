@@ -104,7 +104,7 @@ namespace DayZServer
             _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
             {
                 //this.dateText.Text = DateTime.UtcNow.ToString("HH:mm:ss:fff", CultureInfo.InvariantCulture);
-                this.dateText.Text = _time.ToString(@"ss");
+                this.countdown.Text = _time.ToString(@"ss");
 
                 Console.WriteLine(_time.ToString());
 
@@ -112,41 +112,43 @@ namespace DayZServer
                 {
                     _timer.Stop();
                     _time = _measureGap;
-                    //string dgSortDescription = null;
-                    //string dgRowDescription = null;
-                    //ListSortDirection? dgSortDirection = null;
-                    //Visibility? dgVisibility = Visibility.Hidden;
-                    //int columnIndex = 0;
-                    //int rowIndex = 0;
 
-                    //foreach (DataGridColumn column in serverList.Columns)
-                    //{
-                    //    columnIndex++;
+                    string dgSortDescription = null;
+                    string dgRowDescription = null;
+                    ListSortDirection? dgSortDirection = null;
+                    Visibility? dgVisibility = Visibility.Hidden;
+                    int columnIndex = 0;
+                    int rowIndex = 0;
 
-                    //    if (column.SortDirection != null)
-                    //    {
-                    //        dgSortDirection = column.SortDirection;
-                    //        dgSortDescription = column.SortMemberPath;
+                    foreach (DataGridColumn column in serverList.Columns)
+                    {
+                        columnIndex++;
 
-                    //        break;
-                    //    }
-                    //}
+                        if (column.SortDirection != null)
+                        {
+                            dgSortDirection = column.SortDirection;
+                            dgSortDescription = column.SortMemberPath;
 
-                    //serverList.ItemsSource = dm.Servers;
-                    //if (selectedServer.ServerName == null)
-                    //{
-                    //    selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+                            break;
+                        }
+                    }
 
-                    //}
-                    //updateUserList(selectedServer);
+                    serverList.ItemsSource = dm.Servers;
+                    serverList.Items.Refresh();
+                    if (selectedServer.ServerName == null)
+                    {
+                        selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
 
-                    //if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
-                    //{
-                    //    SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
-                    //    CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
-                    //    view.SortDescriptions.Add(s);
-                    //    serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
-                    //}
+                    }
+                    updateUserList(selectedServer);
+
+                    if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
+                    {
+                        SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
+                        CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
+                        view.SortDescriptions.Add(s);
+                        serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
+                    }
                     _timer.Start();
                 }
                 _time = _time.Add(TimeSpan.FromSeconds(-1));

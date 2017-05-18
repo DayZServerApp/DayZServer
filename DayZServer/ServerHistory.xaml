@@ -269,11 +269,11 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
                             
                         </StackPanel>
-                        <Slider Style="{StaticResource Horizontal_Slider}" IsSnapToTickEnabled="True" x:Name="RefreshSlider" Grid.Row="1" Minimum="5" SmallChange="1" Value="{Binding Path=MeasureGap, Mode=TwoWay}" Maximum="60" TickFrequency="3" />
-                        <TextBlock Name="dateText" Foreground="YellowGreen" Height="16" Width="100" Margin="353,0,-244,23" Grid.Row="1"/>
+                        <Slider Style="{StaticResource Horizontal_Slider}" IsSnapToTickEnabled="True" x:Name="RefreshSlider" Grid.Row="1" Minimum="1" SmallChange="1" Value="{Binding Path=MeasureGap, Mode=TwoWay}" Maximum="60" TickFrequency="3" />
+                        <!--<TextBlock Name="countdown" Foreground="YellowGreen" Height="16" Width="100" Margin="353,0,-244,23" Grid.Row="1"/>-->
                             
                     </Grid>
-                    <TextBlock Height="16" VerticalAlignment="Top" Foreground="YellowGreen" Width="100" HorizontalAlignment="Left" Margin="259,34,0,0"><Run Text="Refresh Interval:" /><Run Text=" "/><Run Text="{Binding Value, ElementName=RefreshSlider}" /></TextBlock>
+                    <TextBlock Height="32" VerticalAlignment="Top" Foreground="YellowGreen" Width="293" HorizontalAlignment="Left" Margin="259,18,0,0"><Run Text="Refresh in  " FontSize="14" /><Run Name="countdown" Foreground="YellowGreen" FontSize="30" /><Run Text=" seconds" Foreground="YellowGreen" FontSize="14" /><!--<Run Text="{Binding Value, ElementName=RefreshSlider}" />--></TextBlock>
                     <Canvas x:Name="browse_dialog" Height="207"  Width="516" Background="#FF78A41E" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="510,-232,511,102" >
                     <Button x:Name="cancel_button" Content="Cancel" Canvas.Left="364" Canvas.Top="160" Width="142" Height="37" Click="cancel_click" FontSize="18" BorderBrush="{x:Null}" Background="#FFBAF344"/>
                     <TextBox Height="66" Canvas.Left="10" TextWrapping="Wrap" Text="Browse and find the location of DayZ.exe and try again. &#xA;The game should be in the steam folder &#xA;\Steam\SteamApps\common\DayZ\DayZ.exe" Canvas.Top="50" Width="496" Background="{x:Null}" Foreground="White" FontSize="16" BorderBrush="{x:Null}"/>
