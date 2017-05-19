@@ -30,8 +30,8 @@ namespace DayZServer
 
         //*****ToDo Try to wire up observable concurrent dictionary correctly
 
-        
-       
+
+
 
 
         Notifier copynotifier = new Notifier(cfg =>
@@ -65,18 +65,18 @@ namespace DayZServer
         });
 
 
-        
+
         public string selectedIP;
         public static DataManager dm = new DataManager();
         public static DataGrid innerDataGrid = new DataGrid();
         public static DataManager.Server selectedServer = new DataManager.Server();
         private TimeSpan _measureGap = TimeSpan.FromSeconds(7);
-       
+
 
 
         DispatcherTimer _timer;
         TimeSpan _time;
-        public ICollectionView PlayersView { get; set; }
+
 
         public ServerHistory()
         {
@@ -97,16 +97,12 @@ namespace DayZServer
             //serverList.ItemsSource = dm.Servers;
             DataContext = this;
             serverList.ItemsSource = dm.Servers;
-            PlayersView = CollectionViewSource.GetDefaultView(dm.Players);
-            userList.ItemsSource = PlayersView;
-
-            
 
 
             _time = _measureGap;
-            
+
             //_timeset = TimeSpan.FromSeconds(20);
-            _timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 8), DispatcherPriority.Background, delegate
+            _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
             {
                 //this.dateText.Text = DateTime.UtcNow.ToString("HH:mm:ss:fff", CultureInfo.InvariantCulture);
                 //this.countdown.Text = _time.ToString(@"ss");
@@ -115,52 +111,50 @@ namespace DayZServer
                 if (selectedServer.ServerName == null)
                 {
                     selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
-                    //updateUserList(selectedServer);
+                    updateUserList(selectedServer);
 
                 }
 
-               
+            if (_time == TimeSpan.Zero)
+            {
+                _timer.Stop();
+                _time = _measureGap;
 
-                //if (_time == TimeSpan.Zero)
+                //string dgSortDescription = null;
+                //string dgRowDescription = null;
+                //ListSortDirection? dgSortDirection = null;
+                //Visibility? dgVisibility = Visibility.Hidden;
+                //int columnIndex = 0;
+                //int rowIndex = 0;
+
+                //foreach (DataGridColumn column in serverList.Columns)
                 //{
-                //_timer.Stop();
-                //_time = _measureGap;
+                //    columnIndex++;
 
-                string dgSortDescription = null;
-                    string dgRowDescription = null;
-                    ListSortDirection? dgSortDirection = null;
-                    Visibility? dgVisibility = Visibility.Hidden;
-                    int columnIndex = 0;
-                    int rowIndex = 0;
+                //    if (column.SortDirection != null)
+                //    {
+                //        dgSortDirection = column.SortDirection;
+                //        dgSortDescription = column.SortMemberPath;
 
-                    foreach (DataGridColumn column in serverList.Columns)
-                    {
-                        columnIndex++;
-
-                        if (column.SortDirection != null)
-                        {
-                            dgSortDirection = column.SortDirection;
-                            dgSortDescription = column.SortMemberPath;
-
-                            break;
-                        }
-                    }
-           
-                    //serverList.ItemsSource = dm.Servers;
-                    //serverList.Items.Refresh();
-
-                    //updateUserList(selectedServer);
-
-                    if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
-                    {
-                        SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
-                        CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
-                        view.SortDescriptions.Add(s);
-                        serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
-                    }
-                    //_timer.Start();
+                //        break;
+                //    }
                 //}
-               // _time = _time.Add(TimeSpan.FromSeconds(-1));
+
+                //serverList.ItemsSource = dm.Servers;
+                //serverList.Items.Refresh();
+
+                updateUserList(selectedServer);
+
+                //if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
+                //{
+                //    SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
+                //    CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
+                //    view.SortDescriptions.Add(s);
+                //    serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
+                //}
+                    _timer.Start();
+                }
+                _time = _time.Add(TimeSpan.FromSeconds(-1));
             }, this.Dispatcher);
             //_timer.Start();
 
@@ -179,16 +173,16 @@ namespace DayZServer
                 OnPropertyChanged(value);
             }
             //set { DataManager.PingTimer.Interval = TimeSpan.FromMilliseconds(value).TotalMilliseconds; }
-            
+
         }
 
-     
+
 
         public void OnPropertyChanged(double propertyName)
         {
             DataManager.PingTimer.Interval = propertyName * 1000;
             _time = TimeSpan.FromSeconds(propertyName);
-            
+
         }
 
 
@@ -247,8 +241,8 @@ namespace DayZServer
                 serverList.ItemsSource = dm.Servers;
                 if (selectedServer.ServerName == null)
                 {
-                   selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
-                   
+                    selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+
                 }
                 updateUserList(selectedServer);
 
@@ -259,7 +253,7 @@ namespace DayZServer
                     view.SortDescriptions.Add(s);
                     serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
                 }
-               
+
             }));
 
         }
@@ -430,7 +424,7 @@ namespace DayZServer
                 {
                     fButton.Background = checkoff;
                 }
-                
+
 
 
                 string favoriteServer = obj.FullIP_Address;
@@ -606,7 +600,7 @@ namespace DayZServer
             selectedIP = obj.IP_Address;
             updateUserList(obj);
             selectedServer = obj;
-            
+
 
 
 
@@ -737,99 +731,91 @@ namespace DayZServer
         {
 
             this.Dispatcher.Invoke((Action)(() =>
-                            {
-                                
-                                string dgSortDescriptionUser = null;
-                                ListSortDirection? dgSortDirectionUser = null;
-                                int columnIndexUser = 0;
+            {
+
+                string dgSortDescriptionUser = null;
+                ListSortDirection? dgSortDirectionUser = null;
+                int columnIndexUser = 0;
 
 
-                                foreach (DataGridColumn column in userList.Columns)
-                                {
-                                    columnIndexUser++;
+                foreach (DataGridColumn column in userList.Columns)
+                {
+                    columnIndexUser++;
 
-                                    if (column.SortDirection != null)
-                                    {
-                                        dgSortDirectionUser = column.SortDirection;
-                                        dgSortDescriptionUser = column.SortMemberPath;
+                    if (column.SortDirection != null)
+                    {
+                        dgSortDirectionUser = column.SortDirection;
+                        dgSortDescriptionUser = column.SortMemberPath;
 
-                                        break;
-                                    }
-                                }
-                                try
-                                {
-                                    if (obj != null)
-                                    {
-                                        //int p = (int)previousServer.UserCount + 1;
-                                        //int c = (int) obj.UserCount;
+                        break;
+                    }
+                }
+                try
+                {
+                    if (obj != null)
+                    {
+                        //int p = (int)previousServer.UserCount + 1;
+                        //int c = (int) obj.UserCount;
 
-                                        //if (userList.Items.Count > obj.playersList.Count)
-                                        //{
-                                        //    playernotifier.ShowError("Players Joining DayZ :");
-                                        //}else if (userList.Items.Count < obj.playersList.Count)
-                                        //{
-                                        //    playernotifier.ShowInformation("Players Leaving DayZ");
-                                        //}
+                        //if (userList.Items.Count > obj.playersList.Count)
+                        //{
+                        //    playernotifier.ShowError("Players Joining DayZ :");
+                        //}else if (userList.Items.Count < obj.playersList.Count)
+                        //{
+                        //    playernotifier.ShowInformation("Players Leaving DayZ");
+                        //}
+                        ActiveServerName.Text = obj.ServerName;
+                        userList.ItemsSource = obj.playersList;
+                        //if (copynotifier != null)
+                        //{
+                        // copynotifier.ShowSuccess("Players Joining DayZ");
+                        //}
 
-                                        PlayersView.Filter = item =>
-                                        {
-                                            DataManager.DayZPlayer player = item as DataManager.DayZPlayer; // hope this are your items
-                                            return player.FullIP_Address == obj.FullIP_Address; // or put whatever condition you want
-                                        };
-
-
-                                        //ActiveServerName.Text = obj.ServerName;
-                                        //userList.ItemsSource = obj.playersList;
-                                        //if (copynotifier != null)
-                                        //{
-                                           // copynotifier.ShowSuccess("Players Joining DayZ");
-                                        //}
-                                       
-                                        //layernotifier.ShowError("Players Joining DayZ :");
-                                        //if (previousServer.FullIP_Address != null) { 
-                                        //if (obj.FullIP_Address == previousServer.FullIP_Address &&
-                                        //    c >= p)
-                                        //{
-                                        //    playernotifier.ShowError("Players Joining DayZ :");
-                                        //    previousServer = obj;
-                                        //}
-                                        //    else if (obj.FullIP_Address == previousServer.FullIP_Address &&
-                                        //             c <= p)
-                                        //{
-                                        //    playernotifier.ShowInformation("Players Leaving DayZ");
-                                        //    previousServer = obj;
-                                        //    }
-                                        //}
+                        //layernotifier.ShowError("Players Joining DayZ :");
+                        //if (previousServer.FullIP_Address != null) { 
+                        //if (obj.FullIP_Address == previousServer.FullIP_Address &&
+                        //    c >= p)
+                        //{
+                        //    playernotifier.ShowError("Players Joining DayZ :");
+                        //    previousServer = obj;
+                        //}
+                        //    else if (obj.FullIP_Address == previousServer.FullIP_Address &&
+                        //             c <= p)
+                        //{
+                        //    playernotifier.ShowInformation("Players Leaving DayZ");
+                        //    previousServer = obj;
+                        //    }
+                        //}
 
 
-                                    }
+                    }
 
-                                }
-                                catch (Exception err)
-                                {
-                                    Console.WriteLine(err.Message);
-                                }
-
-
-                                if (!string.IsNullOrEmpty(dgSortDescriptionUser) && dgSortDirectionUser != null)
-                                {
-                                    SortDescription sUser = new SortDescription(dgSortDescriptionUser, dgSortDirectionUser.Value);
-                                    CollectionView viewUser = (CollectionView)CollectionViewSource.GetDefaultView(userList.ItemsSource);
-                                    try
-                                    {
-                                        viewUser.SortDescriptions.Add(sUser);
-                                        userList.Columns[columnIndexUser - 1].SortDirection = dgSortDirectionUser;
-                                    }
-                                    catch (Exception err)
-                                    {
-                                        Console.WriteLine(err.Message);
-
-                                    }
+                }
+                catch (Exception err)
+                {
+                    Console.WriteLine(err.Message);
+                }
 
 
-                                }
+                if (!string.IsNullOrEmpty(dgSortDescriptionUser) && dgSortDirectionUser != null)
+                {
+                    SortDescription sUser = new SortDescription(dgSortDescriptionUser, dgSortDirectionUser.Value);
+                    CollectionView viewUser = (CollectionView)CollectionViewSource.GetDefaultView(userList.ItemsSource);
+                    try
+                    {
+                        viewUser.SortDescriptions.Add(sUser);
+                        userList.Columns[columnIndexUser - 1].SortDirection = dgSortDirectionUser;
+                    }
+                    catch (Exception err)
+                    {
+                        Console.WriteLine(err.Message);
 
-                            }));
+                    }
+
+
+                }
+
+            }));
 
 
         }
