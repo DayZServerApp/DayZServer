@@ -30,8 +30,8 @@ namespace DayZServer
 
         //*****ToDo Try to wire up observable concurrent dictionary correctly
 
-
-
+        
+       
 
 
         Notifier copynotifier = new Notifier(cfg =>
@@ -76,7 +76,7 @@ namespace DayZServer
 
         DispatcherTimer _timer;
         TimeSpan _time;
-       
+        public ICollectionView PlayersView { get; set; }
 
         public ServerHistory()
         {
@@ -97,7 +97,11 @@ namespace DayZServer
             //serverList.ItemsSource = dm.Servers;
             DataContext = this;
             serverList.ItemsSource = dm.Servers;
+            PlayersView = CollectionViewSource.GetDefaultView(dm.Players);
+            userList.ItemsSource = PlayersView;
+
             
+
 
             _time = _measureGap;
             
@@ -111,16 +115,18 @@ namespace DayZServer
                 if (selectedServer.ServerName == null)
                 {
                     selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
-                    updateUserList(selectedServer);
+                    //updateUserList(selectedServer);
 
                 }
 
+               
+
                 //if (_time == TimeSpan.Zero)
                 //{
-                    //_timer.Stop();
-                    //_time = _measureGap;
+                //_timer.Stop();
+                //_time = _measureGap;
 
-                    string dgSortDescription = null;
+                string dgSortDescription = null;
                     string dgRowDescription = null;
                     ListSortDirection? dgSortDirection = null;
                     Visibility? dgVisibility = Visibility.Hidden;
@@ -764,8 +770,16 @@ namespace DayZServer
                                         //{
                                         //    playernotifier.ShowInformation("Players Leaving DayZ");
                                         //}
-                                        ActiveServerName.Text = obj.ServerName;
-                                        userList.ItemsSource = obj.playersList;
+
+                                        PlayersView.Filter = item =>
+                                        {
+                                            DataManager.DayZPlayer player = item as DataManager.DayZPlayer; // hope this are your items
+                                            return player.FullIP_Address == obj.FullIP_Address; // or put whatever condition you want
+                                        };
+
+
+                                        //ActiveServerName.Text = obj.ServerName;
+                                        //userList.ItemsSource = obj.playersList;
                                         //if (copynotifier != null)
                                         //{
                                            // copynotifier.ShowSuccess("Players Joining DayZ");

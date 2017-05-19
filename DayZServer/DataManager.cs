@@ -51,6 +51,7 @@ namespace DayZServer
         public static string tester;
         public static string currentIP;
         public ObservableCollection<Server> Servers = new ObservableCollection<Server>();
+        public ObservableCollection<DayZPlayer> Players = new ObservableCollection<DayZPlayer>();
         public static System.Timers.Timer PingTimer;
         private static System.Timers.Timer PingTimer2;
         static int pingLoopInProgress = 0;
@@ -108,19 +109,19 @@ namespace DayZServer
             public bool Details { get; set; }
 
             private List<DayZPlayer> _playersList;
-            public List<DayZPlayer> playersList
-            {
-                get
-                {
-                    return _playersList;
-                }
-                set
-                {
-                    if (_playersList == value)
-                        return; _playersList = value;
-                    OnPropertyChanged(new PropertyChangedEventArgs("playersList"));
-                }
-            }
+            //public List<DayZPlayer> playersList
+            //{
+            //    get
+            //    {
+            //        return _playersList;
+            //    }
+            //    set
+            //    {
+            //        if (_playersList == value)
+            //            return; _playersList = value;
+            //        OnPropertyChanged(new PropertyChangedEventArgs("playersList"));
+            //    }
+            //}
 
             public bool IsPrivate { get; set; }
             public long MaxPlayers { get; set; }
@@ -133,11 +134,32 @@ namespace DayZServer
             }
         }
 
-        public class DayZPlayer
+        public class DayZPlayer : INotifyPropertyChanged
         {
             public string Name { get; set; }
             public string FullIP_Address { get; set; }
-            public string Time { get; set; }
+
+            private string _Time;
+            public string Time
+            {
+                get
+                {
+                    return _Time;
+                }
+                set
+                {
+                    if (_Time == value)
+                        return; _Time = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("Time"));
+                }
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+            public void OnPropertyChanged(PropertyChangedEventArgs e)
+            {
+                if (PropertyChanged != null)
+                    PropertyChanged(this, e);
+            }
 
         }
 
@@ -265,7 +287,7 @@ namespace DayZServer
             profileServer.MaxPlayers = 0;
             profileServer.QueryPort = 0;
             profileServer.Game_Port = GamePort;
-            profileServer.playersList = null;
+            //profileServer.playersList = null;
             profileServer.Details = false;
         }
 
@@ -308,7 +330,7 @@ namespace DayZServer
                 
                 foreach (Server dayZServer in serverHistory)
                 {
-                        ServerToDictionary(dayZServer);
+                        ServerToCollection(dayZServer);
                 }
             }
             catch (Exception e)
@@ -322,13 +344,19 @@ namespace DayZServer
 
         //need to refactor so there are not two methods here
 
-        private void ServerToDictionary(Server dayZServer)
+        private void ServerToCollection(Server dayZServer)
         {
             // The await causes the handler to return immediately.
-            PushData(dayZServer);
+            PushServer(dayZServer);
         }
 
-        private void PushData(Server dayZServer)
+        private void PlayerToCollection(DayZPlayer dayZPlayer)
+        {
+            // The await causes the handler to return immediately.
+            PushPlayer(dayZPlayer);
+        }
+
+        private void PushServer(Server dayZServer)
         {
             try
             {
@@ -345,7 +373,6 @@ namespace DayZServer
                         serverMatch.UserCount = dayZServer.UserCount;
                         serverMatch.IsPrivate = dayZServer.IsPrivate;
                         serverMatch.MaxPlayers = dayZServer.MaxPlayers;
-                        serverMatch.playersList = dayZServer.playersList;
                         NotifyPropertyChanged("Name");
 
                     });
@@ -356,6 +383,41 @@ namespace DayZServer
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                     {
                         Servers.Add(dayZServer);
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error Pushing Data to Dictionary" + e);
+            }
+
+        }
+
+        private void PushPlayer(DayZPlayer dayZPlayer)
+        {
+            try
+            {
+                DayZPlayer playerMatch = Players.FirstOrDefault(i => i.FullIP_Address == dayZPlayer.FullIP_Address);
+
+                if (playerMatch != null)
+                {
+
+
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                    {
+
+
+                        playerMatch.Time = dayZPlayer.Time;
+                        NotifyPropertyChanged("Name");
+
+                    });
+
+                }
+                else
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                    {
+                        Players.Add(dayZPlayer);
                     });
                 }
             }
@@ -381,27 +443,27 @@ namespace DayZServer
                             if (matchCurrent != null)
                             {
                                 matchCurrent.Current = "0";
-                                await Task.Run(() => ServerToDictionary(matchCurrent));
+                                await Task.Run(() => ServerToCollection(matchCurrent));
                                 await Task.Run(() => UpdateHistory());
                             }
 
                             match.Date = DateTime.Now;
-                            await Task.Run(() => ServerToDictionary(match));
+                            await Task.Run(() => ServerToCollection(match));
                             await Task.Run(() => UpdateHistory());
                         }
                     }
                     else if (matchCurrent != null)
                 {
                     matchCurrent.Current = "0";
-                    await Task.Run(() => ServerToDictionary(matchCurrent));
-                    await Task.Run(() => ServerToDictionary(profileServer));
+                    await Task.Run(() => ServerToCollection(matchCurrent));
+                    await Task.Run(() => ServerToCollection(profileServer));
                     await Task.Run(() => UpdateHistory());
 
                 }
                 else
                 {
                     
-                    await Task.Run(() => ServerToDictionary(profileServer));
+                    await Task.Run(() => ServerToCollection(profileServer));
                     await Task.Run(() => UpdateHistory());
                 }
                         
@@ -592,7 +654,8 @@ namespace DayZServer
                     i.Name = dzPlayer.Name;
                     i.FullIP_Address = dayZServer.FullIP_Address;
                     i.Time = new DateTime(dzPlayer.Time.Ticks).ToString("HH:mm:ss");
-                    playerList.Add(i);
+                    PushPlayer(i);
+                    //playerList.Add(i);
                     //Console.WriteLine("Name : " + dzPlayer.Name + "\nScore : " + dzPlayer.Score + "\nTime : " + dzPlayer.Time + "\nServer : " + serverInfo.Name + "\nUser Count : " + serverInfo.Players + "\nPing : " + serverInfo.Ping);
                 }
             }
@@ -604,8 +667,8 @@ namespace DayZServer
                 dayZServer.IsPrivate = serverInfo.IsPrivate;
                 dayZServer.MaxPlayers = serverInfo.MaxPlayers;
             }
-            dayZServer.playersList = playerList;
-            ServerToDictionary(dayZServer);
+            //dayZServer.playersList = playerList;
+            ServerToCollection(dayZServer);
             
         }
 
@@ -1272,7 +1335,7 @@ namespace DayZServer
                     }
 
 
-                    await Task.Run(() => ServerToDictionary(match));
+                    await Task.Run(() => ServerToCollection(match));
                     await Task.Run(() => UpdateHistory());
                 }
             }
@@ -1485,7 +1548,7 @@ namespace DayZServer
             gtServer.MaxPlayers = 0;
             gtServer.QueryPort = 0;
             gtServer.Game_Port = GamePort;
-            gtServer.playersList = null;
+            //gtServer.playersList = null;
             gtServer.Details = false;
 
 
@@ -1523,12 +1586,12 @@ namespace DayZServer
                                 {
                                     match.Details = false;
                                 }
-                            await Task.Run(() => ServerToDictionary(match));
+                            await Task.Run(() => ServerToCollection(match));
                                 await Task.Run(() => UpdateHistory());
                             }
                             else
                             {
-                                await Task.Run(() => ServerToDictionary(gtServer));
+                                await Task.Run(() => ServerToCollection(gtServer));
                                 await Task.Run(() => UpdateHistory());
                             }
 
@@ -1536,7 +1599,7 @@ namespace DayZServer
 
                 }
                 else {
-                        await Task.Run(() => ServerToDictionary(gtServer));
+                        await Task.Run(() => ServerToCollection(gtServer));
                         await Task.Run(() => UpdateHistory());
                     }
 
