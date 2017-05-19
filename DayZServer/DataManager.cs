@@ -13,15 +13,34 @@ using System.Timers;
 using QueryMaster;
 using System.Threading;
 using System.Security.Permissions;
-
-
+using System.Windows.Data;
+using System.Collections.Specialized;
+using System.Collections;
 
 namespace DayZServer
 {
-
-
-    public class DataManager
+    public static class ExtensionMethods
     {
+        public static int Remove<T>(
+            this ObservableCollection<T> coll, Func<T, bool> condition)
+        {
+            var itemsToRemove = coll.Where(condition).ToList();
+
+            foreach (var itemToRemove in itemsToRemove)
+            {
+                coll.Remove(itemToRemove);
+            }
+
+            return itemsToRemove.Count;
+        }
+    }
+
+    public class DataManager 
+    {
+
+        
+
+
         public string myDocumentsPath;
         public string[] profile;
         public string profilepath;
@@ -56,7 +75,7 @@ namespace DayZServer
         static int pingLoopInProgress = 0;
 
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public static event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String info)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
@@ -490,17 +509,27 @@ namespace DayZServer
             Interlocked.Decrement(ref pingLoopInProgress);
         }
 
-
+        public CancellationTokenSource cts = new CancellationTokenSource();
+        public ParallelOptions po = new ParallelOptions();
         public void getPing()
         {
-            Parallel.ForEach(Servers, new ParallelOptions
-                {
-                    MaxDegreeOfParallelism = 10
-                },
-                dayZServer =>
-                {
-                    QueryServerData(dayZServer);
-                });
+            po.MaxDegreeOfParallelism = 10;
+            po.CancellationToken = cts.Token;
+
+            try
+            {
+                Parallel.ForEach(Servers, po,
+                    dayZServer =>
+                    {
+                        QueryServerData(dayZServer);
+                        //po.CancellationToken.ThrowIfCancellationRequested();
+                    });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Thread Kill Error: " + e);
+            }
+
         }
 
         public async Task QueryServerData(Server dayZServer)
@@ -1292,23 +1321,30 @@ namespace DayZServer
 
                 if (serverMatch != null)
                 {
+                    cts.Cancel();
+                    cts = new CancellationTokenSource();
                     Servers.Remove(serverMatch);
                 }
             }
             catch (ArgumentException e)
             {
+                
                 Console.WriteLine("Exception: " + e);
             }
         }
+
+
 
         public async Task deleteServerHistory()
         {
             try
             {
-                foreach (Server server in Servers)
-                {
-                    Servers.Remove(server);
-                }
+               //foreach (Server server in Servers)
+                //{
+                cts.Cancel();
+                cts = new CancellationTokenSource();
+                Servers.Remove(x => x.Current != "1");
+                //}
                 await Task.Run(() => UpdateHistory());
                 await Task.Run(() => ProfileCheck());
             }
