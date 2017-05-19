@@ -438,14 +438,14 @@
                     <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed" SortDirection="Descending">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding PingSpeed, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding PingSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Players" Width="auto" SortMemberPath="UserCount" IsReadOnly="True" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding UserCount, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting"/>
+                                <TextBlock Text="{Binding UserCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
