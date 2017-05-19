@@ -97,21 +97,28 @@ namespace DayZServer
             //serverList.ItemsSource = dm.Servers;
             DataContext = this;
             serverList.ItemsSource = dm.Servers;
+            
 
             _time = _measureGap;
             
             //_timeset = TimeSpan.FromSeconds(20);
-            _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
+            _timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 8), DispatcherPriority.Background, delegate
             {
                 //this.dateText.Text = DateTime.UtcNow.ToString("HH:mm:ss:fff", CultureInfo.InvariantCulture);
-                this.countdown.Text = _time.ToString(@"ss");
+                //this.countdown.Text = _time.ToString(@"ss");
 
                 Console.WriteLine(_time.ToString());
-
-                if (_time == TimeSpan.Zero)
+                if (selectedServer.ServerName == null)
                 {
-                    _timer.Stop();
-                    _time = _measureGap;
+                    selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+                    updateUserList(selectedServer);
+
+                }
+
+                //if (_time == TimeSpan.Zero)
+                //{
+                    //_timer.Stop();
+                    //_time = _measureGap;
 
                     string dgSortDescription = null;
                     string dgRowDescription = null;
@@ -132,15 +139,11 @@ namespace DayZServer
                             break;
                         }
                     }
+           
+                    //serverList.ItemsSource = dm.Servers;
+                    //serverList.Items.Refresh();
 
-                    serverList.ItemsSource = dm.Servers;
-                    serverList.Items.Refresh();
-                    if (selectedServer.ServerName == null)
-                    {
-                        selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
-
-                    }
-                    updateUserList(selectedServer);
+                    //updateUserList(selectedServer);
 
                     if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
                     {
@@ -149,11 +152,11 @@ namespace DayZServer
                         view.SortDescriptions.Add(s);
                         serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
                     }
-                    _timer.Start();
-                }
-                _time = _time.Add(TimeSpan.FromSeconds(-1));
+                    //_timer.Start();
+                //}
+               // _time = _time.Add(TimeSpan.FromSeconds(-1));
             }, this.Dispatcher);
-            _timer.Start();
+            //_timer.Start();
 
 
         }

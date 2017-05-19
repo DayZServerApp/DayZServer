@@ -438,7 +438,7 @@
                     <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed" SortDirection="Descending">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding PingSpeed}" Foreground="#747576" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PingSpeed, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Foreground" Value="Black"/>

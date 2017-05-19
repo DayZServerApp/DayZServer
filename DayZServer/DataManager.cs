@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,10 +13,13 @@ using System.Timers;
 using QueryMaster;
 using System.Threading;
 using System.Security.Permissions;
-using SteamKit2.Unified.Internal;
 
-namespace DayZServer
+
+
+namespace DayZServer 
 {
+
+
     public class DataManager
     {
         public string myDocumentsPath;
@@ -52,12 +55,16 @@ namespace DayZServer
         private static System.Timers.Timer PingTimer2;
         static int pingLoopInProgress = 0;
 
- 
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(String info)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+        }
 
 
 
-
-        public class Server
+        public class Server : INotifyPropertyChanged
         {
             public string ServerName { get; set; }
             public ushort QueryPort { get; set; }
@@ -67,13 +74,63 @@ namespace DayZServer
             public DateTime Date { get; set; }
             public string Favorite { get; set; }
             public string Current { get; set; }
-            public long PingSpeed { get; set; }
-            public long UserCount { get; set; }
+            private long _PingSpeed;
+            public long PingSpeed
+            {
+                get
+                {
+                    return _PingSpeed;
+                }
+                set
+                {
+                    if (_PingSpeed == value)
+                        return; _PingSpeed = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("PingSpeed"));
+                }
+            }
+
+            private long _UserCount;
+            public long UserCount
+            {
+                get
+                {
+                    return _UserCount;
+                }
+                set
+                {
+                    if (_UserCount == value)
+                        return; _UserCount = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("UserCount"));
+                }
+            }
+
             public int UserTotal { get; set; }
             public bool Details { get; set; }
-            public List<DayZPlayer> playersList { get; set; }
+
+            private List<DayZPlayer> _playersList;
+            public List<DayZPlayer> playersList
+            {
+                get
+                {
+                    return _playersList;
+                }
+                set
+                {
+                    if (_playersList == value)
+                        return; _playersList = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("playersList"));
+                }
+            }
+
             public bool IsPrivate { get; set; }
             public long MaxPlayers { get; set; }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+            public void OnPropertyChanged(PropertyChangedEventArgs e)
+            {
+                if (PropertyChanged != null)
+                    PropertyChanged(this, e);
+            }
         }
 
         public class DayZPlayer
@@ -282,11 +339,15 @@ namespace DayZServer
                     
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                     {
+                    
+                    
                         serverMatch.PingSpeed = dayZServer.PingSpeed;
                         serverMatch.UserCount = dayZServer.UserCount;
                         serverMatch.IsPrivate = dayZServer.IsPrivate;
                         serverMatch.MaxPlayers = dayZServer.MaxPlayers;
                         serverMatch.playersList = dayZServer.playersList;
+                        NotifyPropertyChanged("Name");
+
                     });
                     
                 }

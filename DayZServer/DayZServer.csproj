@@ -132,6 +132,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ObservableConcurrentDictionary.cs" />
+    <Compile Include="OcPropertyChangedListener.cs" />
     <Compile Include="ServerHistory.xaml.cs">
       <DependentUpon>ServerHistory.xaml</DependentUpon>
     </Compile>
