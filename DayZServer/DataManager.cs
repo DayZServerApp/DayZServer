@@ -63,7 +63,7 @@ namespace DayZServer
         public string temphistory;
         public int pingIndex;
         public List<Server> server_list;
-        public List<Server> serverHistory;
+        
         public List<Server> serversList = new List<Server>();
         public List<DayZPlayer> playersList = new List<DayZPlayer>();
         public Server profileServer = new Server();
@@ -73,6 +73,7 @@ namespace DayZServer
         public static System.Timers.Timer PingTimer;
         private static System.Timers.Timer PingTimer2;
         static int pingLoopInProgress = 0;
+        public FileSystemWatcher watcherProfile = new FileSystemWatcher();
 
 
         public static event PropertyChangedEventHandler PropertyChanged;
@@ -92,7 +93,20 @@ namespace DayZServer
             public string FullIP_Address { get; set; }
             public DateTime Date { get; set; }
             public string Favorite { get; set; }
-            public string Current { get; set; }
+            private string _Current;
+            public string Current
+            {
+                get
+                {
+                    return _Current;
+                }
+                set
+                {
+                    if (_Current == value)
+                        return; _Current = value;
+                    OnPropertyChanged(new PropertyChangedEventArgs("Current"));
+                }
+            }
             private long _PingSpeed;
             public long PingSpeed
             {
@@ -272,6 +286,15 @@ namespace DayZServer
                 }
             }
 
+            profileServer.ServerName = null;
+            profileServer.IP_Address = null;
+            profileServer.FullIP_Address = null;
+            profileServer.Favorite = null;
+            profileServer.Current = null;
+            profileServer.Game_Port = null;
+            profileServer.playersList = null;
+
+
             profileServer.ServerName = servername;
             profileServer.IP_Address = IPAddress;
             profileServer.FullIP_Address = FullIPAddress;
@@ -318,6 +341,7 @@ namespace DayZServer
 
             try
             {
+                List<Server> serverHistory = new List<Server>();
                 var fs = new FileStream(serverhistorypath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 var sr = new StreamReader(fs);
                 await Task.Run(() => temphistory = sr.ReadToEnd());
@@ -359,14 +383,12 @@ namespace DayZServer
 
                     System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                     {
-
-
                         serverMatch.PingSpeed = dayZServer.PingSpeed;
                         serverMatch.UserCount = dayZServer.UserCount;
                         serverMatch.IsPrivate = dayZServer.IsPrivate;
                         serverMatch.MaxPlayers = dayZServer.MaxPlayers;
                         serverMatch.playersList = dayZServer.playersList;
-                        NotifyPropertyChanged("Name");
+                        serverMatch.Current = dayZServer.Current;
 
                     });
 
@@ -389,49 +411,225 @@ namespace DayZServer
 
         private async Task ProfileMatch()
         {
+
+
+
+
+
             try
             {
-                Server match = Servers.FirstOrDefault(x => x.IP_Address == profileServer.IP_Address);
-                Server matchCurrent = Servers.FirstOrDefault(x => x.Current == "1");
 
+                Server match = Servers.FirstOrDefault(x => x.IP_Address == profileServer.IP_Address);
+
+                foreach (Server dz in Servers)
+                {
+                    if (dz.Current == "1")
+                    {
+                        dz.Current = "0";
+                        ServerToDictionary(dz);
+                        UpdateHistory();
+                    }
+
+                }
                 if (match != null)
                 {
-                    if (match.Current == "0")
-                    {
-                        if (matchCurrent != null)
-                        {
-                            matchCurrent.Current = "0";
-                            await Task.Run(() => ServerToDictionary(matchCurrent));
-                            await Task.Run(() => UpdateHistory());
-                        }
-
-                        match.Date = DateTime.Now;
-                        await Task.Run(() => ServerToDictionary(match));
-                        await Task.Run(() => UpdateHistory());
-                    }
-                }
-                else if (matchCurrent != null)
-                {
-                    matchCurrent.Current = "0";
-                    await Task.Run(() => ServerToDictionary(matchCurrent));
-                    await Task.Run(() => ServerToDictionary(profileServer));
-                    await Task.Run(() => UpdateHistory());
-
+                    match.Current = "1";
+                    ServerToDictionary(match);
+                    UpdateHistory();
                 }
                 else
                 {
-
-                    await Task.Run(() => ServerToDictionary(profileServer));
-                    await Task.Run(() => UpdateHistory());
+                    ServerToDictionary(profileServer);
+                    UpdateHistory();
                 }
 
+                //    if (match != null)
+                //    {
+                //        if (match.Current == "0")
+                //        {
+                //            Server matchCurrent = Servers.FirstOrDefault(x => x.Current == "1");
+
+                //            if (matchCurrent != null)
+                //            {
+                //                matchCurrent.Current = "0";
+                //                ServerToDictionary(matchCurrent);
+                //                await Task.Run(() => UpdateHistory());
+                //            //PingTimer.Start();
+
+                //        }
+
+                //            match.Date = DateTime.Now;
+                //            match.Current = "1";
+                //            ServerToDictionary(match);
+                //            await Task.Run(() => UpdateHistory());
+                //        //PingTimer.Start();
+                //    }
+                //    }
+                //    else
+                //    {
+                //        Server matchCurrent = Servers.FirstOrDefault(x => x.Current == "1");
+
+                //        if (matchCurrent != null)
+                //        {
+                //            matchCurrent.Current = "0";
+                //        ServerToDictionary(matchCurrent);
+
+                //    }
+                //    ServerToDictionary(profileServer);
+                //        await Task.Run(() => UpdateHistory());
+                //    //PingTimer.Start();
+                //}
 
             }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception" + e);
-            }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception" + e);
+                }
+            
+            
+           
+
+
+
+
+
+
+            //try
+            //{
+            //    if (Servers.Count != 0)
+            //    {
+
+            //        Server serverMatch = Servers.FirstOrDefault(x => x.IP_Address == profileServer.IP_Address);
+            //        Server serverCurrent = Servers.FirstOrDefault(x => x.Current == "1");
+            //        if (serverMatch != null)
+            //        {
+            //            serverCurrent.Current = "0";
+            //            await Task.Run(() => ServerToDictionary(serverCurrent));
+            //            serverMatch.Current = "1";
+            //            await Task.Run(() => ServerToDictionary(serverMatch));
+            //            await Task.Run(() => UpdateHistory());
+            //            PingTimer.Start();
+            //        }
+            //        else
+            //        {
+            //            await Task.Run(() => ServerToDictionary(profileServer));
+            //            await Task.Run(() => UpdateHistory());
+            //            PingTimer.Start();
+            //        }
+
+            //    }
+            //    else
+            //    {
+            //        await Task.Run(() => ServerToDictionary(profileServer));
+            //        await Task.Run(() => UpdateHistory());
+            //        PingTimer.Start();
+
+            //    }
+
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine("Exception Could ProfileMatch: " + e);
+            //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //try
+            //{
+            //    Server currentMatch = Servers.FirstOrDefault(i => i.Current == "1");
+            //    Server serverMatch = Servers.FirstOrDefault(i => i.IP_Address == profileServer.IP_Address);
+
+            //    if (currentMatch != null)
+            //    {
+            //        currentMatch.Current = "0";
+            //        await Task.Run(() => ServerToDictionary(currentMatch));
+            //        await Task.Run(() => UpdateHistory());
+
+            //        if (serverMatch != null)
+            //        {
+            //            serverMatch.Current = "1";
+            //            await Task.Run(() => ServerToDictionary(serverMatch));
+            //            PingTimer.Start();
+            //        }
+
+            //        else
+            //        {
+            //            await Task.Run(() => ServerToDictionary(profileServer));
+            //            PingTimer.Start();
+            //            await Task.Run(() => UpdateHistory());
+            //        }
+            //    }
+            //    else
+            //    {
+            //        await Task.Run(() => ServerToDictionary(profileServer));
+            //        PingTimer.Start();
+            //        await Task.Run(() => UpdateHistory());
+            //    }
+
+
+
+
+
+
+
+
+
+
+
+            //if (serverMatch != null)
+            //{
+            //    if (currentMatch != null)
+            //    {
+            //        currentMatch.Current = "0";
+            //        await Task.Run(() => ServerToDictionary(currentMatch));
+            //        serverMatch.Current = "1";
+            //        await Task.Run(() => ServerToDictionary(serverMatch));
+            //        await Task.Run(() => UpdateHistory());
+            //        PingTimer.Start();
+            //    }
+            //}
+            //else
+            //{
+            //    if (currentMatch != null)
+            //    {
+            //        currentMatch.Current = "0";
+            //        await Task.Run(() => ServerToDictionary(currentMatch));
+            //        await Task.Run(() => ServerToDictionary(serverMatch));
+            //        await Task.Run(() => UpdateHistory());
+            //        PingTimer.Start();
+            //    }
+            //    else
+            //    {
+            //        await Task.Run(() => ServerToDictionary(profileServer));
+            //        await Task.Run(() => UpdateHistory());
+            //        PingTimer.Start();
+            //    }
+            //}
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine("Error Profile Match: " + e);
+            //}
+
         }
+
 
 
         public async Task UpdateHistory()
@@ -442,6 +640,8 @@ namespace DayZServer
             await Task.Run(() => sw.Write(listjson));
             sw.Close();
             fsw.Close();
+            PingTimer.Start();
+            watcherProfile.EnableRaisingEvents = true;
         }
 
 
@@ -449,7 +649,7 @@ namespace DayZServer
         private void WatchProfileChanges()
         {
 
-            FileSystemWatcher watcherProfile = new FileSystemWatcher();
+            
             watcherProfile.Path = directoryPathProfile;
             /* Watch for changes in LastAccess and LastWrite times, and
                the renaming of files or directories. */
@@ -479,9 +679,13 @@ namespace DayZServer
         // Define the event handlers.
         private async void OnProfileChanged(object source, FileSystemEventArgs e)
         {
+            watcherProfile.EnableRaisingEvents = false;
             // Specify what is done when a file is changed, created, or deleted.
             Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
-            await Task.Delay(3000);
+            PingTimer.Stop();
+            cts.Cancel();
+            cts = new CancellationTokenSource();
+            //await Task.Delay(5000);
             ProfileCheck();
         }
 

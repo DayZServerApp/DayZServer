@@ -105,7 +105,8 @@ namespace DayZServer
                 //this.countdown.Text = _time.ToString(@"ss");
 
                 Console.WriteLine(_time.ToString());
-                if (selectedServer.ServerName == null)
+                //selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+                if (selectedServer.Current == null)
                 {
                     selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
                     updateUserList(selectedServer);

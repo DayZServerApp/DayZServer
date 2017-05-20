@@ -7,12 +7,12 @@
         <!--<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>-->
         <Style x:Key="currentText" TargetType="TextBlock">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Current}" Value="True">
+                <DataTrigger Binding="{Binding Current, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
                     <Setter Property="Foreground" Value="Red"/>
 
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding Current}" Value="False">
+                <DataTrigger Binding="{Binding Current, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="False">
                     <Setter Property="Foreground" Value="Green"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -337,7 +337,7 @@
                             <SolidColorBrush x:Key="{x:Static SystemColors.InactiveBorderBrushKey}" Color="Transparent" />
                         </Style.Resources>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Current}" Value="1">
+                            <DataTrigger Binding="{Binding Current, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="1">
                                 <Setter Property="Background" Value="YellowGreen"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -473,14 +473,14 @@
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource deleteStyle}">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Current}" Value="0">
+                                                <DataTrigger Binding="{Binding Current, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="0">
                                                     <Setter Property="Background">
                                                         <Setter.Value>
                                                             <ImageBrush ImageSource="images/deleteoff.png" Stretch="Uniform"/>
                                                         </Setter.Value>
                                                     </Setter>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding Current}" Value="1">
+                                                <DataTrigger Binding="{Binding Current, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="1">
                                                     <Setter Property="Background">
                                                         <Setter.Value>
                                                             <ImageBrush ImageSource="images/deletedisabled.png" Stretch="Uniform"/>
