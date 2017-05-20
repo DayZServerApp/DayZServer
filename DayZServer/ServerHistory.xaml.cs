@@ -24,11 +24,8 @@ using System.Windows.Media.Imaging;
 
 namespace DayZServer
 {
-
     public partial class ServerHistory : Window
     {
-
-
 
         Notifier copynotifier = new Notifier(cfg =>
         {
@@ -60,101 +57,45 @@ namespace DayZServer
             cfg.Dispatcher = Application.Current.Dispatcher;
         });
 
-
-
         public string selectedIP;
         public static DataManager dm = new DataManager();
         public static DataGrid innerDataGrid = new DataGrid();
         public static DataManager.Server selectedServer = new DataManager.Server();
         private TimeSpan _measureGap = TimeSpan.FromSeconds(7);
-
-
-
         DispatcherTimer _timer;
         TimeSpan _time;
-        
 
         public ServerHistory()
         {
             InitializeComponent();
-
-            //checkProfileForNewServerTimer = new System.Timers.Timer(8000);
-            //checkProfileForNewServerTimer.Elapsed += OnNewServerTimedEvent;
-            //checkProfileForNewServerTimer.Enabled = true;
             ActiveServerName.MouseLeftButtonDown += new MouseButtonEventHandler(Hyperlink_RequestNavigate);
-            //steamLogin.Visibility = Visibility.Hidden;
             browse_dialog.Visibility = Visibility.Hidden;
-            //dm.Servers.PropertyChanged += updateServerList(;
             DataManager.PropertyChanged += updateServerList;
             dm.startDataManager();
-            //serverList.RowDetailsVisibilityChanged += serverList_RowDetailsVisibilityChanged;
-
-            //serverList.DataContext = dm.Servers;
-
-            //serverList.ItemsSource = dm.Servers;
             DataContext = this;
             serverList.ItemsSource = dm.Servers;
-
-
+            selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
             _time = _measureGap;
-
-            //_timeset = TimeSpan.FromSeconds(20);
             _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
             {
-                //this.dateText.Text = DateTime.UtcNow.ToString("HH:mm:ss:fff", CultureInfo.InvariantCulture);
-                //this.countdown.Text = _time.ToString(@"ss");
-
-                Console.WriteLine(_time.ToString());
-                //selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
-                if (selectedServer.Current == null)
+                if (selectedServer == null)
                 {
                     selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
                     updateUserList(selectedServer);
-
                 }
 
             if (_time == TimeSpan.Zero)
             {
                 _timer.Stop();
                 _time = _measureGap;
+                selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+                    updateUserList(selectedServer);
 
-                //string dgSortDescription = null;
-                //string dgRowDescription = null;
-                //ListSortDirection? dgSortDirection = null;
-                //Visibility? dgVisibility = Visibility.Hidden;
-                //int columnIndex = 0;
-                //int rowIndex = 0;
-
-                //foreach (DataGridColumn column in serverList.Columns)
-                //{
-                //    columnIndex++;
-
-                //    if (column.SortDirection != null)
-                //    {
-                //        dgSortDirection = column.SortDirection;
-                //        dgSortDescription = column.SortMemberPath;
-
-                //        break;
-                //    }
-                //}
-
-                //serverList.ItemsSource = dm.Servers;
-                //serverList.Items.Refresh();
-
-                updateUserList(selectedServer);
-
-                //if (!string.IsNullOrEmpty(dgSortDescription) && dgSortDirection != null)
-                //{
-                //    SortDescription s = new SortDescription(dgSortDescription, dgSortDirection.Value);
-                //    CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(serverList.ItemsSource);
-                //    view.SortDescriptions.Add(s);
-                //    serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
-                //}
                     _timer.Start();
                 }
                 _time = _time.Add(TimeSpan.FromSeconds(-1));
             }, this.Dispatcher);
-            //_timer.Start();
+           _timer.Start();
 
 
         }
@@ -170,7 +111,6 @@ namespace DayZServer
 
                 OnPropertyChanged(value);
             }
-            //set { DataManager.PingTimer.Interval = TimeSpan.FromMilliseconds(value).TotalMilliseconds; }
 
         }
 
@@ -188,19 +128,14 @@ namespace DayZServer
         {
             Dispatch();
 
-            //serverList.ItemsSource = dm.Servers.Values;
-
-            // Update the UI with results
         }
 
         private void Dispatch()
         {
-
-
             
-            Visibility? dgVisibility = Visibility.Hidden;
-            int columnIndex = 0;
-            int rowIndex = 0;
+            //Visibility? dgVisibility = Visibility.Hidden;
+            //int columnIndex = 0;
+            //int rowIndex = 0;
 
            //foreach (DataGridColumn column in serverList.Columns)
             //{
@@ -230,8 +165,6 @@ namespace DayZServer
             //    serverList.Columns[columnIndex - 1].SortDirection = dgSortDirection;
             //}
 
-
-
         }
 
 
@@ -241,16 +174,11 @@ namespace DayZServer
 
         public void Copy_ServerIP(object sender, RoutedEventArgs e)
         {
-
             DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
             string fullAddress = obj.FullIP_Address;
             Clipboard.SetText(fullAddress);
             copynotifier.ShowSuccess("Copied: " + fullAddress);
-
         }
-
-
-       
 
         private void GT_Click(object sender, RoutedEventArgs e)
         {
@@ -265,14 +193,10 @@ namespace DayZServer
 
         private void player_click(object sender, RoutedEventArgs e)
         {
-
-
             string IP = ((Button)sender).Tag as string;
             string Name = ((Button)sender).Content as string;
             string URL = "http://www.gametracker.com/player/" + Name + "/" + IP + "/";
-
-
-            System.Diagnostics.Process.Start(URL);
+            Process.Start(URL);
         }
 
         private void Join_Click(object sender, RoutedEventArgs e)
@@ -326,7 +250,6 @@ namespace DayZServer
 
         private void favorite_Click(object sender, RoutedEventArgs e)
         {
-
             this.Dispatcher.Invoke((Action)(async () =>
             {
                 DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
@@ -345,11 +268,8 @@ namespace DayZServer
                     fButton.Background = checkoff;
                 }
 
-
-
                 string favoriteServer = obj.FullIP_Address;
                 await dm.updateFavorite(favoriteServer);
-
             }));
         }
 
@@ -362,7 +282,6 @@ namespace DayZServer
                 dm.deleteServer(deleteServer);
 
             }));
-
         }
 
         private void ClearHistory(object sender, RoutedEventArgs e)
@@ -370,7 +289,6 @@ namespace DayZServer
             selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
             updateUserList(selectedServer);
             dm.deleteServerHistory();
-            
         }
 
         public void writeAppPath(string dayzpath)
@@ -383,15 +301,12 @@ namespace DayZServer
 
                 using (StreamWriter sw = File.CreateText(dayzapppath))
                 {
-
                     if (sw.BaseStream != null)
                     {
                         sw.WriteLine(dayzpath);
                         sw.Close();
                     }
-
                 }
-
             }
             catch (Exception)
             {
@@ -416,13 +331,13 @@ namespace DayZServer
                 catch (Exception e)
                 {
                     // Let the user know what went wrong.
-                    string dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
+                    string dayzpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
                     return dayzpath;
                 }
             }
             else
             {
-                string dayzpath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
+                string dayzpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "steam", "SteamApps", "common", "DayZ", "DayZ.exe");
                 writeAppPath(dayzpath);
                 return dayzpath;
             }
@@ -446,6 +361,7 @@ namespace DayZServer
             string path = System.IO.Path.Combine(appDataPath, "DayZServer");
             DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
             string serverIP = obj.IP_Address;
+            string gamePort = obj.Game_Port;
 
             // start the game seperated from this process.
             using (Process game = new Process())
@@ -461,7 +377,7 @@ namespace DayZServer
                         if (IsProcessOpen("DayZ") == false)
                         {
                             ProcessStartInfo startInf = new ProcessStartInfo(dayzpath);
-                            startInf.Arguments = "-connect=" + serverIP;
+                            startInf.Arguments = "-cpuCount=2 -noSplash -exThreads=3 -mod=@cars -connect=" + serverIP + " -port=" + gamePort + "";
                             game.StartInfo = startInf;
                             game.Start();
                         }
@@ -472,7 +388,7 @@ namespace DayZServer
                             {
                                 objProcesses[0].Kill();
                                 ProcessStartInfo startInf = new ProcessStartInfo(dayzpath);
-                                startInf.Arguments = "-connect=" + serverIP;
+                                startInf.Arguments = "-cpuCount=2 -noSplash -exThreads=3 -mod=@cars -connect=" + serverIP + " -port=" + gamePort + "";
                                 game.StartInfo = startInf;
                                 game.Start();
 
@@ -523,124 +439,9 @@ namespace DayZServer
             selectedIP = obj.IP_Address;
             updateUserList(obj);
             selectedServer = obj;
-
-
-
-
-            //for (var vis = sender as Visual; vis != null; vis = VisualTreeHelper.GetParent(vis) as Visual)
-            //    if (vis is DataGridRow)
-            //    {
-            //        var row = (DataGridRow)vis;
-            //        row.DetailsVisibility =
-            //            row.DetailsVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-            //        break;
-            //    }
         }
 
-        //private void server_Details(object sender, RoutedEventArgs e)
-        //{
-        //    string appDataPath = Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
-        //    string path = System.IO.Path.Combine(appDataPath, "DayZServer");
-        //    DataManager.Server obj = ((Button)sender).Tag as DataManager.Server;
-
-
-
-        //    //selectedIP = obj.IP_Address;
-        //    //updateUserList(obj);
-
-        //    for (var vis = sender as Visual; vis != null; vis = VisualTreeHelper.GetParent(vis) as Visual)
-        //        if (vis is DataGridRow)
-        //        {
-        //            var row = (DataGridRow)vis;
-
-        //            if (row.DetailsVisibility == Visibility.Visible)
-        //            {
-        //                obj.Details = false;
-        //                dm.Servers.UpdateWithNotification(obj.IP_Address, obj);
-        //                dm.UpdateHistory();
-        //            }
-        //            else
-        //            {
-        //                obj.Details = true;
-        //                dm.Servers.UpdateWithNotification(obj.IP_Address, obj);
-        //                dm.UpdateHistory();
-        //            }
-        //            break;
-
-        //        }
-        //}
-
-
-
-
-
-        //void serverList_RowDetailsVisibilityChanged(object sender, DataGridRowDetailsEventArgs e)
-        //{
-
-
-        //    innerDataGrid = e.DetailsElement as DataGrid;
-        //    DataManager.Server obj = e.Row.DataContext as DataManager.Server;
-        //    if (obj != null && innerDataGrid != null)
-        //    {
-        //        UpdateUserList(innerDataGrid, obj);
-        //    }
-
-
-        //}
-
-
-        //public void UpdateUserList(DataGrid detailsDataGrid, DataManager.Server obj)
-        //{
-        //    this.Dispatcher.Invoke((Action)(() =>
-        //    {
-        //        string dgSortDescriptionUser = null;
-        //        ListSortDirection? dgSortDirectionUser = null;
-        //        int columnIndexUser = 0;
-
-
-        //        foreach (DataGridColumn column in detailsDataGrid.Columns)
-        //        {
-        //            columnIndexUser++;
-
-        //            if (column.SortDirection != null)
-        //            {
-        //                dgSortDirectionUser = column.SortDirection;
-        //                dgSortDescriptionUser = column.SortMemberPath;
-
-        //                break;
-        //            }
-        //        }
-        //        try
-        //        {
-        //            if (obj != null) { detailsDataGrid.ItemsSource = obj.playersList; }
-
-        //        }
-        //        catch (Exception err)
-        //        {
-        //            Console.WriteLine(err.Message);
-        //        }
-
-
-        //        if (!string.IsNullOrEmpty(dgSortDescriptionUser) && dgSortDirectionUser != null)
-        //        {
-        //            SortDescription sUser = new SortDescription(dgSortDescriptionUser, dgSortDirectionUser.Value);
-        //            CollectionView viewUser = (CollectionView)CollectionViewSource.GetDefaultView(detailsDataGrid.ItemsSource);
-        //            try
-        //            {
-
-        //            }
-        //            catch (Exception err)
-        //            {
-        //                Console.WriteLine(err.Message);
-
-        //            }
-
-
-        //        }
-
-        //    }));
-        //}
-
+       
         private void Hyperlink_RequestNavigate(object sender, MouseButtonEventArgs e)
         {
             string FullIP_Address = selectedServer.FullIP_Address;
@@ -655,11 +456,9 @@ namespace DayZServer
 
             this.Dispatcher.Invoke((Action)(() =>
             {
-
                 string dgSortDescriptionUser = null;
                 ListSortDirection? dgSortDirectionUser = null;
                 int columnIndexUser = 0;
-
 
                 foreach (DataGridColumn column in userList.Columns)
                 {
@@ -677,40 +476,8 @@ namespace DayZServer
                 {
                     if (obj != null)
                     {
-                        //int p = (int)previousServer.UserCount + 1;
-                        //int c = (int) obj.UserCount;
-
-                        //if (userList.Items.Count > obj.playersList.Count)
-                        //{
-                        //    playernotifier.ShowError("Players Joining DayZ :");
-                        //}else if (userList.Items.Count < obj.playersList.Count)
-                        //{
-                        //    playernotifier.ShowInformation("Players Leaving DayZ");
-                        //}
                         ActiveServerName.Text = obj.ServerName;
                         userList.ItemsSource = obj.playersList;
-                        //if (copynotifier != null)
-                        //{
-                        // copynotifier.ShowSuccess("Players Joining DayZ");
-                        //}
-
-                        //layernotifier.ShowError("Players Joining DayZ :");
-                        //if (previousServer.FullIP_Address != null) { 
-                        //if (obj.FullIP_Address == previousServer.FullIP_Address &&
-                        //    c >= p)
-                        //{
-                        //    playernotifier.ShowError("Players Joining DayZ :");
-                        //    previousServer = obj;
-                        //}
-                        //    else if (obj.FullIP_Address == previousServer.FullIP_Address &&
-                        //             c <= p)
-                        //{
-                        //    playernotifier.ShowInformation("Players Leaving DayZ");
-                        //    previousServer = obj;
-                        //    }
-                        //}
-
-
                     }
 
                 }
