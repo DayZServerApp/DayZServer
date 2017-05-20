@@ -388,28 +388,68 @@ namespace DayZServer
             try
             {
                 Server match = Servers.FirstOrDefault(x => x.IP_Address == profileServer.IP_Address);
+                Server current = Servers.FirstOrDefault(x => x.Current == "1");
 
-                foreach (Server dz in Servers)
+
+                if (current != null)
                 {
-                    if (dz.Current == "1")
+                    if(match != null)
                     {
-                        dz.Current = "0";
-                        ServerToDictionary(dz);
+                        if (current.IP_Address == match.IP_Address)
+                        {
+                            current.Date = DateTime.Now;
+                            ServerToDictionary(current);
+                            UpdateHistory();
+                        }
+                        else
+                        {
+                            
+                            current.Current = "0";
+                            ServerToDictionary(current);
+                            ServerToDictionary(profileServer);
+                            UpdateHistory();
+                        }
+                    }
+                    else
+                    {
+                        current.Current = "0";
+                        ServerToDictionary(current);
+                        ServerToDictionary(profileServer);
                         UpdateHistory();
                     }
                 }
-                if (match != null)
-                {
-                    match.Current = "1";
-                    match.Date = DateTime.Now;
-                    ServerToDictionary(match);
-                    UpdateHistory();
-                }
-                else
+                else 
                 {
                     ServerToDictionary(profileServer);
                     UpdateHistory();
                 }
+
+
+
+
+
+
+                //foreach (Server dz in Servers)
+                //{
+                //    if (dz.Current == "1")
+                //    {
+                //        dz.Current = "0";
+                //        ServerToDictionary(dz);
+                //        UpdateHistory();
+                //    }
+                //}
+                //if (match != null)
+                //{
+                //    match.Current = "1";
+                //    match.Date = DateTime.Now;
+                //    ServerToDictionary(match);
+                //    UpdateHistory();
+                //}
+                //else
+                //{
+                //    ServerToDictionary(profileServer);
+                //    UpdateHistory();
+                //}
 
             }
                 catch (Exception e)
@@ -466,7 +506,7 @@ namespace DayZServer
             PingTimer.Stop();
             cts.Cancel();
             cts = new CancellationTokenSource();
-            await Task.Delay(2000);
+            await Task.Delay(5000);
             ProfileCheck();
         }
 

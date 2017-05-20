@@ -74,7 +74,7 @@ namespace DayZServer
             dm.startDataManager();
             DataContext = this;
             serverList.ItemsSource = dm.Servers;
-            selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+            //selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
             _time = _measureGap;
             _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
             {
@@ -88,7 +88,7 @@ namespace DayZServer
             {
                 _timer.Stop();
                 _time = _measureGap;
-                selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+                //selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
                     updateUserList(selectedServer);
 
                     _timer.Start();
