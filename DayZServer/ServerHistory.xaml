@@ -308,7 +308,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Time" SortMemberPath="Name" SortDirection="Ascending" Width="80">
+                    <DataGridTemplateColumn Header="Time" SortMemberPath="Name" Width="80">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Width="80" Height="50" Cursor="Hand" Text="{Binding Time}"  FontSize="16" Foreground="#707071" Background="{x:Null}" Margin="10,20,0,0" />
@@ -320,7 +320,7 @@
         </Border>
 
         <Border Background="White" DockPanel.Dock="Right">
-            <DataGrid  Name="serverList"  EnableColumnVirtualization="True" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}" ItemsSource="{Binding ServerList}" EnableRowVirtualization="True"  SelectedIndex="{Binding AssetMainGridSelectedIndex,Mode=TwoWay}" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
+            <DataGrid  Name="serverList"  EnableColumnVirtualization="True" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}"  EnableRowVirtualization="True"  SelectedIndex="{Binding AssetMainGridSelectedIndex,Mode=TwoWay}" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
                 <DataGrid.CellStyle>
                     <Style TargetType="DataGridCell">
                         <Setter Property="BorderThickness" Value="0"/>
@@ -344,21 +344,21 @@
                     </Style>
                 </DataGrid.RowStyle>
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="55" SortMemberPath="Favorite" SortDirection="Ascending" Header="Favorite">
+                    <DataGridTemplateColumn Width="55" SortMemberPath="Favorite" Header="Favorite">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button x:Name="favoriteButton" Height="32" Click="favorite_Click" Tag="{Binding PresentationTraceSources.TraceLevel=High}" VerticalAlignment="Center" Width="32" Cursor="Hand">
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource firstStyle}">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Favorite }" Value="1">
+                                                <DataTrigger Binding="{Binding Favorite, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="1">
                                                     <Setter Property="Background">
                                                         <Setter.Value >
                                                             <ImageBrush ImageSource="images/checkon.png" Stretch="Uniform"/>
                                                         </Setter.Value>
                                                     </Setter>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding Favorite}" Value="0">
+                                                <DataTrigger Binding="{Binding Favorite, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="0">
                                                     <Setter Property="Background">
                                                         <Setter.Value>
                                                             <ImageBrush ImageSource="images/checkoff.png" Stretch="Uniform"/>
@@ -375,7 +375,7 @@
                     <DataGridTemplateColumn Header="Server Name" Width="auto" SortMemberPath="ServerName" IsReadOnly="True" MinWidth="400">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ServerName}" Foreground="#707071" Cursor="Arrow" FontSize="18" Margin="10" />
+                                <TextBlock Text="{Binding ServerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#707071" Cursor="Arrow" FontSize="18" Margin="10" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -399,7 +399,7 @@
                     <DataGridTemplateColumn Header="IP Address" Width="150" SortMemberPath="IP_Address">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding IP_Address}" Foreground="#747576" Cursor="Arrow" Style="{StaticResource currentText}" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                                <TextBlock Text="{Binding IP_Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" Cursor="Arrow" Style="{StaticResource currentText}" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0"/>
 
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -407,7 +407,7 @@
                     <DataGridTemplateColumn Header="Date" Width="150"  SortMemberPath="Date" SortDirection="Descending">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Date}" Foreground="#747576" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" Cursor="Arrow" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -425,7 +425,7 @@
                                     <Button.Style>
                                         <Style TargetType="Button">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding UserCount}" Value="Unavailable">
+                                                <DataTrigger Binding="{Binding UserCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="Unavailable">
                                                     <Setter Property="Visibility" Value="Hidden" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -435,28 +435,28 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed" SortDirection="Descending">
+                    <DataGridTemplateColumn Header="Ping" Width="80"  SortMemberPath="PingSpeed">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding PingSpeed, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding PingSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" Cursor="AppStarting" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Players" Width="auto" SortMemberPath="UserCount" IsReadOnly="True" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding UserCount, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting"/>
+                                <TextBlock Text="{Binding UserCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Max" Width="auto" SortMemberPath="UserCount" IsReadOnly="True" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding MaxPlayers}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
+                                <TextBlock Text="{Binding MaxPlayers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding MaxPlayers}" Value="Unavailable">
+                                                <DataTrigger Binding="{Binding MaxPlayers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="Unavailable">
                                                     <Setter Property="Cursor" Value="No" />
                                                 </DataTrigger>
                                             </Style.Triggers>

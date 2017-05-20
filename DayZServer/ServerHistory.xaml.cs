@@ -78,18 +78,19 @@ namespace DayZServer
             _time = _measureGap;
             _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
             {
-                if (selectedServer == null)
+                if (string.IsNullOrEmpty(selectedServer.ServerName))
                 {
                     selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
-                    updateUserList(selectedServer);
+                    
                 }
+                updateUserList(selectedServer);
+                
 
-            if (_time == TimeSpan.Zero)
+                if (_time == TimeSpan.Zero)
             {
                 _timer.Stop();
                 _time = _measureGap;
-                //selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
-                    updateUserList(selectedServer);
+
 
                     _timer.Start();
                 }
