@@ -291,7 +291,7 @@ namespace DayZServer
         {
             public string Name { get; set; }
             public string FullIP_Address { get; set; }
-            public string Time { get; set; }
+            public TimeSpan Time { get; set; }
 
         }
 
@@ -745,7 +745,7 @@ namespace DayZServer
                     DayZPlayer i = new DayZPlayer();
                     i.Name = dzPlayer.Name;
                     i.FullIP_Address = dayZServer.FullIP_Address;
-                    i.Time = new DateTime(dzPlayer.Time.Ticks).ToString("HH:mm:ss");
+                    i.Time = dzPlayer.Time;
                     playerList.Add(i);
                     //Console.WriteLine("Name : " + dzPlayer.Name + "\nScore : " + dzPlayer.Score + "\nTime : " + dzPlayer.Time + "\nServer : " + serverInfo.Name + "\nUser Count : " + serverInfo.Players + "\nPing : " + serverInfo.Ping);
                 }

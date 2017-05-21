@@ -301,17 +301,17 @@
                 DockPanel.Dock="Right">
             <DataGrid x:Name="userList" AutoGenerateColumns="False" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader" Background="{x:Null}">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn  Header="Players" SortMemberPath="Name" SortDirection="Ascending" Width="250">
+                    <DataGridTemplateColumn  Header="Players" SortMemberPath="Name"  Width="250">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Click="player_click" Tag="{Binding FullIP_Address}"  Height="50" Cursor="Hand" Content="{Binding Name}" BorderBrush="{x:Null}" FontSize="20" Foreground="#707071" Padding="5,1,0,1" HorizontalContentAlignment="Left" Background="{x:Null}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Time" SortMemberPath="Name" Width="80">
+                    <DataGridTemplateColumn Header="Time" SortMemberPath="Time" SortDirection="Descending" Width="80">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Width="80" Height="50" Cursor="Hand" Text="{Binding Time}"  FontSize="16" Foreground="#707071" Background="{x:Null}" Margin="10,20,0,0" />
+                                <TextBlock Width="80" Height="50" Cursor="Hand" Text="{Binding Time, StringFormat=hh\\:mm\\:ss,TargetNullValue=' --- '}"   FontSize="16" Foreground="#707071" Background="{x:Null}" Margin="10,20,0,0" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
