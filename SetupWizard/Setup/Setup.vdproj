@@ -15,12 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_15717CD036304A3080B13442F2D07110"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_442D0E7458F1BF977E58024427468C67"
         "OwnerKey" = "8:_8FD9822237014450A31740FD3A8C898D"
         "MsmSig" = "8:_UNDEFINED"
@@ -76,19 +70,13 @@
         "Entry"
         {
         "MsmKey" = "8:_9CB2D1ACA1FDCBA284E00DBD97B0CD6C"
-        "OwnerKey" = "8:_15717CD036304A3080B13442F2D07110"
+        "OwnerKey" = "8:_8FD9822237014450A31740FD3A8C898D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_9CB2D1ACA1FDCBA284E00DBD97B0CD6C"
         "OwnerKey" = "8:_DFF81090F2C3C50E0B4996BD5379C4F3"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_9CB2D1ACA1FDCBA284E00DBD97B0CD6C"
-        "OwnerKey" = "8:_8FD9822237014450A31740FD3A8C898D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -112,13 +100,13 @@
         "Entry"
         {
         "MsmKey" = "8:_AF817995AB64EC566A5BE543558DE4AB"
-        "OwnerKey" = "8:_8FD9822237014450A31740FD3A8C898D"
+        "OwnerKey" = "8:_657182F6CE6D4FB3B6EE70A38580EF20"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_AF817995AB64EC566A5BE543558DE4AB"
-        "OwnerKey" = "8:_657182F6CE6D4FB3B6EE70A38580EF20"
+        "OwnerKey" = "8:_8FD9822237014450A31740FD3A8C898D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -142,55 +130,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_DFF81090F2C3C50E0B4996BD5379C4F3"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_AF817995AB64EC566A5BE543558DE4AB"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_933897B56EDD757205E83B4B5E68094A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A115FE4AE89A5C60E11688F9B0FB684E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_442D0E7458F1BF977E58024427468C67"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E28D79AA62B3F46DE0160243EBB14349"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4D929845E4221D54D7EBF5946851D997"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_95BA08417C8330E6790B5ED506709B43"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8FD9822237014450A31740FD3A8C898D"
+        "OwnerKey" = "8:_9CB2D1ACA1FDCBA284E00DBD97B0CD6C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -202,13 +142,55 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9CB2D1ACA1FDCBA284E00DBD97B0CD6C"
+        "OwnerKey" = "8:_8FD9822237014450A31740FD3A8C898D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_15717CD036304A3080B13442F2D07110"
+        "OwnerKey" = "8:_95BA08417C8330E6790B5ED506709B43"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_4D929845E4221D54D7EBF5946851D997"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_E28D79AA62B3F46DE0160243EBB14349"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_442D0E7458F1BF977E58024427468C67"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_A115FE4AE89A5C60E11688F9B0FB684E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_933897B56EDD757205E83B4B5E68094A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_AF817995AB64EC566A5BE543558DE4AB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_DFF81090F2C3C50E0B4996BD5379C4F3"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -313,11 +295,6 @@
             "AssemblyAsmDisplayName" = "8:ToastNotifications, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e89d9d7314a7c797, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_442D0E7458F1BF977E58024427468C67"
-                    {
-                    "Name" = "8:ToastNotifications.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:ToastNotifications.dll"
             "TargetName" = "8:"
@@ -344,11 +321,6 @@
             "AssemblyAsmDisplayName" = "8:protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_4D929845E4221D54D7EBF5946851D997"
-                    {
-                    "Name" = "8:protobuf-net.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:protobuf-net.dll"
             "TargetName" = "8:"
@@ -375,11 +347,6 @@
             "AssemblyAsmDisplayName" = "8:System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_4F5A5134964CBC8DA00CAE3B514E1EBA"
-                    {
-                    "Name" = "8:System.Windows.Interactivity.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Windows.Interactivity.dll"
             "TargetName" = "8:"
@@ -406,11 +373,6 @@
             "AssemblyAsmDisplayName" = "8:System.Windows.Controls.Layout.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_657182F6CE6D4FB3B6EE70A38580EF20"
-                    {
-                    "Name" = "8:System.Windows.Controls.Layout.Toolkit.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Windows.Controls.Layout.Toolkit.dll"
             "TargetName" = "8:"
@@ -437,11 +399,6 @@
             "AssemblyAsmDisplayName" = "8:System.Windows.Controls.Input.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_933897B56EDD757205E83B4B5E68094A"
-                    {
-                    "Name" = "8:System.Windows.Controls.Input.Toolkit.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Windows.Controls.Input.Toolkit.dll"
             "TargetName" = "8:"
@@ -468,11 +425,6 @@
             "AssemblyAsmDisplayName" = "8:Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_95BA08417C8330E6790B5ED506709B43"
-                    {
-                    "Name" = "8:Newtonsoft.Json.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:Newtonsoft.Json.dll"
             "TargetName" = "8:"
@@ -499,11 +451,6 @@
             "AssemblyAsmDisplayName" = "8:Ionic.BZip2, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_9CB2D1ACA1FDCBA284E00DBD97B0CD6C"
-                    {
-                    "Name" = "8:Ionic.BZip2.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:Ionic.BZip2.dll"
             "TargetName" = "8:"
@@ -530,11 +477,6 @@
             "AssemblyAsmDisplayName" = "8:ToastNotifications.Messages, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e89d9d7314a7c797, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_A115FE4AE89A5C60E11688F9B0FB684E"
-                    {
-                    "Name" = "8:ToastNotifications.Messages.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:ToastNotifications.Messages.dll"
             "TargetName" = "8:"
@@ -581,11 +523,6 @@
             "AssemblyAsmDisplayName" = "8:WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_AF817995AB64EC566A5BE543558DE4AB"
-                    {
-                    "Name" = "8:WPFToolkit.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:WPFToolkit.dll"
             "TargetName" = "8:"
@@ -612,11 +549,6 @@
             "AssemblyAsmDisplayName" = "8:QueryMaster, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_DFF81090F2C3C50E0B4996BD5379C4F3"
-                    {
-                    "Name" = "8:QueryMaster.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:QueryMaster.dll"
             "TargetName" = "8:"
@@ -643,11 +575,6 @@
             "AssemblyAsmDisplayName" = "8:SteamKit2, Version=1.6.2.38878, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_E28D79AA62B3F46DE0160243EBB14349"
-                    {
-                    "Name" = "8:SteamKit2.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:SteamKit2.dll"
             "TargetName" = "8:"
@@ -1480,37 +1407,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_15717CD036304A3080B13442F2D07110"
-            {
-            "SourcePath" = "8:..\\..\\DayZServer\\QueryMaster\\obj\\Debug\\QueryMaster.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_AE0DE6D2161F40E6A53A4E8B57D89775"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{4CA9C894-518F-42D7-BBE2-CFDFE7A03F8A}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_8FD9822237014450A31740FD3A8C898D"
             {
-            "SourcePath" = "8:..\\..\\DayZServer\\obj\\Debug\\DayZServer.exe"
+            "SourcePath" = "8:..\\..\\DayZServer\\obj\\Release\\DayZServer.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_AE0DE6D2161F40E6A53A4E8B57D89775"

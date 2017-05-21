@@ -11,6 +11,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
 using QueryMaster;
+using QueryMaster.Utils;
+using QueryMaster.GameServer;
+using QueryMaster.MasterServer;
+using QueryMaster.Steam;
 using System.Threading;
 using System.Security.Permissions;
 using System.Windows.Data;
@@ -666,7 +670,8 @@ namespace DayZServer
 
         public async Task QueryServerData(Server dayZServer)
         {
-            ReadOnlyCollection<Player> players;
+            
+            ReadOnlyCollection<QueryMaster.GameServer.PlayerInfo> players;
             ServerInfo info;
             if (dayZServer.QueryPort == 0)
             {
@@ -698,7 +703,7 @@ namespace DayZServer
 
                                 if (matchCurrent != null)
                                 {
-                                    QueryMaster.Server server = ServerQuery.GetServerInstance(EngineType.Source, serverip, queryportnum);
+                                    QueryMaster.GameServer.Server server = ServerQuery.GetServerInstance(EngineType.Source, serverip, queryportnum);
                                     players = server.GetPlayers();
                                     info = server.GetInfo();
                                     matchCurrent.QueryPort = queryportnum;
@@ -722,7 +727,7 @@ namespace DayZServer
             {
                 try
                 {
-                    QueryMaster.Server server = ServerQuery.GetServerInstance(EngineType.Source, dayZServer.IP_Address, dayZServer.QueryPort);
+                    QueryMaster.GameServer.Server server = ServerQuery.GetServerInstance(EngineType.Source, dayZServer.IP_Address, dayZServer.QueryPort);
                     players = server.GetPlayers();
                     info = server.GetInfo();
                     UpdateServerData(dayZServer, players, info);
@@ -735,12 +740,12 @@ namespace DayZServer
         }
 
 
-        public void UpdateServerData(Server dayZServer, ReadOnlyCollection<Player> playerData, ServerInfo serverInfo)
+        public void UpdateServerData(Server dayZServer, ReadOnlyCollection<QueryMaster.GameServer.PlayerInfo> playerData, ServerInfo serverInfo)
         {
             List<DayZPlayer> playerList = new List<DayZPlayer>();
             if (playerData != null)
             {
-                foreach (Player dzPlayer in playerData)
+                foreach (QueryMaster.GameServer.PlayerInfo dzPlayer in playerData)
                 {
                     DayZPlayer i = new DayZPlayer();
                     i.Name = dzPlayer.Name;

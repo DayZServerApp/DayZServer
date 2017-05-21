@@ -452,18 +452,8 @@
                     <DataGridTemplateColumn Header="Max" Width="auto" SortMemberPath="UserCount" IsReadOnly="True" >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding MaxPlayers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10" Cursor="AppStarting">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding MaxPlayers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="Unavailable">
-                                                    <Setter Property="Cursor" Value="No" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
+                                <TextBlock Text="{Binding MaxPlayers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#747576" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="10"/>
+                        </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn Width="55">
