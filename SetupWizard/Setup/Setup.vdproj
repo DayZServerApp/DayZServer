@@ -724,7 +724,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DayZ Server History"
         "ProductCode" = "8:{3BFD6CBA-91BB-49BF-B583-C0E006A8B2F9}"
-        "PackageCode" = "8:{B2D1C711-789C-46C4-91AD-49D3E92D11ED}"
+        "PackageCode" = "8:{97E31841-9103-4ACC-BD06-5749B04B5275}"
         "UpgradeCode" = "8:{82EDF2F8-3DB3-4A25-81BF-5BE52B2D8577}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1223,8 +1223,8 @@
                             "Type" = "3:3"
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
-                            "Setting" = "3:1"
-                            "Value" = "8:#1246"
+                            "Setting" = "3:2"
+                            "Value" = "8:The MIT License"
                             "DefaultValue" = "8:#1246"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1482,7 +1482,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_15717CD036304A3080B13442F2D07110"
             {
-            "SourcePath" = "8:..\\..\\DayZServer\\QueryMaster\\obj\\Release\\QueryMaster.dll"
+            "SourcePath" = "8:..\\..\\DayZServer\\QueryMaster\\obj\\Debug\\QueryMaster.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_AE0DE6D2161F40E6A53A4E8B57D89775"
@@ -1510,7 +1510,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_8FD9822237014450A31740FD3A8C898D"
             {
-            "SourcePath" = "8:..\\..\\DayZServer\\obj\\Release\\DayZServer.exe"
+            "SourcePath" = "8:..\\..\\DayZServer\\obj\\Debug\\DayZServer.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_AE0DE6D2161F40E6A53A4E8B57D89775"
