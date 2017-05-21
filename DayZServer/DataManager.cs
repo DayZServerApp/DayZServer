@@ -62,21 +62,23 @@ namespace DayZServer
         public List<Server> serversList = new List<Server>();
         public List<DayZPlayer> playersList = new List<DayZPlayer>();
         
+
         public static string tester;
         public static string currentIP;
-        public ObservableCollection<Server> Servers = new ObservableCollection<Server>();
+        //public ObservableCollection<Server> Servers = new ObservableCollection<Server>();
         public static System.Timers.Timer PingTimer;
         private static System.Timers.Timer PingTimer2;
         static int pingLoopInProgress = 0;
         public FileSystemWatcher watcherProfile = new FileSystemWatcher();
+        public ObservableCollection<Server> Servers { get; set; }
+        
 
-
-        public static event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String info)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
-        }
-
+        //public static event PropertyChangedEventHandler PropertyChanged;
+        //private void NotifyPropertyChanged(String info)
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+        //}
+       
         public class Server : INotifyPropertyChanged
         {
             private string _ServerName;
@@ -280,6 +282,11 @@ namespace DayZServer
             }
         }
 
+
+
+
+       
+
         public class DayZPlayer
         {
             public string Name { get; set; }
@@ -332,7 +339,7 @@ namespace DayZServer
 
         public DataManager()
         {
-
+            Servers = new ObservableCollection<Server>();
         }
 
 

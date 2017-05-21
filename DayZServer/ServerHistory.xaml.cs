@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -60,20 +61,81 @@ namespace DayZServer
         public string selectedIP;
         public static DataManager dm = new DataManager();
         public static DataGrid innerDataGrid = new DataGrid();
-        public static DataManager.Server selectedServer = new DataManager.Server();
+        public DataManager.Server selectedServer = new DataManager.Server();
+        //public ObservableCollection<DataManager.Server> Servers = new ObservableCollection<DataManager.Server>();
+
         private TimeSpan _measureGap = TimeSpan.FromSeconds(7);
         DispatcherTimer _timer;
         TimeSpan _time;
 
+        //private void intList_Changed(object sender, PropertyChangedEventArgs e)
+        //{
+        //    if (e.PropertyName == "Current")
+        //    {
+                
+        //        selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+        //        updateUserList(selectedServer);
+        //    }
+           
+        //}
+        public void items_CollectionChanged(object sender,
+            System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                //your code
+                selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+                updateUserList(selectedServer);
+            }
+            if(e.OldItems != null) { 
+            
+            foreach (INotifyPropertyChanged item in e.OldItems)
+                item.PropertyChanged -= new
+                    PropertyChangedEventHandler(item_PropertyChanged);
+            
+        }
+            if (e.NewItems != null)
+            {
+
+                foreach (INotifyPropertyChanged item in e.NewItems)
+                    item.PropertyChanged +=
+                        new PropertyChangedEventHandler(item_PropertyChanged);
+            }
+        }
+
+        public void item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Current")
+               {
+
+                   selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+                   updateUserList(selectedServer);
+                }
+            //if (e.PropertyName == "PingSpeed")
+            //{
+
+                
+            //}
+        }
         public ServerHistory()
         {
             InitializeComponent();
             ActiveServerName.MouseLeftButtonDown += new MouseButtonEventHandler(Hyperlink_RequestNavigate);
             browse_dialog.Visibility = Visibility.Hidden;
-            DataManager.PropertyChanged += updateServerList;
             dm.startDataManager();
+            //dm.Servers.CollectionChanged += CollectionChangedMethod;
+            //((INotifyPropertyChanged)Servers).PropertyChanged +=
+            //    new PropertyChangedEventHandler(intList_Changed);
+            
+
+
             DataContext = this;
             serverList.ItemsSource = dm.Servers;
+            ObservableCollection<INotifyPropertyChanged> items =
+                new ObservableCollection<INotifyPropertyChanged>();
+            dm.Servers.CollectionChanged +=
+                new System.Collections.Specialized.NotifyCollectionChangedEventHandler(
+                    items_CollectionChanged);
             //selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
             _time = _measureGap;
             _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
@@ -101,7 +163,35 @@ namespace DayZServer
 
         }
 
+       
 
+
+
+
+        //private void CollectionChangedMethod(object sender, NotifyCollectionChangedEventArgs e)
+        //{
+
+
+        //    //different kind of changes that may have occurred in collection
+        //    if (e.Action == NotifyCollectionChangedAction.Add)
+        //    {
+        //        //your code
+        //        selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
+        //        updateUserList(selectedServer);
+        //    }
+        //    if (e.Action == NotifyCollectionChangedAction.Replace)
+        //    {
+        //        //your code
+        //    }
+        //    if (e.Action == NotifyCollectionChangedAction.Remove)
+        //    {
+        //        //your code
+        //    }
+        //    if (e.Action == NotifyCollectionChangedAction.Move)
+        //    {
+        //        //your code
+        //    }
+        //}
 
         public double MeasureGap
         {
