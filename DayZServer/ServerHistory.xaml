@@ -31,6 +31,11 @@
             </Setter>
         </Style>
 
+        <Style x:Key="ItemTextBlockEventSetterStyle" TargetType="{x:Type TextBlock}">
+            <EventSetter Event="MouseLeftButtonDown" 
+                         Handler="ServerHyperlink_RequestNavigate"/>
+        </Style>
+
         <Style x:Key="SliderRepeatButton1" TargetType="RepeatButton">
             <Setter Property="SnapsToDevicePixels" Value="true" />
             <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -320,7 +325,7 @@
         </Border>
 
         <Border Background="White" DockPanel.Dock="Right">
-            <DataGrid  Name="serverList"  EnableColumnVirtualization="True" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}"  EnableRowVirtualization="True"  SelectedIndex="{Binding AssetMainGridSelectedIndex,Mode=TwoWay}" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
+            <DataGrid  Name="serverList"   EnableColumnVirtualization="True" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}"  EnableRowVirtualization="True"  SelectedIndex="{Binding AssetMainGridSelectedIndex,Mode=TwoWay}" CanUserAddRows="False"  GridLinesVisibility="None" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserResizeRows="False" CanUserSortColumns="True" BorderBrush="{x:Null}" DockPanel.Dock="Top" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" SelectionMode="Single" SelectionUnit="CellOrRowHeader">
                 <DataGrid.CellStyle>
                     <Style TargetType="DataGridCell">
                         <Setter Property="BorderThickness" Value="0"/>
@@ -375,7 +380,7 @@
                     <DataGridTemplateColumn Header="Server Name" Width="auto" SortMemberPath="ServerName" IsReadOnly="True" MinWidth="400">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ServerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="#707071" Cursor="Arrow" FontSize="18" Margin="10" />
+                                <TextBlock Text="{Binding ServerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Tag="{Binding}"  Style="{StaticResource ItemTextBlockEventSetterStyle}" Name="ServerNameText"  Foreground="#707071" Cursor="Hand"  FontSize="18" Margin="10"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using ToastNotifications;
 using ToastNotifications.Lifetime;
 using ToastNotifications.Messages;
@@ -22,6 +23,7 @@ using ToastNotifications.Position;
 using System.Windows.Threading;
 using System.Windows.Navigation;
 using System.Windows.Media.Imaging;
+using Microsoft.Windows.Controls.Primitives;
 
 namespace DayZServer
 {
@@ -536,6 +538,24 @@ namespace DayZServer
         private void Hyperlink_RequestNavigate(object sender, MouseButtonEventArgs e)
         {
             string FullIP_Address = selectedServer.FullIP_Address;
+            string URL = "https://www.gametracker.com/server_info/" + FullIP_Address + "/";
+            Process.Start(URL);
+        }
+
+        private void ServerHyperlink_RequestNavigate(object sender, MouseButtonEventArgs e)
+        {
+            DataManager.Server obj = ((TextBlock)sender).Tag as DataManager.Server;
+            string FullIP_Address = obj.FullIP_Address;
+            string URL = "https://www.gametracker.com/server_info/" + FullIP_Address + "/";
+            Process.Start(URL);
+        }
+
+
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            DataManager.Server obj = ((Hyperlink)sender).Tag as DataManager.Server;
+            string FullIP_Address = obj.FullIP_Address;
             string URL = "https://www.gametracker.com/server_info/" + FullIP_Address + "/";
             Process.Start(URL);
         }
