@@ -69,6 +69,7 @@ Source code is C# .Net developed using Visual Studio 2015
 ## History
 
 Release 2.0 
+Release 1.3
 
 ## Credits
 
