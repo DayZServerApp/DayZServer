@@ -77,6 +77,8 @@ VectorG7 <a href="http://steamcommunity.com/id/VG7/" target="_blank">Join me on 
 
 AeroXbird - Kick started the Join server functionality
 
+## Virus Check
+https://www.virustotal.com/en/file/8097fa15731de543ca69d167059cf16b460b604003e29386e6fbcdf1c71a44d6/analysis/1495425508/
 
 ## License
 
