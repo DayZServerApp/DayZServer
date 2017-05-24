@@ -284,6 +284,12 @@ namespace DayZServer
             System.Diagnostics.Process.Start(URL);
         }
 
+        private void Map_Click(object sender, RoutedEventArgs e)
+        {
+            Map map = new Map();
+            map.ShowDialog();
+        }
+
         private void player_click(object sender, RoutedEventArgs e)
         {
             string IP = ((Button)sender).Tag as string;

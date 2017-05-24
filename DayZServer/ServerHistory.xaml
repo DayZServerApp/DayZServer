@@ -271,7 +271,7 @@
                     <Button  ToolTip="DayZServer" Click="Link_Click" Tag="https://github.com/DayZServerApp/DayZServer/releases" Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,139,0" >
                         <Image Source="images/button.png" Height="48"/>
                     </Button>
-                    <Button Click="Link_Click" Tag="http://www.izurvive.com/" ToolTip="Map"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,1,188,-1" >
+                    <Button Click="Map_Click" Tag="http://www.izurvive.com/" ToolTip="Map"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,1,188,-1" >
                         <Image Source="images/appicon.png" Width="75" Height="44" />
                     </Button>
                     <Button Click="ClearHistory" ToolTip="Clear All Servers" Width="46"  Cursor="Hand" Background="{x:Null}" BorderBrush="{x:Null}" HorizontalAlignment="Right" Margin="0,0,301,0">

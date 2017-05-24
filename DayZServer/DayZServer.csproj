@@ -127,6 +127,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DataManager.cs" />
+    <Compile Include="Map.xaml.cs">
+      <DependentUpon>Map.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OcPropertyChangedListener.cs" />
     <Compile Include="ServerHistory.xaml.cs">
       <DependentUpon>ServerHistory.xaml</DependentUpon>
@@ -136,6 +139,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Map.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ServerHistory.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
