@@ -23,7 +23,7 @@ using ToastNotifications.Position;
 using System.Windows.Threading;
 using System.Windows.Navigation;
 using System.Windows.Media.Imaging;
-using Microsoft.Windows.Controls.Primitives;
+
 
 namespace DayZServer
 {
@@ -34,9 +34,9 @@ namespace DayZServer
         {
             cfg.PositionProvider = new WindowPositionProvider(
                 parentWindow: Application.Current.MainWindow,
-                corner: Corner.TopLeft,
-                offsetX: 550,
-                offsetY: 29);
+                corner: Corner.BottomLeft,
+                offsetX: 500,
+                offsetY: 16);
 
             cfg.LifetimeSupervisor = new TimeAndCountBasedLifetimeSupervisor(
                 notificationLifetime: TimeSpan.FromSeconds(3),
