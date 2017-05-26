@@ -123,9 +123,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DataManager.cs" />
-    <Compile Include="Map.xaml.cs">
-      <DependentUpon>Map.xaml</DependentUpon>
-    </Compile>
     <Compile Include="OcPropertyChangedListener.cs" />
     <Compile Include="ServerHistory.xaml.cs">
       <DependentUpon>ServerHistory.xaml</DependentUpon>
@@ -135,10 +132,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Map.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="ServerHistory.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -255,14 +248,6 @@
     <Resource Include="images\screenshot2_2sm.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="HelixToolkit.Wpf\HelixToolkit.Wpf.csproj">
-      <Project>{3f3b4548-a9db-4874-86f7-e7c4fec8a351}</Project>
-      <Name>HelixToolkit.Wpf</Name>
-    </ProjectReference>
-    <ProjectReference Include="HelixToolkit\HelixToolkit.csproj">
-      <Project>{7c0e987e-cc34-4b19-ba6b-b381aeabb530}</Project>
-      <Name>HelixToolkit</Name>
-    </ProjectReference>
     <ProjectReference Include="QueryMaster\QueryMaster\QueryMaster.csproj">
       <Project>{4ca9c894-518f-42d7-bbe2-cfdfe7a03f8a}</Project>
       <Name>QueryMaster</Name>

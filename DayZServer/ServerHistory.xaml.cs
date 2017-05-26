@@ -142,7 +142,7 @@ namespace DayZServer
             _time = _measureGap;
             _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Background, delegate
             {
-                if (string.IsNullOrEmpty(selectedServer.ServerName))
+                if (selectedServer == null)
                 {
                     selectedServer = dm.Servers.FirstOrDefault(x => x.Current == "1");
                     
@@ -286,8 +286,8 @@ namespace DayZServer
 
         private void Map_Click(object sender, RoutedEventArgs e)
         {
-            Map map = new Map();
-            map.ShowDialog();
+            //Map map = new Map();
+            //map.ShowDialog();
         }
 
         private void player_click(object sender, RoutedEventArgs e)
