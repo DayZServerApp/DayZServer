@@ -21,6 +21,8 @@ using System.Windows.Data;
 using System.Collections.Specialized;
 using System.Collections;
 
+
+
 namespace DayZServer
 {
     public static class ExtensionMethods
@@ -65,6 +67,7 @@ namespace DayZServer
         public List<Server> server_list;
         public List<Server> serversList = new List<Server>();
         public List<DayZPlayer> playersList = new List<DayZPlayer>();
+
         
 
         public static string tester;
@@ -375,7 +378,7 @@ namespace DayZServer
             FullIPAddress = DayZProfile.Split(new string[] { "lastMPServer=\"" }, StringSplitOptions.None)[1].Split(new string[] { "\";" }, StringSplitOptions.None)[0].Trim();
             GamePort = FullIPAddress.Substring(FullIPAddress.LastIndexOf(':') + 1);
             IPAddress = FullIPAddress.Substring(0, FullIPAddress.LastIndexOf(":"));
-            version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
+            //version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
 
             bool result = !IPAddress.Any(x => char.IsLetter(x));
             if (!result)
@@ -527,20 +530,17 @@ namespace DayZServer
             try
             {
                 Server profileServer = CheckingProfile();
-                Server match = Servers.FirstOrDefault(x => x.FullIP_Address == profileServer.FullIP_Address);
+                //Server match = Servers.FirstOrDefault(x => x.FullIP_Address == profileServer.FullIP_Address);
                 Server current = Servers.FirstOrDefault(x => x.Current == "1");
 
+
+
                 if (current != null)
-                {
-                    if (match != null)
+                { 
+                    if (current.FullIP_Address != profileServer.FullIP_Address || current.ServerName != profileServer.ServerName)
                     {
-                        if (current.FullIP_Address == match.FullIP_Address)
-                        {
-                            current.Date = DateTime.Now;
-                            ServerToDictionary(current);
-                            UpdateHistory();
-                        }
-                        else
+                        Server match = Servers.FirstOrDefault(x => x.ServerName == profileServer.ServerName);
+                        if (match != null)
                         {
                             current.Current = "0";
                             match.Current = "1";
@@ -549,13 +549,12 @@ namespace DayZServer
                             ServerToDictionary(match);
                             UpdateHistory();
                         }
+                       
                     }
                     else
                     {
-                        current.Current = "0";
+                        current.Date = DateTime.Now;
                         ServerToDictionary(current);
-                        System.Threading.Thread.Sleep(3000);
-                        ServerToDictionary(profileServer);
                         UpdateHistory();
                     }
                 }
@@ -564,6 +563,41 @@ namespace DayZServer
                     ServerToDictionary(profileServer);
                     UpdateHistory();
                 }
+
+                //    if (current != null)
+                //{
+                //    if (match != null)
+                //    {
+                //        if (current.FullIP_Address == match.FullIP_Address)
+                //        {
+                //            current.Date = DateTime.Now;
+                //            ServerToDictionary(current);
+                //            UpdateHistory();
+                //        }
+                //        else
+                //        {
+                //            current.Current = "0";
+                //            match.Current = "1";
+                //            match.Date = DateTime.Now;
+                //            ServerToDictionary(current);
+                //            ServerToDictionary(match);
+                //            UpdateHistory();
+                //        }
+                //    }
+                //    else
+                //    {
+                //        current.Current = "0";
+                //        ServerToDictionary(current);
+                //        System.Threading.Thread.Sleep(3000);
+                //        ServerToDictionary(profileServer);
+                //        UpdateHistory();
+                //    }
+                //}
+                //else
+                //{
+                //    ServerToDictionary(profileServer);
+                //    UpdateHistory();
+                //}
 
 
             }
@@ -620,8 +654,8 @@ namespace DayZServer
             Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
             PingTimer.Stop();
             cts.Cancel();
-            cts = new CancellationTokenSource();
-            ProfileMatch();
+            cts = new CancellationTokenSource();            
+                ProfileMatch();           
         }
 
         private void OnProfileRenamed(object source, RenamedEventArgs e)
@@ -748,7 +782,15 @@ namespace DayZServer
                 foreach (QueryMaster.GameServer.PlayerInfo dzPlayer in playerData)
                 {
                     DayZPlayer i = new DayZPlayer();
-                    i.Name = dzPlayer.Name;
+                    if (string.IsNullOrEmpty(dzPlayer.Name))
+                    {
+                        i.Name = "Name Unavailable";
+                    }
+                    else
+                    {
+                        i.Name = dzPlayer.Name;
+                    }
+
                     i.FullIP_Address = dayZServer.FullIP_Address;
                     i.Time = dzPlayer.Time;
                     playerList.Add(i);
@@ -798,7 +840,7 @@ namespace DayZServer
                 await Task.Run(() => Directory.CreateDirectory(myDocumentsPath));
                 string dummyProfileDirectory = Path.Combine(Environment.CurrentDirectory, @"Profile\");
                 await Task.Run(() => ExtractEmbeddedResource(myDocumentsPath, "DayZServer", "VG7.DayZProfile"));
-                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars")).ToArray();
+                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars") || !f.Contains("chars")).ToArray();
                 if (profile != null)
                 {
                     profilepath = profile[0];
@@ -808,10 +850,10 @@ namespace DayZServer
             }
             else
             {
-                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars")).ToArray();
+                profile = Directory.GetFiles(myDocumentsPath, "*.DayZProfile").Where(f => !f.Contains("vars") || !f.Contains("chars")).ToArray();
                 if (profile != null)
                 {
-                    profilepath = profile[0];
+                    profilepath = profile[1];
                     fileNameProfile = new FileInfo(profilepath).Name;
                     directoryPathProfile = new FileInfo(profilepath).Directory.FullName;
                 }
@@ -890,12 +932,22 @@ namespace DayZServer
             {
                 Server serverMatch = Servers.FirstOrDefault(i => i.IP_Address == IP_Address);
 
-                if (serverMatch != null)
+               
+
+
+
+                if (serverMatch.Current == "0")
+                {
+                   
+                    if (serverMatch != null)
                 {
                     cts.Cancel();
                     cts = new CancellationTokenSource();
                     Servers.Remove(serverMatch);
+                    ProfileMatch();
+                    UpdateHistory();
                 }
+            }
             }
             catch (ArgumentException e)
             {
@@ -930,62 +982,78 @@ namespace DayZServer
             string _UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
             webClient.Headers["Accept"] = "application/x-ms-application, image/jpeg, application/xaml+xml, image/gif, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*";
             webClient.Headers["User-Agent"] = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; MDDC)";
-            data = await webClient.DownloadDataTaskAsync(new Uri("https://www.gametracker.com/search/dayz/US/?sort=3&order=DESC&searchipp=50", UriKind.Absolute));
-            string result = System.Text.Encoding.UTF8.GetString(data);
 
-            Match m2 = Regex.Match(result, "(?<=Server Map).*?(?=Server Map)", RegexOptions.Singleline);
-            if (m2.Success)
+            try
             {
-                result = m2.ToString();
-            }
-            else
-            {
-                result = "<td><a href=\"/search/dayz/600/\"><img src=\"/images/game_icons16/dayz.png\" alt=\"DAYZ\"/></a></td><td><a class=\"c03serverlink\" href=\"/server_info/216.244.78.242:2802/\">\\DG Clan - SUPERSHARD #1 \\ Unlocked \\ High Loot \\ 24/7 day</a><a href=\"javascript:showPopupExternalLink('gt://joinGame:game=dayz&amp;ip=216.244.78.242&amp;port=2802');\"><img src=\"/images/global/btn_join.png\" alt=\"Join\"/></a></td><td>5/50</td><td></td><td><a href=\"/search/dayz/US/\"><img src=\"/images/flags/us.gif\" alt=\"\" class=\"item_16x11\"/></a></td><td><span class=\"ip\">216.244.78.242</span><span class=\"port\">:2802</span></td><td>DayZ_Auto</td>";
-            }
-            List<DayZPlayer> GTlist = new List<DayZPlayer>();
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+                       | SecurityProtocolType.Tls11
+                       | SecurityProtocolType.Tls12
+                       | SecurityProtocolType.Ssl3;
 
-            // 1.
-            // Find all matches in file.
-            MatchCollection m1 = Regex.Matches(result, @"(<a.*?>.*?</a>)",
-                RegexOptions.Singleline);
+                data = await webClient.DownloadDataTaskAsync(new Uri("https://www.gametracker.com/search/dayz/US/?sort=3&order=DESC&searchipp=50", UriKind.Absolute));
 
-            // 2.
-            // Loop over each match.
-            foreach (Match m in m1)
-            {
-                string value = m.Groups[1].Value;
-                DayZPlayer i = new DayZPlayer();
+                string result = System.Text.Encoding.UTF8.GetString(data);
 
-                // 3.
-                // Get href attribute.
-                Match m3 = Regex.Match(value, "href=\"/server_info/" + "(.*?)" + "/\"",
+                Match m2 = Regex.Match(result, "(?<=Server Map).*?(?=Server Map)", RegexOptions.Singleline);
+                if (m2.Success)
+                {
+                    result = m2.ToString();
+                }
+                else
+                {
+                    result = "<td><a href=\"/search/dayz/600/\"><img src=\"/images/game_icons16/dayz.png\" alt=\"DAYZ\"/></a></td><td><a class=\"c03serverlink\" href=\"/server_info/216.244.78.242:2802/\">\\DG Clan - SUPERSHARD #1 \\ Unlocked \\ High Loot \\ 24/7 day</a><a href=\"javascript:showPopupExternalLink('gt://joinGame:game=dayz&amp;ip=216.244.78.242&amp;port=2802');\"><img src=\"/images/global/btn_join.png\" alt=\"Join\"/></a></td><td>5/50</td><td></td><td><a href=\"/search/dayz/US/\"><img src=\"/images/flags/us.gif\" alt=\"\" class=\"item_16x11\"/></a></td><td><span class=\"ip\">216.244.78.242</span><span class=\"port\">:2802</span></td><td>DayZ_Auto</td>";
+                }
+                List<DayZPlayer> GTlist = new List<DayZPlayer>();
+
+                // 1.
+                // Find all matches in file.
+                MatchCollection m1 = Regex.Matches(result, @"(<a.*?>.*?</a>)",
                     RegexOptions.Singleline);
 
-                if (m3.Success)
+                // 2.
+                // Loop over each match.
+                foreach (Match m in m1)
                 {
-                    i.FullIP_Address = m3.Groups[1].Value.ToString();
+                    string value = m.Groups[1].Value;
+                    DayZPlayer i = new DayZPlayer();
+
+                    // 3.
+                    // Get href attribute.
+                    Match m3 = Regex.Match(value, "href=\"/server_info/" + "(.*?)" + "/\"",
+                        RegexOptions.Singleline);
+
+                    if (m3.Success)
+                    {
+                        i.FullIP_Address = m3.Groups[1].Value.ToString();
+                    }
+
+                    // 4.
+                    // Remove inner tags from text.
+                    string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
+                        RegexOptions.Singleline);
+                    i.Name = t;
+                    if (i.FullIP_Address == null) continue;
+                    GTlist.Add(i);
                 }
+                Console.WriteLine("Servers" + GTlist);
 
-                // 4.
-                // Remove inner tags from text.
-                string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
-                    RegexOptions.Singleline);
-                i.Name = t;
-                if (i.FullIP_Address == null) continue;
-                GTlist.Add(i);
+                foreach (DayZPlayer GTServer in GTlist)
+                {
+                    bool serverdata = !GTServer.FullIP_Address.Any(x => char.IsLetter(x));
+                    if (!serverdata)
+                    {
+                        continue;
+                    }
+
+                    await Task.Run(() => writeGTList(GTServer.Name, GTServer.FullIP_Address));
+                }
             }
-            Console.WriteLine("Servers" + GTlist);
-
-            foreach (DayZPlayer GTServer in GTlist)
+            catch (WebException ex)
             {
-                bool serverdata = !GTServer.FullIP_Address.Any(x => char.IsLetter(x));
-                if (!serverdata)
-                {
-                    continue;
-                }
-
-                await Task.Run(() => writeGTList(GTServer.Name, GTServer.FullIP_Address));
+                Console.WriteLine("Exception" + ex);
             }
+            
         }
 
         public async Task writeGTList(string serverName, string fullIPAdress)
@@ -995,7 +1063,7 @@ namespace DayZServer
             FullIPAddress = fullIPAdress;
             GamePort = FullIPAddress.Substring(FullIPAddress.LastIndexOf(':') + 1);
             IPAddress = FullIPAddress.Substring(0, FullIPAddress.LastIndexOf(":"));
-            version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
+            //version = DayZProfile.Split(new string[] { "version=" }, StringSplitOptions.None)[1].Split(new string[] { ";" }, StringSplitOptions.None)[0].Trim();
 
             gtServer.ServerName = servername;
             gtServer.IP_Address = IPAddress;
