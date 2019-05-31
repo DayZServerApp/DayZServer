@@ -6,6 +6,7 @@
 ![dayzserver1 3](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot2_2sm.png)
 
 **This version is packed full of features including:**
+-  :beetle: Bug fixes cause by the DayZ Standalone update
 -  :zap: **NEW**  Mega-Multithreaded for high performance
 - Full server list
 -  :zap: **NEW**  Click selected server title for details
