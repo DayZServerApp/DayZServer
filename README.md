@@ -3,50 +3,62 @@
 
 **[Download DayZServer](https://github.com/DayZServerApp/DayZServer/releases)**
 
-![dayzserver1 3](https://cloud.githubusercontent.com/assets/8209975/6989260/298eb3be-da1f-11e4-83ae-70f036eba0f0.png)
+![dayzserver1 3](https://raw.githubusercontent.com/DayZServerApp/DayZServer/master/DayZServer/images/screenshot2_2sm.png)
 
 **This version is packed full of features including:**
-* Multithreaded for high performance
-* Full server list
-* Highlight current server
-* IP addresses
-* Player count for available servers
-* :zap: **NEW** Player list for available servers 
-* Dates
-* Real-time ping rates
-* Sorting
-* Favorites
-* Join servers
-* Link to map
-* Delete one server at a time
-* Clear entire server history
-* Quick server populate from GT
+-  :beetle: Bug fixes cause by the DayZ Standalone update
+-  :zap: **NEW**  Mega-Multithreaded for high performance
+- Full server list
+-  :zap: **NEW**  Click selected server title for details
+- Highlight current server
+- IP addresses
+- Player count for available servers
+- Player list for available servers
+-  :zap: **NEW** Click player name for details 
+- Dates
+- Real-time ping rates
+- :zap: **NEW**  Adjustable refresh rate
+- Sorting
+- Favorites
+- :zap: **NEW**  Copy IP Address 
+- Join servers
+- Link to map
+- Delete one server at a time
+- Clear entire server history
+- Quick server populate from GT
+
+**Run Setup.msi. Go to your recently added applications or where ever you normally open applications and you will see the DayZ  Server History icon. Launch DayZ Server History. Then play DayZ. The application will maintain a history of servers you have played on while also updating your current server in real-time.** 
+- Each time you join a new server DayZServer will save it for you.
+- The last server you were on is identified by the green highlight.  
+- You can mark your favorite servers
+- You can sort servers by Favorite, Server Name, IP Address, Date, Ping, Player Count. (Beta)
+- Clicking the copy icon next to the IP Address will copy the servers IP address to your clipboard.  
+- Clicking on the selected server name at the top right will open a link to GT will show you information about the server if it is available. 
+- Click the Join button to launch DayZ and join the server.
+- Click the Players button to see who is currently on the server and how long they have been on.
+- Clicking the X button will delete that specific server from your list. 
+- Clicking on individual players in the Players list on the right will open a link to GT will show you information about the player if it is available. 
+- Sliding the slider at the bottom left will adjust how fast the servers are updated in real-time refresh every one second or every one minute. 
+- Clicking the GT button at the bottom right will populate the list with servers.
+- Clicking the DayZ button at the bottm right will open the DayZServer download page. You can check and see if there is a new version out. 
+- Clicking the trash can will delete the server list leaving only the last server you visited. 
+- Clicking the map button will open a DayZ map. 
+
+
+
+
+
 
 
 ## Installation
 **Download the release from Github https://github.com/DayZServerApp/DayZServer/releases**
-* Unzip all the files into a folder. 
-* Run DayZServer.exe. 
+* Run Setup.msi 
+* Open DayZ Server History. 
 * Then play DayZ. 
-* **Note:** If you had a previous version you may need to clear the history by clicking on the trash icon. This will ensure the data storage is up to date.
-* **Note:** If you don't have DayZ installed you can still run the application by placing the files VG7.DayZProfile and VG7.vars.DayZProfile in a folder named DayZ at this path C:\Users\{Your_Personal_User_Directory}\Documents\DayZ
 
 ## Usage
 
-Source code is C# .Net developed using Visual Studio 2013
-
-* Each time you join a new server DayZServer will save it for you.
-* The last server you were on is identified by the light blue highlight.  
-* You can mark your favorite servers
-* You can sort servers by Favorite, Server Name, IP Address, Date, Ping, Player Count. 
-* Click the Join button to launch DayZ and join the server.
-* Click the Players button to see who is currently on the server.
-* Clicking the X button will delete that specific server from your list. 
-* Clicking on individual players in the Players list on the right will open a link to GT will show you information about the player if it is available. 
-* Clicking the GT button on the right will populate the list with servers.
-* Clicking the DayZ button at the top right will open the DayZServer download page. You can check and see if there is a new version out. 
-* Clicking the trash can will delete the server list leaving only the last server you visited. 
-* Clicking the map button will open a DayZ map.
+Source code is C# .Net developed using Visual Studio 2015
 
 ## Contributing
 
@@ -57,7 +69,9 @@ Source code is C# .Net developed using Visual Studio 2013
 
 ## History
 
-Release 1.1 
+1. Release 2.0.2 
+2. Release 2.0.1 
+3. Release 1.3
 
 ## Credits
 
@@ -65,12 +79,12 @@ VectorG7 <a href="http://steamcommunity.com/id/VG7/" target="_blank">Join me on 
 
 AeroXbird - Kick started the Join server functionality
 
+## Virus Check
+https://www.virustotal.com/gui/file/59d16bbda49273429b5f9d92f1145e7333f347e0de86aae4f285c1b702d29e9e/detection
 
 ## License
 
 The MIT License
-
-Copyright (c) 2010-2015 Google, Inc. http://angularjs.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
